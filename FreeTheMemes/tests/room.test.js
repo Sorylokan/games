@@ -8,8 +8,9 @@ test("room IDs are readable grouped codes", () => {
 });
 
 test("room links carry the room ID", () => {
-  const link = createRoomLink("ftm-demo", "https://example.test");
+  const link = createRoomLink("ABCD-EF23", "https://example.test");
 
-  assert.equal(link, "https://example.test/games/FreeTheMemes/?room=ftm-demo");
-  assert.equal(getRoomIdFromLocation("?room=ftm-demo"), "ftm-demo");
+  assert.equal(link, "https://example.test/games/FreeTheMemes/?room=ABCD-EF23");
+  assert.equal(getRoomIdFromLocation("?room=ABCD-EF23"), "ABCD-EF23");
+  assert.equal(getRoomIdFromLocation("?room=ftm-demo"), null); // code mal formé : ignoré
 });

@@ -4,6 +4,7 @@ import { CARDS, getCardsByDeck } from "../src/data/cards.js";
 import { addEquipment, createDeckState, discardCard, drawCard, resolveCard, resolvePendingAction } from "../src/game/cards.js";
 import { CHARACTERS } from "../src/data/characters.js";
 import { createGameState, createPlayer } from "../src/game/game-state.js";
+import { resolveEquipmentReward } from "../src/game/rules-engine.js";
 
 test("all documented cards have stable ids and translation keys", () => {
   assert.equal(CARDS.length, 48);
@@ -95,7 +96,7 @@ test("equipment rewards require choosing an available card", () => {
     cardIds: ["card-a"]
   };
   const stateWithAction = { ...state, pendingActions: [pendingAction] };
-  const result = resolvePendingAction(stateWithAction, pendingAction, "card-a");
+  const result = resolveEquipmentReward(stateWithAction, pendingAction, "card-a");
 
   assert.equal(result.ok, true);
   assert.deepEqual(result.state.players.killer.equipment, ["card-a"]);

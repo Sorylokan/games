@@ -12,6 +12,7 @@ import { resolvePendingAction } from "../game/cards.js";
 import { createRoomId, createRoomLink, getRoomIdFromLocation, normalizeRoomCode, isValidRoomCode } from "../networking/room.js";
 import { createHostSession, createClientSession } from "../networking/game-session.js";
 import { createActionRequest, cleanName, MESSAGE_TYPES } from "../networking/messages.js";
+import { SECRET_REACTION, isSecretPendingType } from "../networking/serialization.js";
 import { resolveEquipmentReward } from "../game/rules-engine.js";
 import { isValidMovementDestination, getAdjacentAreaIds, resolveMovementAction, resolveMovementDestination, resolveMovementRollChoice } from "../movement.js";
 import { ABILITY_BY_CHARACTER } from "../game/abilities.js";
@@ -54,18 +55,20 @@ const syncDice = () => {
     } catch (err) { warnLog("sound error", err); }
   }
 
-  const hit = fresh.findLast((e) => e.type === "ATTACK_RESOLVED" || e.type === "AREA_ATTACK_RESOLVED" || e.type === "MOVEMENT_ROLLED" || e.type === "ABILITY_ROLLED");
-  if (!hit) return;
-  const hitIndex = real.indexOf(hit);
+  // Ne pas nommer cette variable "hit" : elle masquerait le son hit() importé,
+  // et la boucle ci-dessus planterait (variable pas encore initialisée).
+  const diceEvent = fresh.findLast((e) => e.type === "ATTACK_RESOLVED" || e.type === "AREA_ATTACK_RESOLVED" || e.type === "MOVEMENT_ROLLED" || e.type === "ABILITY_ROLLED");
+  if (!diceEvent) return;
+  const diceIndex = real.indexOf(diceEvent);
   // Retenir le jet ET ses consequences (deplacement, degats...) jusqu'a
   // l'arret de l'odometre, sinon le journal devoile le resultat trop tot.
-  const held = real.slice(hitIndex);
+  const held = real.slice(diceIndex);
   held.forEach((e) => pendingDice.add(e));
   let rolling;
-  if (hit.type === "ABILITY_ROLLED") {
-    rolling = dice.dice[hit.sides === 4 ? 1 : 0].roll(hit.value);   // d6 Death Note, d4 Hadouken
+  if (diceEvent.type === "ABILITY_ROLLED") {
+    rolling = dice.dice[diceEvent.sides === 4 ? 1 : 0].roll(diceEvent.value);   // d6 Death Note, d4 Hadouken
   } else {
-    rolling = hit.d6 == null ? dice.dice[1].roll(hit.d4) : dice.roll([hit.d6, hit.d4]);   // attaque forcee : d4 seul
+    rolling = diceEvent.d6 == null ? dice.dice[1].roll(diceEvent.d4) : dice.roll([diceEvent.d6, diceEvent.d4]);   // attaque forcee : d4 seul
   }
   rolling.then(() => { held.forEach((e) => pendingDice.delete(e)); fillLog(); revealMovement(held); });
 };
@@ -130,6 +133,7 @@ localStorage.setItem("ftm-player-name", localPlayerName);
 let assignedPlayerId = "player-1";
 let roomRole = roomId ? "client" : "local";
 let privateState = null;
+let publicPendingActions = []; // actions en attente telles que diffusées à tous (réactions secrètes masquées)
 let wasMyTurn = false;
 
 // Jeton de siege local : stable par salle et par navigateur, jamais secret.
@@ -146,11 +150,19 @@ const loadSeatToken = (code) => {
 };
 
 // Fusionne ce que seul CE joueur a le droit de savoir dans sa copie locale de l'état.
+// Les actions en attente repartent toujours de la version publique, puis on y remet la
+// version complète des NÔTRES : une vue privée en retard est corrigée au message suivant.
 const withPrivate = (s) => {
   const me = privateState && s?.players?.[privateState.playerId];
   if (!me) return s;
+  const pendingActions = publicPendingActions.map((action, i) => {
+    const mine = privateState.pendingActions?.[i];
+    const matches = mine?.playerId === action.playerId && (action.type === SECRET_REACTION || mine.type === action.type);
+    return matches ? mine : action;
+  });
   return {
     ...s,
+    pendingActions,
     players: {
       ...s.players,
       [me.id]: {
@@ -480,6 +492,7 @@ const connectToRoom = async (requestedRoomId) => {
             return;
           }
           state = { ...state, ...publicState, players: publicState.players };
+          publicPendingActions = publicState.pendingActions ?? [];
           roomStatus = "game synchronized";
         }
         if (state) state = withPrivate(state);
@@ -794,7 +807,11 @@ const renderPendingReactionPanel = (pendingReaction, pendingMovementDestinations
   const canResolve = roomRole === "local" || pendingReaction.playerId === assignedPlayerId;
 
   if (!canResolve) {
-    return `<p class="pending-label" style="margin-top:8px">${escT("ui.waitingForResolve", { name: ownerLabel, action: pendingReaction.type.replaceAll("_", " ").toLowerCase() })}</p>`;
+    // Réaction propre à un personnage : nommer l'action trahirait qui il est.
+    const waiting = isSecretPendingType(pendingReaction.type)
+      ? escT("ui.waitingForChoice", { name: ownerLabel })
+      : escT("ui.waitingForResolve", { name: ownerLabel, action: pendingReaction.type.replaceAll("_", " ").toLowerCase() });
+    return `<p class="pending-label" style="margin-top:8px">${waiting}</p>`;
   }
 
   const choiceButton = (label, choice, secondary = true) => (
