@@ -4,7 +4,7 @@
 // - dispatch() du moteur valide déjà tour/phase/actions, inutile de re-filtrer ici ;
 // - pas de couple public/privé : chaque joueur reçoit sa vue masquée viewFor()
 //   (c'est game/view.js qui fait office de serialization.js chez FTM).
-import { createGame, startNextRound } from "../game/setup.js";
+import { createGame, startNextRound, rematch } from "../game/setup.js";
 import { dispatch } from "../game/rules-engine.js";
 import { viewFor } from "../game/view.js";
 import { MIN_PLAYERS, MAX_PLAYERS } from "../game/game-state.js";
@@ -163,11 +163,13 @@ export class HostAuthority {
   }
 
   const action = request.action ?? {};
-  // Seul l'hôte décide de lancer la manche suivante (évite les doublons).
-  if (action.type === "startNextRound") {
-    if (request.playerId !== this.hostId) return rejected("RESERVE_A_L_HOTE", "Seul l'hôte lance la manche suivante.");
-    const next = startNextRound(this.#state, this.#random);
-    if (!next.ok) return rejected("MANCHE_IMPOSSIBLE", next.error);
+  // Seul l'hôte décide de lancer la manche suivante ou la revanche (évite les doublons).
+  if (action.type === "startNextRound" || action.type === "rematch") {
+    if (request.playerId !== this.hostId) return rejected("RESERVE_A_L_HOTE", "Seul l'hôte relance la partie.");
+    const next = action.type === "rematch"
+      ? rematch(this.#state, this.#random)
+      : startNextRound(this.#state, this.#random);
+    if (!next.ok) return rejected("RELANCE_IMPOSSIBLE", next.error);
     this.#state = next.state;
     this.#broadcast(next.events);
     return { ok: true, state: this.#state };

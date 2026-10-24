@@ -17,7 +17,14 @@
 /* Table : plateau + colonne */
 .table { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, 1fr); gap: 18px; align-items: start; }
 
-@media (max-width: 780px) { .table { grid-template-columns: minmax(0, 1fr); } }
+/* Mobile : une seule colonne. Les boîtes à cliquer passent juste sous la fresque (c'est là que le pouce
+   travaille), les infos de la fresque et les règles ensuite. Marges resserrées pour tout voir sans défiler. */
+@media (max-width: 780px) {
+  .table { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .topbar { padding-block: 10px; margin-bottom: 10px; }
+  .side { gap: 10px; }
+  .queues-card { order: -1; }
+}
 
 .board { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
 

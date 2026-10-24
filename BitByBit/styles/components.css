@@ -70,6 +70,11 @@
 
 .box.small::before { display: none; }
 
+@media (max-width: 780px) {
+  .queue { min-height: 118px; padding: 10px 4px 8px; gap: 5px; }
+  .box { --s: 44px; }
+}
+
 .rules { font-size: 13px; color: var(--mut); font-style: italic; margin: 0; }
 
 .shake { animation: shake .3s; }

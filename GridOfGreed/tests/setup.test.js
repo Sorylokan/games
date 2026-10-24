@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fullDeck } from '../src/data/deck.js';
-import { startNextRound } from '../src/game/setup.js';
+import { startNextRound, rematch } from '../src/game/setup.js';
 import { dispatch } from '../src/game/rules-engine.js';
 import { visibleScore } from '../src/game/game-state.js';
 import { mulberry32 } from '../src/game/simulation.js';
@@ -48,4 +48,15 @@ test('manche suivante : totaux conservés, nouvelle donne', () => {
   assert.equal(n.players[0].total, 24);
   assert.equal(n.players[1].grid.flat().length, 12);
   assert.equal(startNextRound(n).ok, false);
+});
+
+test('revanche : seulement en fin de partie, mêmes joueurs, totaux remis à zéro', () => {
+  assert.equal(rematch(finishScenario(A, A)).ok, false); // manche finie, pas la partie
+  const over = finishScenario(A, A, [11], [95, 95]);
+  assert.equal(over.phase, 'gameOver');
+  const n = ok(rematch(over, mulberry32(3)));
+  assert.equal(n.phase, 'reveal'); assert.equal(n.round, 1);
+  assert.deepEqual(n.players.map((p) => [p.id, p.name, p.total]), [['p0', 'P0', 0], ['p1', 'P1', 0]]);
+  assert.equal(n.targetScore, over.targetScore);
+  assert.deepEqual(n.history, []);
 });

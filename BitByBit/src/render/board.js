@@ -55,10 +55,12 @@ function drawBox(box, i, now) {
   const s = slotPos(i), [px, py] = toScreen(s.x, s.y);
   const sz = Math.min(64, geo.u * 1.55, geo.w / st.line.length - 14);
 
-  if (!box) { // place libre : cadre pointillé qui respire
-    const a = reduceMotion ? 0.5 : 0.35 + 0.15 * Math.sin(now / 700 + i);
-    ctx.globalAlpha = a; ctx.setLineDash([4, 4]); ctx.strokeStyle = pal.line; ctx.lineWidth = 1;
-    rr(px - sz / 2, py - sz / 2, sz, sz, sz * 0.14); ctx.stroke();
+  if (!box) { // place libre : cadre pointillé qui respire, assez marqué pour se voir sur tous les thèmes
+    const a = reduceMotion ? 0.8 : 0.7 + 0.2 * Math.sin(now / 700 + i);
+    ctx.globalAlpha = a * 0.12; ctx.fillStyle = pal.mut;
+    rr(px - sz / 2, py - sz / 2, sz, sz, sz * 0.14); ctx.fill(); // léger fond : la place se lit comme une case
+    ctx.globalAlpha = a; ctx.setLineDash([6, 4]); ctx.strokeStyle = pal.mut; ctx.lineWidth = 1.5;
+    ctx.stroke();
     ctx.setLineDash([]); ctx.globalAlpha = 1;
     return;
   }

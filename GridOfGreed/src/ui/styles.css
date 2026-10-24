@@ -283,6 +283,23 @@ table.scores { border-collapse: collapse; }
 table.scores th, table.scores td { padding: 3px 14px; text-align: center; border-bottom: 1px solid var(--line); }
 table.scores th { color: var(--mut); font-weight: 400; font-size: 12px; }
 
+/* Écran de fin de partie, par-dessus la table (voir endScreenEl dans table.js) */
+.endscreen { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; padding: 16px; background: color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter: blur(2px); animation: endIn .35s ease both; }
+.endscreen.late { animation-delay: 1.6s; }
+@keyframes endIn { from { opacity: 0; } }
+.end-card { display: flex; flex-direction: column; gap: 14px; width: min(380px, 100%); max-height: 100%; overflow: auto; padding: 22px 24px; background: var(--card); border: 1px solid var(--gold); border-radius: 12px; text-align: center; }
+.end-kicker { margin: 0; color: var(--mut); font-size: 13px; font-style: italic; }
+.end-card h2 { font-size: 28px; text-wrap: balance; }
+.end-rank { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.end-rank li { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 8px; }
+.end-rank li.win { border-color: var(--gold); color: var(--gold); }
+.end-rank li.me .pn { text-decoration: underline; text-underline-offset: 3px; }
+.end-rank .pos { width: 1.4em; color: var(--mut); font-variant-numeric: tabular-nums; }
+.end-rank .pn { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.end-rank b { font: 500 15px Fraunces, Georgia, serif; font-variant-numeric: tabular-nums; }
+.end-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; }
+.end-actions .muted { flex-basis: 100%; margin: 0; }
+
 /* Carte fantôme qui vole d'une position à l'autre (voir fly() dans table.js) */
 .flying { position: fixed; margin: 0; z-index: 50; pointer-events: none; transform-origin: top left; }
 
@@ -291,6 +308,7 @@ table.scores th { color: var(--mut); font-weight: 400; font-size: 12px; }
   .card.can:hover .in { scale: none; }
   .card.up .in { transform: rotateY(180deg); }
   .hole { animation: none; }
+  .endscreen { animation: none; }
 }
 
 /* Fenêtre étroite ou portrait (ratio largeur/hauteur ≤ 1,3) :

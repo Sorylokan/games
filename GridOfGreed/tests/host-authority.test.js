@@ -99,6 +99,26 @@ test("initialReveal passe par l'hôte même hors tour, et diffuse les vues", () 
   assert.equal(view.players[1].grid[2][0].v, null); // toujours cachée
 });
 
+test("revanche : réservée à l'hôte, et seulement une fois la partie terminée", () => {
+  const { authority } = makeHost();
+  authority.assignPeer("peerA", "Bob", "tokA");
+  authority.startMatch();
+
+  const tooEarly = authority.handleRequest(createActionRequest("p1", { type: "rematch" }));
+  assert.equal(tooEarly.ok, false);
+
+  // On force une fin de partie pour tester la relance.
+  authority.state.phase = "gameOver";
+  authority.state.players.forEach((p) => { p.total = 120; });
+  const notHost = authority.handleRequest(createActionRequest("p2", { type: "rematch" }), "peerA");
+  assert.equal(notHost.message.error, "RESERVE_A_L_HOTE");
+
+  const result = authority.handleRequest(createActionRequest("p1", { type: "rematch" }));
+  assert.equal(result.ok, true);
+  assert.equal(result.state.phase, "reveal");
+  assert.deepEqual(result.state.players.map((p) => [p.id, p.total]), [["p1", 0], ["p2", 0]]);
+});
+
 test("reconnexion : un jeton connu reprend son siège en pleine partie", () => {
   const { authority, privateMessages } = makeHost();
   authority.assignPeer("peerA", "Bob", "tokA");

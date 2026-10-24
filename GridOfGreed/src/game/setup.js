@@ -34,6 +34,13 @@ export function startNextRound(state, rng = Math.random) {
   return { ok: true, state: s, events: [{ type: 'roundDealt', round: s.round }] };
 }
 
+// Revanche : nouvelle partie à la même table (mêmes joueurs, même ordre, même score de fin), totaux remis à zéro.
+export function rematch(state, rng = Math.random) {
+  if (state.phase !== 'gameOver') return { ok: false, error: 'La partie n\'est pas terminée' };
+  const s = createGame({ players: state.players, targetScore: state.targetScore, rng });
+  return { ok: true, state: s, events: [{ type: 'rematch' }] };
+}
+
 // { type:'initialReveal', slots:[{col,row},{col,row}] }
 export function initialReveal(s, pi, me, a, rng, ev) {
   if (s.phase !== 'reveal') fail('Ce n\'est pas le moment de dévoiler');

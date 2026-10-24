@@ -2,7 +2,7 @@
 // les actions partent vers l'hôte, la vue qui revient redessine tout.
 // Mise en page et cartes reprises de la maquette Dev_Files/grid-of-greed-table.html.
 import { layoutFor } from "../board-layout.js";
-import { playerDot } from "./sidebar.js";
+import { playerDot, dotFor } from "./sidebar.js";
 
 const range = (v) => (v < 0 ? "n" : v === 0 ? "z" : v < 5 ? "l" : v < 9 ? "m" : "h");
 
@@ -381,25 +381,101 @@ function panelEl(view, myIndex, ui, t, onAction, onNextRound, isHost, refresh) {
 
   if (view.phase === "gameOver") {
     const h = document.createElement("h3");
-    const names = view.winners.map((id) => view.players.find((pl) => pl.id === id)?.name ?? id);
-    h.textContent = t("table.gameOver", { names: names.join(" & ") });
+    h.textContent = t("table.gameOver", { names: winnerNames(view) });
     p.append(h);
+    // Écran de fin fermé pour regarder la table : un bouton pour le rouvrir.
+    if (ui.endHidden) {
+      const reopen = document.createElement("button");
+      reopen.className = "ghost";
+      reopen.textContent = t("end.results");
+      reopen.addEventListener("click", () => { ui.endHidden = false; refresh(); });
+      p.append(reopen);
+    }
   }
   return p;
 }
 
-// Redessine toute la table. ui = { revealPicks: [[col,row]...], discardFlipMode: bool }.
-export function renderTable(boardEl, panelSlot, view, myId, { t, isHost, ui, onAction, onNextRound, events = [] }) {
+const winnerNames = (view) =>
+  view.winners.map((id) => view.players.find((pl) => pl.id === id)?.name ?? id).join(" & ");
+
+// Écran de fin de partie, posé par-dessus la table : classement final, revanche (hôte), voir la table, quitter.
+function endScreenEl(view, myId, ui, t, isHost, onRematch, refresh) {
+  const wrap = document.createElement("div");
+  wrap.className = "endscreen";
+  const card = document.createElement("section");
+  card.className = "end-card";
+  card.setAttribute("role", "dialog");
+  card.setAttribute("aria-label", t("end.title"));
+
+  const kicker = document.createElement("p");
+  kicker.className = "end-kicker";
+  kicker.textContent = `${t("end.title")} · ${t("end.rounds", { n: view.round })}`;
+  const title = document.createElement("h2");
+  title.textContent = t("table.gameOver", { names: winnerNames(view) });
+
+  // Classement : moins de points = meilleur ; les ex æquo partagent le même rang.
+  const ranked = view.players.map((pl, i) => ({ pl, i })).sort((a, b) => a.pl.total - b.pl.total);
+  const list = document.createElement("ol");
+  list.className = "end-rank";
+  ranked.forEach(({ pl, i }) => {
+    const li = document.createElement("li");
+    if (view.winners.includes(pl.id)) li.classList.add("win");
+    if (pl.id === myId) li.classList.add("me");
+    const rank = document.createElement("span");
+    rank.className = "pos";
+    rank.textContent = 1 + ranked.findIndex((x) => x.pl.total === pl.total);
+    const name = document.createElement("span");
+    name.className = "pn";
+    name.textContent = pl.name;
+    const total = document.createElement("b");
+    total.textContent = t("end.points", { n: pl.total });
+    li.append(rank, dotFor(i, t), name, total);
+    list.append(li);
+  });
+
+  const actions = document.createElement("div");
+  actions.className = "end-actions";
+  if (isHost) {
+    const again = document.createElement("button");
+    again.textContent = t("end.rematch");
+    again.addEventListener("click", onRematch);
+    actions.append(again);
+  } else {
+    const wait = document.createElement("p");
+    wait.className = "muted";
+    wait.textContent = t("end.waitHost");
+    actions.append(wait);
+  }
+  const look = document.createElement("button");
+  look.className = "ghost";
+  look.textContent = t("end.showTable");
+  look.addEventListener("click", () => { ui.endHidden = true; refresh(); });
+  // Quitter : retour à l'accueil (l'adresse sans #salle=..., donc rechargement propre).
+  const quit = document.createElement("button");
+  quit.className = "ghost";
+  quit.textContent = t("end.quit");
+  quit.addEventListener("click", () => { location.href = location.pathname; });
+  actions.append(look, quit);
+
+  card.append(kicker, title, list, actions);
+  wrap.append(card);
+  return wrap;
+}
+
+// Redessine toute la table. ui = { revealPicks: [[col,row]...], discardFlipMode: bool, endHidden: bool }.
+export function renderTable(boardEl, panelSlot, view, myId, { t, isHost, ui, onAction, onNextRound, onRematch, events = [] }) {
   prevUp = nextUp;
   nextUp = new Map();
   const myIndex = view.players.findIndex((p) => p.id === myId);
   const myTurn = view.current === myIndex;
-  const refresh = () => renderTable(boardEl, panelSlot, view, myId, { t, isHost, ui, onAction, onNextRound });
+  const refresh = () => renderTable(boardEl, panelSlot, view, myId, { t, isHost, ui, onAction, onNextRound, onRematch });
 
   // Réinitialise le mode défausser+retourner quand ce n'est plus pertinent.
   if (view.phase !== "playing" || !myTurn || view.turn?.step !== "place" || view.turn.source !== "pile") {
     ui.discardFlipMode = false;
   }
+  // L'écran de fin se rouvre à chaque nouvelle fin de partie.
+  if (view.phase !== "gameOver") ui.endHidden = false;
 
   const prev = snapshot(boardEl);
 
@@ -458,6 +534,12 @@ export function renderTable(boardEl, panelSlot, view, myId, { t, isHost, ui, onA
   const mid = midEl(view, myTurn, ui, t, onAction, refresh);
   mid.append(panelEl(view, myIndex, ui, t, onAction, onNextRound, isHost, refresh)); // consigne sous les cartes
   boardEl.append(mid);
+  if (view.phase === "gameOver" && !ui.endHidden) {
+    const end = endScreenEl(view, myId, ui, t, isHost, onRematch, refresh);
+    // Juste après le dernier coup : on laisse le temps de voir les cartes se retourner avant l'écran de fin.
+    if (events.some((e) => e.type === "gameOver")) end.classList.add("late");
+    boardEl.append(end);
+  }
   void boardEl.offsetWidth; // force le navigateur à calculer l'état de départ
   boardEl.querySelectorAll(".card").forEach((b) => b.classList.toggle("up", b.dataset.up === "1"));
   fitBoard(view.players.length);

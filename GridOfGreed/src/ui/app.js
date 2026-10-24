@@ -25,7 +25,7 @@ let lobbyLink = "";
 let codeShown = false;
 
 // État purement local de la table : sélection de révélation + mode défausser/retourner.
-const ui = { revealPicks: [], discardFlipMode: false };
+const ui = { revealPicks: [], discardFlipMode: false, endHidden: false };
 
 // --- i18n ---
 function applyTexts() {
@@ -163,6 +163,7 @@ function showTable(view, events = []) {
     t, isHost, ui, events,
     onAction: sendAction,
     onNextRound: () => sendAction({ type: "startNextRound" }),
+    onRematch: () => sendAction({ type: "rematch" }),
   });
   renderSidebar(view, myId, t);
 }
