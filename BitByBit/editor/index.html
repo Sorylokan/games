@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Atelier caché : aucun lien depuis le jeu, accessible en tapant /editor/ dans l'adresse. -->
+<meta name="robots" content="noindex">
+<title>Bit by Bit · Atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700&display=swap">
+<link rel="stylesheet" href="../styles/base.css">
+<link rel="stylesheet" href="../styles/layout.css">
+<link rel="stylesheet" href="../styles/components.css">
+<link rel="stylesheet" href="../styles/editor.css">
+<link rel="stylesheet" href="../styles/themes/classic.css">
+<link rel="stylesheet" href="../styles/themes/escapades.css">
+<link rel="stylesheet" href="../styles/themes/seasons.css">
+<link rel="stylesheet" href="../styles/themes/festive.css">
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="../">Bit by Bit</a>
+    <div class="tools">
+      <select id="lang" data-i18n-title="bar.lang"></select>
+      <select id="skin" data-i18n-title="bar.theme"></select>
+      <a class="btn-link ghost" href="../" data-i18n="ed.backToGame">Retour au jeu</a>
+    </div>
+  </header>
+
+  <main class="table editor">
+    <section class="board" id="board">
+      <canvas id="ed"></canvas>
+      <p class="hint" data-i18n="ed.hint">Clic pour peindre, clic droit pour gommer.</p>
+    </section>
+
+    <aside class="side">
+      <section class="side-card">
+        <h3><span data-i18n="ed.mural">Ta fresque</span> <small id="pixInfo"></small></h3>
+        <label class="field">
+          <span data-i18n="ed.name">Nom</span>
+          <input id="name" maxlength="30" autocomplete="off" data-i18n-ph="ed.namePh">
+        </label>
+        <div class="field">
+          <span data-i18n="ed.size">Pixels de côté</span>
+          <div class="stepper">
+            <button type="button" class="icon-btn" id="sizeMinus" aria-label="−">−</button>
+            <input id="size" type="number" min="4" max="24" inputmode="numeric">
+            <button type="button" class="icon-btn" id="sizePlus" aria-label="+">+</button>
+          </div>
+        </div>
+        <div class="row-btns">
+          <button type="button" class="ghost" id="undo" data-i18n="ed.undo">Annuler</button>
+          <button type="button" class="ghost" id="clear" data-i18n="ed.clear">Tout effacer</button>
+        </div>
+      </section>
+
+      <section class="side-card">
+        <h3 data-i18n="ed.paint">Peinture</h3>
+        <div class="palette" id="palette"></div>
+        <div class="seg" id="toolBar">
+          <button type="button" data-tool="brush" data-i18n="ed.brush">Pinceau</button>
+          <button type="button" data-tool="fill" data-i18n="ed.fill">Remplir</button>
+          <button type="button" data-tool="pick" data-i18n="ed.pick">Pipette</button>
+        </div>
+      </section>
+
+      <section class="side-card">
+        <h3 data-i18n="ed.bgTitle">Image de fond</h3>
+        <p class="muted" data-i18n="ed.bgHelp">Charge une image pour la décalquer : elle reste sous la grille et n'est pas enregistrée.</p>
+        <div class="row-btns">
+          <label class="file-btn ghost"><input type="file" id="bgFile" accept="image/*"><span data-i18n="ed.bgLoad">Choisir une image</span></label>
+          <button type="button" class="ghost" id="bgRemove" data-i18n="ed.bgRemove" hidden>Retirer</button>
+        </div>
+        <div class="bg-controls" id="bgControls" hidden>
+          <label class="field">
+            <span data-i18n="ed.bgOpacity">Transparence</span>
+            <input type="range" id="bgOpacity" min="10" max="100" value="50">
+          </label>
+          <label class="check"><input type="checkbox" id="bgVisible" checked> <span data-i18n="ed.bgShow">Afficher</span></label>
+        </div>
+      </section>
+
+      <section class="side-card">
+        <div class="actions">
+          <button type="button" id="play" data-i18n="ed.play">Jouer cette fresque</button>
+          <button type="button" class="ghost" id="save" data-i18n="ed.save">Enregistrer</button>
+          <button type="button" class="ghost" id="new" data-i18n="ed.new">Nouvelle</button>
+        </div>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="side-card">
+        <h3 data-i18n="ed.share">Partager</h3>
+        <div class="code-row">
+          <input id="code" readonly data-i18n-title="ed.codeLabel">
+          <button type="button" class="ghost" id="copyCode" data-i18n="ed.copy">Copier</button>
+        </div>
+        <div class="code-row">
+          <input id="importCode" autocomplete="off" spellcheck="false" data-i18n-ph="ed.importPh">
+          <button type="button" class="ghost" id="import" data-i18n="ed.import">Importer</button>
+        </div>
+        <details class="dev">
+          <summary data-i18n="ed.devTitle">Pour les fresques officielles</summary>
+          <p class="muted" data-i18n="ed.devHelp">À coller dans src/data/maps.js, puis ajouter le nom dans locales/.</p>
+          <textarea id="snippet" readonly rows="8"></textarea>
+          <button type="button" class="ghost" id="copySnippet" data-i18n="ed.copy">Copier</button>
+        </details>
+      </section>
+
+      <section class="side-card">
+        <h3 data-i18n="ed.library">Mes fresques</h3>
+        <ul class="lib" id="lib"></ul>
+      </section>
+    </aside>
+  </main>
+</div>
+
+<script type="module" src="../src/editor/main.js"></script>
+</body>
+</html>

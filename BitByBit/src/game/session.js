@@ -2,7 +2,8 @@
 import { BASE_SPEED, SPAWN_MS, MAX_OUT, BOX_OPEN_MS, BOX_CLOSE_MS, STORAGE } from '../config.js';
 import { clone, remaining } from '../core/grid.js';
 import { generate } from '../core/generator.js';
-import { levelAt, isEndOfSeries } from '../data/levels.js';
+import { levelAt, customLevel, isEndOfSeries } from '../data/levels.js';
+import { encodeMural } from '../core/mural-code.js';
 import { pickCarrier } from '../data/skins.js';
 import { store } from '../storage.js';
 import { app, nextId } from './state.js';
@@ -12,8 +13,18 @@ import { renderUI, shake } from '../ui/panel.js';
 import { showOverlay, hideOverlay } from '../ui/overlay.js';
 import { t } from '../ui/lang.js';
 
+// Aventure : la fresque n° li, avec sa difficulté.
 export function start(li) {
-  const lvl = levelAt(li);
+  launch(levelAt(li), li);
+  store.set(STORAGE.level, li);
+}
+
+// Fresque perso venue de l'atelier (ne touche pas à la progression de l'aventure).
+export function startCustom(mural) {
+  launch(customLevel(mural), null);
+}
+
+function launch(lvl, li) {
   const { N, target, queues } = generate(lvl, nextId);
   app.st = {
     li, lvl, N, target, queues,
@@ -29,13 +40,20 @@ export function start(li) {
     status: 'play',
     rescueUsed: false,
   };
-  store.set(STORAGE.level, li);
   hideOverlay();
   resize();
   renderUI();
 }
 
-export const restart = () => start(app.st.li);
+export const restart = () => (app.st.lvl.custom ? launch(app.st.lvl, null) : start(app.st.li));
+
+// Liens de fin de partie pour une fresque perso.
+const editLink = () => { location.href = './editor/#edit=' + encodeMural(app.st.lvl); };
+export function backToAdventure() {
+  history.replaceState(null, '', location.pathname);
+  const saved = store.get(STORAGE.level, 0);
+  start(Number.isInteger(saved) && saved >= 0 ? saved : 0);
+}
 
 // Pose la boîte de tête de la file qi sur la première place libre.
 export function place(qi, el) {
@@ -125,12 +143,22 @@ function lose() {
       hideOverlay(); resize(); renderUI();
     } },
     { label: t('end.restart'), ghost: !st.rescueUsed, fn: restart },
+    st.lvl.custom && { label: t('custom.edit'), ghost: true, fn: editLink },
   ]);
 }
 
 function win() {
   const st = app.st;
   st.status = 'win';
+  if (st.lvl.custom) {
+    const name = st.lvl.name || t('custom.untitled');
+    showOverlay(t('end.winTitle'), t(st.rescueUsed ? 'end.winHelped' : 'end.winClean', { name }), [
+      { label: t('end.replay'), fn: restart },
+      { label: t('custom.edit'), ghost: true, fn: editLink },
+      { label: t('custom.adventure'), ghost: true, fn: backToAdventure },
+    ]);
+    return;
+  }
   store.set(STORAGE.level, st.li + 1);
   store.set(STORAGE.best, Math.max(store.get(STORAGE.best, 0), st.li + 1));
   const name = t(`map.${st.lvl.id}`);

@@ -58,6 +58,10 @@ button, input { font: inherit; }
 .home-screen, .room-screen { min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; padding: 0 5vw 20px; color: var(--paper); }
 .home-topbar, .room-topbar, .bar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 0; }
 .wordmark { color: var(--paper); font: 900 20px Impact, "Arial Black", sans-serif; letter-spacing: .03em; text-decoration: none; text-transform: uppercase; }
+/* Retour au catalogue : premier élément de chaque barre ; l'élément suivant se colle à lui (margin-right: auto). */
+.back-link { display: inline-grid; place-items: center; flex: none; width: 34px; height: 34px; margin-right: -4px; border: 2px solid currentColor; line-height: 0; }
+.back-link:hover { opacity: .75; }
+.back-link + * { margin-right: auto; }
 .home-topbar > span, .connection-state { padding: 3px 10px; background: var(--ink); color: var(--lemon); font-size: 11px; font-weight: 700; }
 .connection-state i { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--mint); }
 .home-content, .room-content { width: min(1000px, 100%); margin: auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; padding: 30px 0; }

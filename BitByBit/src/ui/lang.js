@@ -1,5 +1,6 @@
 // Langue de l'interface : charge le fichier locales/<langue>.json, fournit t(), et traduit le HTML
-// (attributs data-i18n pour le texte, data-i18n-title pour l'infobulle et le libellé d'accessibilité).
+// (data-i18n pour le texte, data-i18n-title pour l'infobulle et le libellé d'accessibilité,
+// data-i18n-ph pour le texte d'exemple d'un champ).
 import { createTranslator, loadLocale, getLocale, DEFAULT_LOCALE } from '../i18n.js';
 import { STORAGE } from '../config.js';
 import { store } from '../storage.js';
@@ -38,6 +39,7 @@ export async function setLang(lang) {
 
 export function applyTexts(root = document) {
   root.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
+  root.querySelectorAll('[data-i18n-ph]').forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
   root.querySelectorAll('[data-i18n-title]').forEach((el) => {
     const text = t(el.dataset.i18nTitle);
     el.title = text;

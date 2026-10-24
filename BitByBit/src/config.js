@@ -14,4 +14,6 @@ export const STORAGE = {
   best: 'pc-best',
   skin: 'pc-skin',
   lang: 'pc-lang',
+  murals: 'pc-murals', // fresques perso enregistrées (atelier)
+  draft: 'pc-draft',   // fresque en cours dans l'atelier
 };

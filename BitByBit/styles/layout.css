@@ -12,6 +12,9 @@
 
 .brand { font: 700 21px var(--display); color: var(--accent); letter-spacing: .01em; }
 
+/* Retour au catalogue, à gauche du nom du jeu (style du lien-bouton : a.icon-btn dans base.css) */
+.brand-group { display: flex; align-items: center; gap: 10px; }
+
 .tools { display: flex; align-items: center; gap: 8px; }
 
 /* Table : plateau + colonne */

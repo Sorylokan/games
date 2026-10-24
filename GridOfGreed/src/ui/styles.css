@@ -63,6 +63,11 @@ body {
 .topbar { flex: 0 0 7.37%; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 10%; border-bottom: 1px solid var(--line); }
 .brand { font: 700 20px Fraunces, Georgia, serif; color: var(--gold); }
 .bar-tools { display: flex; align-items: center; gap: 8px; }
+/* Retour au catalogue, à gauche du nom du jeu */
+.brand-group { display: flex; align-items: center; gap: 10px; }
+a.icon-btn { display: inline-block; border: 1px solid var(--line); border-radius: 8px; color: var(--txt); }
+a.icon-btn:hover { background: color-mix(in srgb, var(--gold) 14%, transparent); }
+a.icon-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .topbar select { padding: 4px 8px; font-size: 13px; }
 #toggle-sound[aria-pressed="true"] .i-off, #toggle-sound[aria-pressed="false"] .i-on { display: none; }
 

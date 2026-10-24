@@ -236,6 +236,7 @@
   "ui.rollingDice": "Rolling…",
   "ui.waitingForResolve": "Waiting for {name} to resolve {action}.",
   "ui.waitingForChoice": "{name} is thinking…",
+  "ui.allGames": "All games",
   "reactions.doge.reveal": "Reveal & try to dodge (coin flip)",
   "reactions.doge.decline": "Take the hit",
   "reactions.lifeStonks.reveal": "Reveal & heal 2 HP",

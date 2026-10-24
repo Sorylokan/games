@@ -287,6 +287,10 @@ const renderLocaleSelect = () => `<select class="locale-select" data-locale aria
   SUPPORTED_LOCALES.map((l) => `<option value="${l.code}" ${l.code === locale ? "selected" : ""}>${l.label}</option>`).join("")
 }</select>`;
 
+// Retour au catalogue de tous les jeux (dossier parent), en tête de chaque barre du haut.
+// Classe wordmark en plus : la flèche prend la couleur du logo, que chaque thème redéfinit.
+const renderBackLink = () => `<a class="wordmark back-link" href="../" title="${escHtml(T("ui.allGames"))}" aria-label="${escHtml(T("ui.allGames"))}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>`;
+
 const renderThemeSelect = () => `<select class="locale-select" data-theme-select aria-label="${escHtml(T("ui.theme"))}">${
   THEMES.map((t) => `<option value="${t.id}" ${t.id === theme ? "selected" : ""}>${t.label}</option>`).join("")
 }</select>`;
@@ -1115,7 +1119,7 @@ const render = () => {
         : `<li class="room-player room-player-waiting"><span class="room-player-mark">+</span><span>${T("lobby.waitingPlayers")}</span></li>`;
         app.innerHTML = `
         <main class="room-screen">
-          <header class="room-topbar"><a class="wordmark" href="./">FREE THE MEMES</a>
+          <header class="room-topbar">${renderBackLink()}<a class="wordmark" href="./">FREE THE MEMES</a>
             <div class="topbar-right">${renderLocaleSelect()}${renderThemeSelect()}<span class="connection-state"><i></i>${isHost ? T("lobby.roomOpen") : peers.length > 0 ? T("lobby.hostFound") : T("lobby.searching")}</span></div></header>
           <div class="room-content">
             <section class="room-main">
@@ -1153,7 +1157,7 @@ const render = () => {
 
     app.innerHTML = `
       <main class="home-screen">
-        <header class="home-topbar"><span class="top-chip">${T("lobby.tagline")}</span>
+        <header class="home-topbar">${renderBackLink()}<span class="top-chip">${T("lobby.tagline")}</span>
           <div class="topbar-right">${renderLocaleSelect()}${renderThemeSelect()}</div></header>
         <section class="home-content">
           <div class="home-copy"><p class="eyebrow">${T("lobby.homeEyebrow")}</p><h1>${T("lobby.homeTitle1")}<br><em>${T("lobby.homeTitle2")}</em></h1><p class="home-intro">${T("lobby.homeIntro")}</p><label class="name-field">${T("lobby.playerName")}<input data-player-name value="${escHtml(localPlayerName)}" maxlength="24" aria-label="${escHtml(T("lobby.playerName"))}"></label></div>
@@ -1216,7 +1220,7 @@ const render = () => {
   app.innerHTML = `
   <main class="game-screen">
     <header class="bar">
-      <a class="wordmark" href="./">Free the Memes</a>
+      ${renderBackLink()}<a class="wordmark" href="./">Free the Memes</a>
       <div class="bar-right">${renderLocaleSelect()}${renderThemeSelect()}<span class="chip">${roomId ?? T("ui.localRoom")}</span><span class="chip">${phaseLabel()}</span>
         <button class="action secondary" data-action="mute" aria-label="${escT("ui.sound")}">${isMuted() ? "🔇" : "🔊"}</button>
         <button class="action secondary" data-action="toggle-log">${T("ui.log")}</button>

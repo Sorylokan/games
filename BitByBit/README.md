@@ -18,12 +18,14 @@ Tests (Node 18+) : `npm test`.
 ## Arborescence
 
 ```
-index.html                 squelette de la page
+index.html                 le jeu
+editor/index.html          l'atelier caché : création de fresques perso (aucun lien depuis le jeu)
 locales/                   textes de l'interface, un fichier par langue (fr.json, en.json)
 styles/
   base.css                 couleurs par défaut (thème Nuit), police, boutons
   layout.css               barre du haut, plateau, colonne de droite
   components.css           fenêtre de fin, cartes, files de boîtes
+  editor.css               l'atelier (palette, outils, bibliothèque)
   themes/
     classic.css            Palais, Rubis
     escapades.css          Plage, Forêt, Jardin
@@ -44,6 +46,7 @@ src/
   core/                    règles pures, sans navigateur (testées avec node)
     grid.js                pixels atteignables, ramassage
     generator.js           fabrication de niveaux faisables mais piégeux
+    mural-code.js          code de partage « BB1-… » et export pour maps.js
   game/
     state.js               état partagé (partie, dimensions, couleurs, vitesse, thème)
     geometry.js            repères du plateau
@@ -59,8 +62,27 @@ src/
     overlay.js             fenêtre de fin de fresque
     skin.js                changement de thème
     lang.js                changement de langue, traduction du HTML (data-i18n)
+  editor/                  le code de l'atelier (la page est dans editor/index.html, à la racine du jeu)
+    model.js               fresque en cours, outils (pinceau, remplir), annuler, taille
+    view.js                canevas, image de fond, souris et doigt
+    library.js             fresques enregistrées et brouillon (localStorage)
+    main.js                branchement de l'interface de l'atelier
 tests/                     tests node (règles, générateur, données)
 ```
+
+## Fresques perso (atelier caché)
+
+L'atelier n'est lié nulle part : on y accède en ajoutant `editor/` à l'adresse du jeu
+(`…/games/BitByBit/editor/`). Il permet de :
+- choisir le nombre de pixels de côté (4 à 24) et peindre avec la palette du jeu
+  (pinceau, remplissage, pipette, gomme, clic droit = gomme, Ctrl+Z) ;
+- charger une image de fond pour la décalquer (transparence réglable, non enregistrée) ;
+- jouer sa fresque (lien `…/BitByBit/#play=BB1-…`), l'enregistrer dans « Mes fresques » ;
+- la partager par un code `BB1-…` qu'un ami colle dans « Importer » ;
+- obtenir l'entrée à coller dans `src/data/maps.js` pour en faire une fresque officielle.
+
+Le brouillon est sauvé à chaque coup de pinceau : recharger la page ne perd rien.
+Après une fresque perso, l'écran de fin propose « Modifier », qui rouvre l'atelier.
 
 ## Recettes
 

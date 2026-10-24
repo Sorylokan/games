@@ -15,5 +15,11 @@ export function levelAt(i) {
   };
 }
 
+// Niveau pour une fresque perso (atelier) : difficulté moyenne, moins d'essais si la grille est grande.
+export function customLevel({ name, map }) {
+  const N = map.length;
+  return { id: null, name, map, round: 0, custom: true, cap: 4, mix: 8, tries: N > 16 ? 4 : N > 12 ? 6 : 8 };
+}
+
 // Vrai quand on vient de finir la dernière fresque de la série.
 export const isEndOfSeries = (i) => (i + 1) % MAPS.length === 0;

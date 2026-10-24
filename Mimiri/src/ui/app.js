@@ -51,6 +51,8 @@ function applyI18n() {
     opt.textContent = opt.value === "chaos" ? t("ui.chaos") : t(`theme.${opt.value}`);
   });
   langSelect.setAttribute("aria-label", t("ui.langLabel"));
+  $("back").title = t("ui.back");
+  $("back").setAttribute("aria-label", t("ui.back"));
   boardEl.setAttribute("aria-label", t("ui.boardLabel"));
 }
 

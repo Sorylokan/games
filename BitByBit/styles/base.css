@@ -58,3 +58,16 @@ button.ghost { border-color: var(--line); color: var(--txt); }
 .speed-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
 
 select { font: inherit; font-size: 13px; color: var(--txt); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+
+/* Liens en forme de bouton icône (ex. « Créer une fresque » dans la barre du haut) */
+a.icon-btn { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; color: var(--txt); }
+a.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Champs de saisie */
+input:not([type="range"]):not([type="checkbox"]):not([type="file"]), textarea {
+  font: inherit; color: var(--txt); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px;
+}
+input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+input::placeholder { color: var(--mut); }

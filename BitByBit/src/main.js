@@ -4,7 +4,8 @@ import { DEFAULT_SKIN } from './data/skins.js';
 import { store } from './storage.js';
 import { $ } from './dom.js';
 import { app } from './game/state.js';
-import { start, restart, place, update } from './game/session.js';
+import { start, startCustom, restart, place, update } from './game/session.js';
+import { decodeMural } from './core/mural-code.js';
 import { resize } from './render/canvas.js';
 import { draw } from './render/board.js';
 import { initPanel, renderUI, renderProgress } from './ui/panel.js';
@@ -44,8 +45,15 @@ new ResizeObserver(() => {
 await setLang(initialLang());
 fillSkinSelect();
 setSkin(store.get(STORAGE.skin, DEFAULT_SKIN));
-const saved = store.get(STORAGE.level, 0);
-start(Number.isInteger(saved) && saved >= 0 && saved < 999 ? saved : 0);
+// index.html#play=BB1-… : on joue une fresque perso (lien venu de l'atelier ou d'un ami).
+const playCode = location.hash.match(/^#play=(.+)$/)?.[1];
+const mural = playCode && decodeMural(decodeURIComponent(playCode));
+if (mural) {
+  startCustom(mural);
+} else {
+  const saved = store.get(STORAGE.level, 0);
+  start(Number.isInteger(saved) && saved >= 0 && saved < 999 ? saved : 0);
+}
 document.fonts?.ready.then(renderUI); // Fraunces chargée : on redessine les chiffres
 
 // --- boucle ---

@@ -37,6 +37,11 @@ body {
 .topbar { flex: none; min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 max(14px, 3%); border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: blur(6px); }
 .brand { font: 700 22px var(--display); color: var(--accent); letter-spacing: .03em; }
 .bar-tools { display: flex; align-items: center; gap: 8px; }
+/* Retour au catalogue, à gauche du nom du jeu (mêmes bords que les listes déroulantes) */
+.brand-group { display: flex; align-items: center; gap: 10px; }
+.back { display: inline-flex; padding: 6px; color: var(--txt); border: 1px solid var(--line); border-radius: 10px; }
+.back:hover { border-color: var(--accent); color: var(--accent); }
+.back:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 select { font: inherit; font-size: 14px; color: var(--txt); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; cursor: pointer; }
 select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 

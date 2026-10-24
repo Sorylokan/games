@@ -26,8 +26,13 @@ export function initPanel(onPlace) {
 export function renderUI() {
   const st = app.st;
   if (!st) return;
-  $('lvlNum').textContent = t('side.number', { n: st.li + 1 }) + (st.lvl.round ? ` · ${t('side.round', { n: st.lvl.round + 1 })}` : '');
-  $('lvlName').textContent = t(`map.${st.lvl.id}`);
+  if (st.lvl.custom) {
+    $('lvlNum').textContent = t('custom.badge');
+    $('lvlName').textContent = st.lvl.name || t('custom.untitled');
+  } else {
+    $('lvlNum').textContent = t('side.number', { n: st.li + 1 }) + (st.lvl.round ? ` · ${t('side.round', { n: st.lvl.round + 1 })}` : '');
+    $('lvlName').textContent = t(`map.${st.lvl.id}`);
+  }
   $('total').textContent = st.total;
 
   const playing = st.status === 'play';

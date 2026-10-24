@@ -24,7 +24,11 @@ export const createTranslator = ({ locale, fallbackLocale = DEFAULT_LOCALE, mess
   };
 };
 
-export const loadLocale = async (locale, { baseUrl = "./locales", fetcher = fetch } = {}) => {
+// Dossier locales/ trouvé à partir de CE fichier (src/i18n.js), pas de la page : le jeu (index.html)
+// et l'atelier (editor/index.html) ne sont pas au même niveau mais partagent les mêmes traductions.
+const LOCALES_URL = new URL("../locales", import.meta.url).href;
+
+export const loadLocale = async (locale, { baseUrl = LOCALES_URL, fetcher = fetch } = {}) => {
   const response = await fetcher(`${baseUrl}/${locale}.json`);
 
   if (!response.ok) {

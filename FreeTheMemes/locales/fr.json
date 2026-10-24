@@ -236,6 +236,7 @@
   "ui.rollingDice": "Lancer en cours…",
   "ui.waitingForResolve": "En attente de {name} pour résoudre {action}.",
   "ui.waitingForChoice": "{name} réfléchit…",
+  "ui.allGames": "Tous les jeux",
   "reactions.doge.reveal": "Révéler & tenter d'esquiver (pile ou face)",
   "reactions.doge.decline": "Encaisser le coup",
   "reactions.lifeStonks.reveal": "Révéler & soigner 2 PV",

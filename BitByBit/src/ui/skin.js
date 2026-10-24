@@ -43,6 +43,7 @@ function readPalette() {
 }
 
 export function renderRules() {
+  if (!$('rules')) return; // l'atelier n'affiche pas de règles
   $('rules').textContent = `${t('rules.intro')} ${t(`rules.${SKINS[app.skin].crew}`)}`;
 }
 
