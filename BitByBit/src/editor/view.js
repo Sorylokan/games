@@ -20,6 +20,30 @@ export function setBackgroundOpacity(v) { bg.opacity = v; draw(); }
 export function setBackgroundVisible(v) { bg.visible = v; draw(); }
 export const hasBackground = () => !!bg.img;
 
+// Placement « contain » de l'image dans un carré de côté s : entière, centrée, proportions gardées.
+// Sert à l'aperçu ET à la conversion, pour que les deux aient exactement le même cadrage.
+function fitImage(img, s) {
+  const k = Math.min(s / img.width, s / img.height);
+  const w = img.width * k, h = img.height * k;
+  return { k, x: (s - w) / 2, y: (s - h) / 2, w, h };
+}
+
+// Pixels RGBA de l'image de fond réduite à (N×S)² : S pixels d'échantillon par côté de case, qui
+// voteront pour la couleur de la case. null s'il n'y a pas d'image. Les bandes vides autour d'une
+// image non carrée restent transparentes.
+export function imagePixels(N, S = 1) {
+  if (!bg.img) return null;
+  const side = N * S;
+  const off = document.createElement('canvas');
+  off.width = side; off.height = side;
+  const c = off.getContext('2d', { willReadFrequently: true });
+  c.imageSmoothingEnabled = true;
+  c.imageSmoothingQuality = 'high';
+  const f = fitImage(bg.img, side);
+  c.drawImage(bg.img, f.x, f.y, f.w, f.h);
+  return c.getImageData(0, 0, side, side).data;
+}
+
 export function resizeView() {
   const w = cv.parentElement.clientWidth - 20;
   if (w <= 0) return;
@@ -43,11 +67,10 @@ export function draw() {
 
   // image de fond, entière et centrée, sous la grille
   if (bg.img && bg.visible) {
-    const k = Math.min(size / bg.img.width, size / bg.img.height);
-    const w = bg.img.width * k, h = bg.img.height * k;
+    const f = fitImage(bg.img, size);
     ctx.globalAlpha = bg.opacity;
-    ctx.imageSmoothingEnabled = k < 1; // un petit pixel art agrandi reste net
-    ctx.drawImage(bg.img, (size - w) / 2, (size - h) / 2, w, h);
+    ctx.imageSmoothingEnabled = f.k < 1; // un petit pixel art agrandi reste net
+    ctx.drawImage(bg.img, f.x, f.y, f.w, f.h);
     ctx.globalAlpha = 1;
   }
 

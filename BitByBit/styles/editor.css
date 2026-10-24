@@ -48,6 +48,9 @@ a.brand { text-decoration: none; }
 .file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .file-btn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
 .bg-controls { margin-top: 10px; }
+.conv-controls { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.conv-controls > .muted { margin-bottom: 6px; }
+.conv-controls output { color: var(--accent); font-variant-numeric: tabular-nums; }
 input[type="range"] { width: 100%; accent-color: var(--accent); }
 .check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--txt); }
 .check input { accent-color: var(--accent); }

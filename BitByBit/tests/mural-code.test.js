@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { encodeMural, decodeMural, rle, unrle, toMapsSnippet, slugify, pixelCount } from '../src/core/mural-code.js';
 import { MAPS } from '../src/data/maps.js';
+import { COLORS } from '../src/data/colors.js';
 
 test('rle et unrle sont inverses', () => {
   assert.equal(rle('BBBBKK.'), '4B2K1.');
@@ -22,8 +23,12 @@ test('un code invalide renvoie null', () => {
   assert.equal(decodeMural(''), null);
   assert.equal(decodeMural('BB1-!!!'), null);
   assert.equal(decodeMural('XX1-abc'), null);
-  const bad = encodeMural({ name: 'x', map: ['ZZZZ', 'ZZZZ', 'ZZZZ', 'ZZZZ'] }); // couleur inconnue
-  assert.equal(decodeMural(bad), null);
+  // Couleur inconnue : une lettre que la palette n'utilise pas (cherchée, pour survivre aux ajouts de couleurs).
+  const free = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].find((ch) => !COLORS[ch]);
+  if (free) {
+    const bad = encodeMural({ name: 'x', map: Array(4).fill(free.repeat(4)) });
+    assert.equal(decodeMural(bad), null);
+  }
 });
 
 test('export pour maps.js', () => {

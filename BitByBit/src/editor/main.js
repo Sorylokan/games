@@ -10,7 +10,8 @@ import { initLangSelect, initialLang, setLang, t } from '../ui/lang.js';
 import { initSkinSelect, fillSkinSelect, setSkin } from '../ui/skin.js';
 import { ed, ERASER, newMural, loadMural, toMural, toMap, isEmpty, snapshot, undo, resize, clear } from './model.js';
 import * as library from './library.js';
-import { initView, resizeView, draw, setBackground, setBackgroundOpacity, setBackgroundVisible } from './view.js';
+import { initView, resizeView, draw, setBackground, setBackgroundOpacity, setBackgroundVisible, imagePixels } from './view.js';
+import { pixelsToMap } from '../core/image-to-map.js';
 
 // ---------- petits utilitaires d'interface ----------
 let statusTimer;
@@ -166,6 +167,50 @@ function afterLoad() {
   renderAll();
 }
 
+// ---------- conversion image → pixels ----------
+const SAMPLES = 8; // pixels d'échantillon par côté de case : ils votent pour la couleur de la case
+let lastConverted = null; // grille produite par la dernière conversion, sous forme de texte
+
+const convOptions = () => ({
+  saturation: Number($('convSaturation').value) / 100,
+  contrast: Number($('convContrast').value) / 100,
+  maxColors: Number($('convColors').value),
+  cleanup: $('convCleanup').checked,
+  transparentBg: $('convTransparent').checked,
+});
+
+// Une « série » de conversion dure tant que la grille n'a pas été retouchée : un seul snapshot()
+// au début, donc un Ctrl+Z revient à l'état d'avant la conversion, quels que soient les réglages essayés.
+const inSeries = () => lastConverted !== null && toMap().join('|') === lastConverted;
+
+function convert() {
+  const data = imagePixels(ed.N, SAMPLES);
+  if (!data) return false;
+  if (!inSeries()) snapshot();
+  ed.cells = pixelsToMap(data, ed.N, COLORS, convOptions()).map((row) => [...row]);
+  lastConverted = toMap().join('|');
+  ed.dirty = true;
+  changed();
+  return true;
+}
+
+// Aperçu en direct : un réglage modifié relance la conversion en cours (au plus une fois par image affichée).
+let convFrame = 0;
+function reconvert() {
+  if (!inSeries() || convFrame) return;
+  convFrame = requestAnimationFrame(() => { convFrame = 0; convert(); });
+}
+
+function renderConvValues() {
+  $('convSaturationVal').textContent = (Number($('convSaturation').value) / 100).toFixed(2);
+  $('convContrastVal').textContent = (Number($('convContrast').value) / 100).toFixed(2);
+  $('convColorsVal').textContent = $('convColors').value;
+}
+
+const showBgTools = (on) => {
+  for (const id of ['bgControls', 'bgRemove', 'bgConvert', 'convControls']) $(id).hidden = !on;
+};
+
 // ---------- branchements ----------
 function bindControls() {
   $('name').addEventListener('input', (e) => { ed.name = cleanName(e.target.value); ed.dirty = true; library.saveDraft(toMural(), ed.editingId); renderInfo(); });
@@ -190,7 +235,8 @@ function bindControls() {
       const img = new Image();
       img.onload = () => {
         setBackground(img);
-        $('bgControls').hidden = false; $('bgRemove').hidden = false;
+        lastConverted = null; // nouvelle image : la prochaine conversion ouvre une nouvelle série
+        showBgTools(true);
         status('ed.bgLoaded');
       };
       img.onerror = () => status('ed.bgError', null, true);
@@ -201,7 +247,16 @@ function bindControls() {
   });
   $('bgOpacity').addEventListener('input', (e) => setBackgroundOpacity(Number(e.target.value) / 100));
   $('bgVisible').addEventListener('change', (e) => setBackgroundVisible(e.target.checked));
-  $('bgRemove').addEventListener('click', () => { setBackground(null); $('bgControls').hidden = true; $('bgRemove').hidden = true; });
+  $('bgRemove').addEventListener('click', () => { setBackground(null); lastConverted = null; showBgTools(false); });
+
+  // Remplit toute la grille d'après l'image de fond (annulable avec Ctrl+Z), puis les réglages s'appliquent en direct.
+  $('bgConvert').addEventListener('click', () => { if (convert()) status('ed.bgConverted'); });
+  $('convColors').max = Object.keys(COLORS).length;
+  renderConvValues();
+  for (const id of ['convSaturation', 'convContrast', 'convColors']) {
+    $(id).addEventListener('input', () => { renderConvValues(); reconvert(); });
+  }
+  for (const id of ['convCleanup', 'convTransparent']) $(id).addEventListener('change', reconvert);
 
   $('play').addEventListener('click', () => { location.href = playUrl(toMural()); });
   $('save').addEventListener('click', () => {

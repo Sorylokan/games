@@ -71,6 +71,7 @@
         <p class="muted" data-i18n="ed.bgHelp">Charge une image pour la décalquer : elle reste sous la grille et n'est pas enregistrée.</p>
         <div class="row-btns">
           <label class="file-btn ghost"><input type="file" id="bgFile" accept="image/*"><span data-i18n="ed.bgLoad">Choisir une image</span></label>
+          <button type="button" class="ghost" id="bgConvert" data-i18n="ed.bgConvert" hidden>Convertir en pixels</button>
           <button type="button" class="ghost" id="bgRemove" data-i18n="ed.bgRemove" hidden>Retirer</button>
         </div>
         <div class="bg-controls" id="bgControls" hidden>
@@ -79,6 +80,24 @@
             <input type="range" id="bgOpacity" min="10" max="100" value="50">
           </label>
           <label class="check"><input type="checkbox" id="bgVisible" checked> <span data-i18n="ed.bgShow">Afficher</span></label>
+        </div>
+        <!-- Réglages de la conversion : appliqués en direct à la grille après « Convertir en pixels » -->
+        <div class="conv-controls" id="convControls" hidden>
+          <p class="muted" data-i18n="ed.convHelp">Après la conversion, ces réglages s'appliquent en direct.</p>
+          <label class="field">
+            <span><span data-i18n="ed.convSaturation">Saturation</span> <output id="convSaturationVal"></output></span>
+            <input type="range" id="convSaturation" min="50" max="200" step="5" value="130">
+          </label>
+          <label class="field">
+            <span><span data-i18n="ed.convContrast">Contraste</span> <output id="convContrastVal"></output></span>
+            <input type="range" id="convContrast" min="50" max="200" step="5" value="115">
+          </label>
+          <label class="field">
+            <span><span data-i18n="ed.convColors">Couleurs max</span> <output id="convColorsVal"></output></span>
+            <input type="range" id="convColors" min="2" max="24" step="1" value="8">
+          </label>
+          <label class="check"><input type="checkbox" id="convCleanup" checked> <span data-i18n="ed.convCleanup">Nettoyer les pixels isolés</span></label>
+          <label class="check"><input type="checkbox" id="convTransparent"> <span data-i18n="ed.convTransparent">Fond transparent</span></label>
         </div>
       </section>
 
