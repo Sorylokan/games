@@ -24,7 +24,7 @@ Online games are peer-to-peer (WebRTC through [Trystero](https://github.com/dmot
 ```text
 games/
 ├── index.html, scripts.js, styles.css   catalog page
-├── cards.json                           list of the catalog's game cards
+├── cards.json                           which cards to show, and the featured game
 ├── card_*.json                          one card per game (text, style, preview)
 ├── FreeTheMemes/
 ├── GridOfGreed/
@@ -32,7 +32,7 @@ games/
 └── Mimiri/
 ```
 
-The catalog page is built from the `card_*.json` files. Adding a game means adding its folder, a card file, and one line in `cards.json`.
+The catalog page is built from the `card_*.json` files. Adding a game means adding its folder, a card file, and one line in `cards.json`. The `featured` field of `cards.json` picks the game shown large at the top of the page; every card works both as a featured game and in the regular grid.
 
 ## Conventions
 

@@ -1,0 +1,14 @@
+{
+  "name": "free-the-memes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Free the Memes game engine and browser client.",
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "trystero": "^0.25.4"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "grid-of-greed",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test" }
+}

@@ -1,0 +1,298 @@
+/* FREE THE MEMES - socle neutre : structure (layout) + variables + composants
+   generiques. NE METS ICI AUCUN look de theme (couleurs, fonds, ombres, police) :
+   ceux-ci vivent dans theme-*.css. Les valeurs ci-dessous sont des REPLIS neutres,
+   ecrases par le theme actif (classe .theme-* sur <body>, lien charge apres). */
+:root {
+  /* Repli neutre (gris) si aucun theme n'est charge ; un theme les redefinit tous. */
+  --desk: #888; --ink: #222; --paper: #fff; --chrome: #e8e8e8; --muted: #666;
+  --pink: #ccc; --lemon: #eee; --mint: #ccc; --sky: #ccc;
+  --pc0: #ccc; --pc1: #ddd; --pc2: #ccc; --pc3: #ddd;
+  --pc4: #ccc; --pc5: #ddd; --pc6: #ccc; --pc7: #ddd;
+  --shadow: 4px 4px 0 var(--ink);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-width: 320px; color: var(--ink);
+  background: var(--desk);   /* le fond exact (damier, degrade...) est fourni par le theme */
+  font-family: Tahoma, Verdana, "Segoe UI", sans-serif;  /* repli ; le theme peut changer */
+}
+h1, h2, h3, p { margin-top: 0; }
+button, input { font: inherit; }
+:focus-visible { outline: 3px solid var(--lemon); outline-offset: 2px; }
+#app.app-shell { min-height: 100svh; }
+
+/* ---- Fenetre generique ---- */
+.win { background: var(--paper); border: 2px solid var(--ink); box-shadow: var(--shadow); }
+.win-title {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 4px 8px; background: var(--ink); color: var(--paper);
+  font-size: 12px; font-weight: 700; letter-spacing: .02em;
+}
+.win-title::after { content: "\25A1  \00D7"; opacity: .6; letter-spacing: .2em; }
+.win-body { padding: 10px; }
+
+/* ---- Boutons ---- */
+.action {
+  min-height: 40px; padding: 8px 14px; color: var(--ink); background: var(--lemon);
+  border: 2px solid var(--ink); border-radius: 2px; box-shadow: 3px 3px 0 var(--ink);
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: transform .08s, box-shadow .08s;
+}
+.action:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.action:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+.action.secondary { background: var(--chrome); }
+.action:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+
+/* ---- Pieces (pions) ---- */
+.piece { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 2px; background: var(--paper); border: 2px solid var(--ink); border-radius: 99px; font-size: 11px; font-weight: 700; will-change: transform; }
+.piece-avatar, .pl-avatar { display: grid; place-items: center; width: 22px; height: 22px; border: 2px solid var(--ink); border-radius: 50%; background: var(--pc, var(--pink)); font-size: 11px; font-weight: 800; }
+.piece.current { background: var(--lemon); }
+.piece.dead { opacity: .45; text-decoration: line-through; }
+/* Pion cliquable = cible d'attaque valide (phase d'attaque, a nous de jouer). */
+.piece.attackable { cursor: crosshair; box-shadow: 0 0 0 3px var(--pink, #f0a); outline: 2px dashed var(--ink); outline-offset: 2px; }
+.piece.attackable:hover, .piece.attackable:focus-visible { background: var(--pink, #f0a); color: var(--paper); }
+.piece-0 { --pc: var(--pc0); } .piece-1 { --pc: var(--pc1); } .piece-2 { --pc: var(--pc2); } .piece-3 { --pc: var(--pc3); }
+.piece-4 { --pc: var(--pc4); } .piece-5 { --pc: var(--pc5); } .piece-6 { --pc: var(--pc6); } .piece-7 { --pc: var(--pc7); }
+
+/* ---- Accueil + salon : fenetres sur le bureau ---- */
+.home-screen, .room-screen { min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; padding: 0 5vw 20px; color: var(--paper); }
+.home-topbar, .room-topbar, .bar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 0; }
+.wordmark { color: var(--paper); font: 900 20px Impact, "Arial Black", sans-serif; letter-spacing: .03em; text-decoration: none; text-transform: uppercase; }
+.home-topbar > span, .connection-state { padding: 3px 10px; background: var(--ink); color: var(--lemon); font-size: 11px; font-weight: 700; }
+.connection-state i { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--mint); }
+.home-content, .room-content { width: min(1000px, 100%); margin: auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; padding: 30px 0; }
+.eyebrow { display: inline-block; margin: 0 0 12px; padding: 3px 8px; background: var(--pink); color: var(--ink); font-size: 12px; font-weight: 800; }
+.home-copy h1, .room-main h1 { margin: 0 0 14px; font: 900 clamp(2.6rem, 7vw, 4.6rem)/.95 Impact, "Arial Black", sans-serif; text-transform: uppercase; }
+.home-copy h1 em { font-style: normal; color: var(--lemon); }
+.home-intro, .room-intro { max-width: 440px; font-size: 16px; line-height: 1.5; }
+.name-field { display: grid; gap: 6px; max-width: 340px; margin-top: 26px; font-size: 12px; font-weight: 700; }
+input { min-height: 42px; padding: 8px 10px; color: var(--ink); background: var(--paper); border: 2px solid var(--ink); border-radius: 2px; }
+.online-actions, .invite-block, .room-roster { position: relative; display: grid; gap: 16px; padding: 44px 16px 16px; color: var(--ink); background: var(--paper); border: 2px solid var(--ink); box-shadow: var(--shadow); }
+.online-actions::before, .invite-block::before, .room-roster::before {
+  content: "salon.exe"; position: absolute; inset: 0 0 auto 0; padding: 5px 10px; background: var(--ink); color: var(--paper); font-size: 12px; font-weight: 700;
+}
+.create-room-action { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 58px; background: var(--pink); font-size: 16px; }
+.join-room-block > label, .invite-block > label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; }
+.room-join, .invite-field { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.invite-field.has-toggle { grid-template-columns: minmax(0, 1fr) auto auto; } /* + bouton œil */
+.room-status { margin: 0; font-size: 12px; font-weight: 700; color: var(--muted); }
+.room-main .room-status { color: var(--paper); }
+.start-room-action { display: flex; justify-content: space-between; width: min(320px, 100%); margin-top: 20px; }
+.waiting-note { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.waiting-pulse { width: 10px; height: 10px; background: var(--lemon); animation: blink 1.2s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.roster-heading { display: flex; justify-content: space-between; align-items: baseline; }
+.roster-heading h2 { margin: 0; font-size: 16px; }
+.room-roster ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.room-player { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 10px; padding: 6px; border: 2px solid var(--ink); background: var(--chrome); font-weight: 700; font-size: 13px; }
+.room-player small { background: var(--ink); color: var(--lemon); padding: 1px 6px; font-size: 10px; }
+.room-player-mark { display: grid; place-items: center; width: 26px; height: 26px; border: 2px solid var(--ink); background: var(--mint); font-weight: 800; }
+.room-player-open { background: transparent; border-style: dashed; opacity: .6; }
+.roster-foot { margin: 0; font-size: 11px; color: var(--muted); }
+.home-footer { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; font-weight: 700; opacity: .8; }
+
+/* ---- Partie ---- */
+/* Colonne latérale 340px : le plateau, contraint en hauteur (ratio 5:4),
+   a de la marge en largeur sur laquelle on grappille. */
+.game-screen { height: 100svh; min-height: 600px; display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: auto minmax(0, 1fr); gap: 0 20px; padding: 0 20px 16px; overflow: hidden; }
+.bar { grid-column: 1 / -1; }
+.bar .chip { padding: 3px 10px; background: var(--ink); color: var(--lemon); font-size: 11px; font-weight: 700; }
+.bar-right { display: flex; gap: 8px; align-items: center; }
+.bar .action { min-height: 30px; padding: 3px 10px; font-size: 12px; }
+/* Grille a 3 pistes : turnline / plateau / dock. Le dock ne prend que sa
+   hauteur (max-content) et grandit vers le HAUT ; la ligne plateau (1fr)
+   absorbe la difference, donc pas de scroll quand un choix/carte apparait. */
+.stage { display: grid; grid-template-rows: max-content minmax(0, 1fr) max-content; gap: 12px; min-height: 0; }
+.turnline { align-self: flex-start; padding: 5px 12px; background: var(--chrome); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); font-size: 13px; }
+.turnline.mine { background: var(--lemon); }
+/* Le plateau fait ~85svh de haut : il deborde de sa ligne de grille sur le dock
+   en dessous. z-index:0 l'enferme dans son propre contexte d'empilement pour que
+   ses enfants (zones, des) ne se comparent plus qu'entre eux. */
+.board { position: relative; z-index: 0; min-height: 0; width: min(100%, 1200px, calc((100svh - 230px) * 1.25)); aspect-ratio: 5 / 4; margin: 0 auto; }
+.tri { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.tri polygon { fill: rgba(255,255,255,.1); stroke: var(--paper); stroke-width: 3; stroke-dasharray: 8 7; vector-effect: non-scaling-stroke; }
+.zone { position: absolute; z-index: 1; width: 25%; min-width: 120px; transform: translate(-50%, -50%); }
+.zone.z0 { left: 24%; top: 13%; } .zone.z1 { left: 76%; top: 13%; }
+.zone.z2 { left: 81%; top: 42%; } .zone.z3 { left: 65%; top: 72%; }
+.zone.z4 { left: 35%; top: 72%; } .zone.z5 { left: 19%; top: 42%; }
+.zone .win-title { font-size: 11px; background: var(--zc, var(--pink)); color: var(--ink); }
+.zone.z0, .zone.z1 { --zc: var(--pink); } .zone.z2, .zone.z3 { --zc: var(--mint); } .zone.z4, .zone.z5 { --zc: var(--sky); }
+.zone .win-title::after { content: "\00D7"; opacity: 1; }
+.zone .win-body { display: flex; flex-wrap: wrap; gap: 4px; min-height: 40px; padding: 7px; }
+.zone .empty { color: var(--muted); font-size: 11px; }
+.zone.here { box-shadow: 0 0 0 4px var(--lemon), var(--shadow); z-index: 2; }
+.dice-slot { position: absolute; left: 50%; top: 41%; transform: translate(-50%, -50%); z-index: 3; }
+.dice-slot .win-title { background: var(--pink); color: var(--ink); font-size: 11px; }
+.dice-slot .win-title::after { content: "\00D7"; opacity: 1; }
+.dice-body { display: flex; justify-content: center; padding: 6px 38px 8px; background: #012456; }
+.dice-slot .dice-tray { --gold: 255, 228, 77; --die-bg: #012456; }
+
+/* position+z-index > 3 (dice-slot) : la barre d'action reste AU-DESSUS du plateau
+   qui deborde, dans tous les themes. */
+.dock { position: relative; z-index: 4; padding: 10px; background: var(--chrome); border: 2px solid var(--ink); box-shadow: var(--shadow); }
+.dock-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.dock-title { margin-right: auto; font-size: 14px; font-weight: 700; }
+.pending-choices { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.pending-label { width: 100%; margin: 6px 0 0; font-size: 12px; font-weight: 700; }
+.victory { padding: 12px; background: var(--lemon); border: 2px solid var(--ink); box-shadow: var(--shadow); font-weight: 700; }
+.victory h2 { margin: 0 0 4px; font: 900 26px Impact, sans-serif; text-transform: uppercase; }
+
+.side { display: flex; flex-direction: column; gap: 14px; min-height: 0; overflow: auto; padding: 0 6px 6px 0; }
+.hp { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; }
+.hp-bar { flex: 1; height: 14px; border: 2px solid var(--ink); background: var(--paper); }
+.hp-fill { height: 100%; background: var(--mint); background-image: repeating-linear-gradient(90deg, transparent 0 8px, var(--ink) 8px 10px); }
+.me-name { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: 700; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.chip-eq { padding: 2px 7px; background: var(--lemon); border: 2px solid var(--ink); font-size: 11px; font-weight: 700; text-transform: capitalize; }
+.pl { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px dashed var(--muted); font-size: 12px; }
+.pl:last-child { border: 0; }
+.pl.active b::after { content: " \25C0"; }
+.pl.dead { opacity: .45; }
+.pl small { display: block; color: var(--muted); }
+.pl-avatar { background: var(--pc, var(--pink)); }
+
+@media (max-width: 860px) {
+  .game-screen { height: auto; overflow: visible; grid-template-columns: 1fr; padding: 0 12px 16px; }
+  .board { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; aspect-ratio: auto; }
+  .tri { display: none; }
+  .zone { position: static; width: auto; transform: none; }
+  .dice-slot { position: static; grid-column: 1 / -1; order: -1; justify-self: center; transform: none; }
+  .home-content, .room-content { grid-template-columns: 1fr; gap: 24px; }
+}
+@media (prefers-reduced-motion: reduce) { .action, .waiting-pulse, .piece { transition: none; animation: none; } }
+
+/* Plateau : boîte au ratio fixe 5:4. Le triangle et les zones sont en % de CETTE boîte.
+   Les centres des cartes sont posés sur les arêtes du triangle (6,18) (94,18) (50,94).
+   Pas de scroll interne : la grille 3 pistes (cf. .stage plus haut) laisse le dock
+   pousser vers le haut plutôt que d'écraser le plateau. */
+.stage { overflow: visible; }
+.board { flex: none; width: min(100%, 780px, max(520px, calc((100svh - 230px) * 1.25))); aspect-ratio: 5 / 4; margin: 0 auto; }
+.zone { width: 32%; min-width: 170px; }
+.zone.z0 { left: 26%;   top: 18%; }
+.zone.z1 { left: 74%;   top: 18%; }
+.zone.z2 { left: 81.7%; top: 39.3%; }
+.zone.z3 { left: 66.7%; top: 65.1%; }
+.zone.z4 { left: 33.3%; top: 65.1%; }
+.zone.z5 { left: 18.3%; top: 39.3%; }
+.dice-slot { top: 44%; }
+
+@media (max-width: 860px) {
+  .board { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; aspect-ratio: auto; }
+  .zone { position: static; width: auto; min-width: 0; transform: none; }
+  .dice-slot { position: static; grid-column: 1 / -1; order: -1; justify-self: center; transform: none; }
+}
+
+/* Fiche personnage, équipement, identités révélées */
+.badge { display: inline-block; padding: 0 6px; border: 2px solid var(--ink); background: var(--chrome); font: 800 10px/1.5 Tahoma, sans-serif; font-style: normal; }
+.f-user { background: var(--sky); } .f-memer { background: var(--mint); } .f-troller { background: var(--pink); }
+.me-name { flex-wrap: wrap; }
+.sheet { margin: 10px 0 0; font-size: 12px; }
+.sheet dt { margin-top: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--muted); }
+.sheet dd { margin: 2px 0 0; line-height: 1.4; }
+.eq { padding: 6px 0; border-bottom: 1px dashed var(--muted); }
+.eq:last-child { border: 0; }
+.eq b { display: block; font-size: 12px; }
+.eq small { color: var(--muted); font-size: 11px; line-height: 1.35; }
+.pl.revealed { padding-left: 6px; border-left: 4px solid var(--ink); }
+.pl-id { display: block; font-style: normal; font-size: 11px; font-weight: 700; }
+
+/* Journal : fenêtre flottante, déplaçable (barre de titre) et redimensionnable (coin) */
+.term { position: fixed; right: 20px; bottom: 20px; z-index: 50; width: 420px; height: 260px; min-width: 240px; min-height: 120px; display: flex; flex-direction: column; resize: both; overflow: hidden; background: #012456; color: #eeedf0; border: 2px solid var(--ink); box-shadow: var(--shadow); font: 12px/1.45 Consolas, "Lucida Console", monospace; }
+.term[hidden] { display: none; }
+.term-bar { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; background: var(--ink); color: #fff; cursor: grab; touch-action: none; user-select: none; }
+.term-x { width: 22px; padding: 0; background: var(--pink); color: var(--ink); border: 2px solid var(--ink); font-weight: 800; line-height: 1; cursor: pointer; }
+.term-body { flex: 1; overflow: auto; padding: 8px; }
+.term-body div::before { content: "PS> "; color: var(--lemon); }
+.term-body .dbg { opacity: .5; }
+@media (max-width: 860px) { .term { width: calc(100vw - 24px); right: 12px; } }
+
+/* Pastilles = post-it */
+.pl-tags { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 5px; }
+.pl-tags:empty { display: none; }
+.pl.droppable { cursor: copy; }
+.pl.droppable:hover, .pl.over { background: #fff7c2; }
+.pl.over { outline: 3px dashed var(--ink); outline-offset: 2px; }
+.note { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); font-size: 11px; font-weight: 800; transform: rotate(-1.5deg); user-select: none; }
+.note:nth-child(even) { transform: rotate(1.2deg); }
+.note button { all: unset; cursor: pointer; font-size: 12px; line-height: 1; opacity: .7; }
+.note button:hover { opacity: 1; }
+.n0 { background: var(--pink); } .n1 { background: var(--mint); } .n2 { background: var(--lemon); }
+.n3 { background: var(--sky); } .n4 { background: var(--pc5); } .n5 { background: var(--paper); }
+.note.src { cursor: grab; margin: 0 4px 6px 0; }
+.note.src.sel { outline: 3px solid var(--ink); outline-offset: 2px; }
+.tags-box { margin-top: 10px; padding-top: 10px; border-top: 2px dashed var(--ink); }
+.tag-palette { display: flex; flex-wrap: wrap; }
+.tag-new { display: grid; grid-template-columns: 1fr auto; gap: 6px; margin-top: 4px; }
+.tag-new input { min-height: 32px; padding: 4px 8px; font-size: 12px; }
+.tag-new .action { min-height: 32px; padding: 2px 10px; font-size: 12px; }
+.tag-colors { grid-column: 1 / -1; display: flex; gap: 6px; }
+.tag-dot { width: 20px; height: 20px; padding: 0; border: 2px solid var(--ink); border-radius: 50%; cursor: pointer; }
+.tag-dot.on { outline: 3px solid var(--ink); outline-offset: 2px; }
+.tag-hint { margin: 8px 0 0; font-size: 11px; line-height: 1.4; color: var(--muted); }
+.tag-err { margin: 4px 0 0; font-size: 11px; font-weight: 700; color: #b00020; }
+.tag-clear { all: unset; cursor: pointer; text-decoration: underline; }
+.home-copy h1 { font-size: clamp(3.4rem, 10vw, 7rem); line-height: .9; text-shadow: 4px 4px 0 var(--ink); }
+.home-copy h1 em { text-shadow: 4px 4px 0 var(--ink); }
+
+/* Zones : effet, numéros de dés, pions */
+.zone .win-title::after { content: none; }
+.zone-dice { padding: 0 6px; background: var(--ink); color: var(--lemon); font-size: 10px; }
+.zone .win-body { display: block; padding: 8px; }
+.zone-effect { margin: 0 0 8px; font-size: 11px; line-height: 1.35; color: #333; }
+.zone-tokens { display: flex; flex-wrap: wrap; gap: 4px; min-height: 26px; }
+
+/* Accueil / salon */
+.online-actions::before, .invite-block::before, .room-roster::before { content: attr(data-title); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.top-chip { padding: 3px 10px; background: var(--ink); color: var(--lemon); font-size: 11px; font-weight: 700; }
+.locale-select { min-height: 28px; padding: 2px 6px; color: var(--ink); background: var(--paper); border: 2px solid var(--ink); border-radius: 2px; box-shadow: 2px 2px 0 var(--ink); font: 700 11px Tahoma, Verdana, sans-serif; cursor: pointer; }
+.bar-right .locale-select { min-height: 30px; }
+.eyebrow, .name-field, .join-room-block > label, .invite-block label, .home-footer { text-transform: uppercase; }
+.invite-block { gap: 14px; }
+.invite-field input { min-width: 0; font: 12px Consolas, "Lucida Console", monospace; }
+
+.seat-picker { display: flex; align-items: center; gap: 10px; margin-top: 16px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.seat-picker b { min-width: 1.5em; text-align: center; font-size: 20px; }
+.seat-picker .action { min-height: 32px; padding: 2px 12px; }
+
+/* ---- Plateau agrandi, v2 (à coller TOUT À LA FIN de styles.css ; remplace la version précédente) ----
+   Dés recentrés + lignes de zones écartées pour que les fenêtres ne se chevauchent plus. */
+.game-screen { gap: 0 24px; }
+/* Plateau fixe a ~85% de la hauteur d'ecran : stable quand le dock grandit,
+   la marge en dessous (15%) absorbe la barre d'action. aspect-ratio 5:4. */
+.board { width: min(100%, 1500px, calc(85svh * 1.25)); }
+.zone { width: 34%; min-width: 200px; }
+.zone .win-title { font-size: clamp(12px, 1vw, 15px); padding: 5px 10px; }
+.zone .win-body { padding: 10px 12px; }
+.zone-effect { font-size: clamp(11px, .85vw, 14px); line-height: 1.35; margin-bottom: 6px; }
+.zone-tokens { gap: 6px; min-height: 30px; }
+.piece { font-size: clamp(11px, 1vw, 15px); }
+.piece-avatar { width: clamp(22px, 2vw, 32px); height: clamp(22px, 2vw, 32px); }
+
+@media (min-width: 861px) {
+  .tri { transform: scaleY(1.12); }                      /* triangle étiré : plus de hauteur pour les 3 rangées */
+  .zone.z0 { left: 27%; top: 14%; } .zone.z1 { left: 73%; top: 14%; }
+  .zone.z5 { left: 15%; top: 40%; } .zone.z2 { left: 83%; top: 50%; }
+  .zone.z4 { left: 28%; top: 71%; } .zone.z3 { left: 73%; top: 75%; }
+  /* Dés : le grossissement est dans le même `transform` que le centrage.
+     (La propriété `scale` seule décalait la fenêtre vers le haut et la gauche.) */
+  .dice-slot { top: 43%; transform: translate(-50%, -50%) scale(1.17); }
+}
+@media (max-width: 860px) {
+  .zone { width: auto; min-width: 0; }
+}
+
+/* ---- Animation "impact" : declenchee par JS sur les evenements (degats, a ton tour).
+   Defaut : les zones du plateau vibrent. Chaque theme peut redefinir .anim-shake. */
+@keyframes ftm-shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -1px); }
+  80% { transform: translate(2px, 1px); }
+}
+.anim-shake .zone { animation: ftm-shake .35s ease-in-out; }
+@media (prefers-reduced-motion: reduce) { .anim-shake .zone { animation: none; } }
+
+/* Toast d'erreur en jeu : affiche dans le dock quand une action est refusee. */
+.game-notice { color: #b00020; font-weight: 700; background: #ffe0e0; border: 2px solid #b00020; padding: 4px 10px; border-radius: 3px; }

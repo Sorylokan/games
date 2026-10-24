@@ -1,0 +1,21 @@
+{
+  "ui.gridSize": "Grid size",
+  "ui.daily": "Daily challenge",
+  "ui.new": "New grid",
+  "ui.restart": "Restart",
+  "ui.moves": "Moves",
+  "ui.best": "Best",
+  "ui.newRecord": "New record!",
+  "ui.movesCount": "{n} moves",
+  "ui.dailyNote": "Daily challenge: same grid for everyone.",
+  "ui.loadError": "Could not load the game. Please reload the page.",
+  "ui.themeLabel": "Theme",
+  "ui.chaos": "Chaos",
+  "ui.langLabel": "Language",
+  "ui.boardLabel": "Game board",
+  "theme.kittens": "Cuddly Kittens",
+  "theme.puppies": "Cuddly Puppies",
+  "theme.grumpy": "Grumpy Cats",
+  "theme.garden": "Blooming Garden",
+  "theme.nightfall": "Nightfall"
+}

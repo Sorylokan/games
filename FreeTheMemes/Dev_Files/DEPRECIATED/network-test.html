@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Free the Memes - Peer Test</title>
+	<style>
+		:root { color-scheme: dark; font-family: system-ui, sans-serif; color: #f5f1e8; background: #111318; }
+		body { margin: 0; padding: 24px; }
+		main { width: min(1080px, 100%); margin: auto; }
+		.toolbar { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin: 20px 0; }
+		input, button { min-height: 40px; padding: 8px 12px; border: 1px solid #3b414e; border-radius: 5px; color: inherit; background: #20242d; }
+		button { cursor: pointer; background: #d4f06a; color: #111318; font-weight: 800; }
+		#status { min-height: 24px; color: #aeb1bd; }
+		.layout { display: grid; grid-template-columns: 1fr 260px; gap: 16px; }
+		#arena { position: relative; height: 560px; overflow: hidden; border: 1px solid #3b414e; border-radius: 8px; background: repeating-linear-gradient(0deg, #191c23 0 39px, #20242d 40px), repeating-linear-gradient(90deg, transparent 0 39px, #303541 40px); }
+		.peer { position: absolute; width: 44px; height: 44px; border: 3px solid #fff; border-radius: 6px; transform: translate(-50%, -50%); cursor: grab; box-shadow: 0 5px 18px #0008; }
+		.peer.self { outline: 3px solid #d4f06a; outline-offset: 4px; }
+		.peer.remote { cursor: default; filter: saturate(.85); }
+		.player-list { display: grid; gap: 8px; align-content: start; }
+		.player { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: center; padding: 9px; border: 1px solid #303541; border-radius: 5px; background: #20242d; font-size: 12px; }
+		.swatch { width: 14px; height: 14px; border-radius: 3px; }
+		.player small { display: block; color: #aeb1bd; }
+		@media (max-width: 720px) { .toolbar, .layout { grid-template-columns: 1fr; } }
+	</style>
+</head>
+<body>
+	<main>
+		<p>Free the Memes / Trystero-only test</p>
+		<h1>Peer arena</h1>
+		<p>No game rules, no characters, no fake players. Only real browsers connected to one room.</p>
+		<div class="toolbar">
+			<input id="room" placeholder="Room code">
+			<input id="name" placeholder="Your name" value="Peer">
+			<button id="connect" type="button">Connect</button>
+		</div>
+		<div id="status">Offline</div>
+		<div class="layout">
+			<div id="arena"></div>
+			<aside><h2>Connected peers</h2><div id="players" class="player-list"></div></aside>
+		</div>
+	</main>
+	<script type="module">
+		import { joinRoom, selfId } from "https://esm.sh/trystero@0.25.4/nostr";
+
+		const palette = ["#d4f06a", "#ff9867", "#83dbe3", "#d89bff", "#f4d35e", "#ff6f9f", "#82f7c5", "#b7b7ff"];
+		const roomInput = document.querySelector("#room");
+		const nameInput = document.querySelector("#name");
+		const connectButton = document.querySelector("#connect");
+		const status = document.querySelector("#status");
+		const arena = document.querySelector("#arena");
+		const playerList = document.querySelector("#players");
+		const peers = new Map();
+		const colorFor = (id) => palette[[...id].reduce((sum, character) => sum + character.charCodeAt(0), 0) % palette.length];
+		let room;
+		let move;
+		let state;
+
+		const render = () => {
+			arena.querySelectorAll(".peer").forEach((element) => element.remove());
+			playerList.replaceChildren();
+			for (const [peerId, peer] of peers) {
+				const square = document.createElement("button");
+				square.className = `peer ${peerId === selfId ? "self" : "remote"}`;
+				square.style.left = `${peer.x}%`;
+				square.style.top = `${peer.y}%`;
+				square.style.background = peer.color;
+				square.title = `${peer.name} / ${peerId}`;
+				square.disabled = peerId !== selfId;
+				square.addEventListener("pointerdown", (event) => {
+					if (peerId === selfId) square.setPointerCapture(event.pointerId);
+				});
+				square.addEventListener("pointermove", (event) => {
+					if (peerId !== selfId || !event.buttons) return;
+					const rect = arena.getBoundingClientRect();
+					const position = {
+						x: Math.max(3, Math.min(97, ((event.clientX - rect.left) / rect.width) * 100)),
+						y: Math.max(5, Math.min(95, ((event.clientY - rect.top) / rect.height) * 100))
+					};
+					peers.set(selfId, { ...peers.get(selfId), ...position });
+					move.send({ peerId: selfId, ...peers.get(selfId) });
+					render();
+				});
+				arena.appendChild(square);
+				const row = document.createElement("div");
+				row.className = "player";
+				row.innerHTML = `<span class="swatch" style="background:${peer.color}"></span><span>${peer.name}${peerId === selfId ? " (you)" : ""}<small>${peerId}</small></span>`;
+				playerList.appendChild(row);
+			}
+		};
+
+		const announce = (target) => {
+			const own = peers.get(selfId);
+			move.send(own, target ? { target } : undefined);
+		};
+
+		connectButton.addEventListener("click", () => {
+			const roomId = roomInput.value.trim();
+			if (!roomId) { status.textContent = "Enter a room code."; return; }
+			room = joinRoom({ appId: "free-the-memes-peer-test" }, roomId);
+			move = room.makeAction("peer-state");
+			peers.set(selfId, { name: nameInput.value.trim() || "Peer", color: colorFor(selfId), x: 50, y: 50 });
+			move.onMessage = (message, { peerId }) => {
+				peers.set(peerId, { ...peers.get(peerId), ...message, color: peers.get(peerId)?.color ?? colorFor(peerId) });
+				render();
+			};
+			room.onPeerJoin = (peerId) => { announce(peerId); status.textContent = `${peers.size} peer(s) connected.`; };
+			room.onPeerLeave = (peerId) => { peers.delete(peerId); render(); };
+			announce();
+			status.textContent = "Connected. This page is only Trystero.";
+			render();
+		});
+	</script>
+</body>
+</html>

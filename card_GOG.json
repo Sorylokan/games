@@ -1,0 +1,50 @@
+{
+  "title": "Grid of Greed",
+  "path": "GridOfGreed/",
+  "mode": "multi",
+  "tagline": "Play safe. Or don't.",
+  "description": {
+    "fr": "Retourne tes tuiles, échange-les, prends des risques pour effacer une colonne. Le moins de points gagne !",
+    "en": "Flip your tiles, swap them, take risks to clear a column. Fewest points wins!"
+  },
+  "meta": { "fr": "2 à 8 joueurs", "en": "2–8 players" },
+  "button": { "fr": "Jouer →", "en": "Play →" },
+  "fonts": ["Fraunces:opsz,wght@9..144,500;9..144,700"],
+
+  "style": {
+    "--gold": "#b8923a",
+    "background": "#15131c",
+    "border": "1px solid #3a3648",
+    "borderRadius": "12px",
+    "padding": "1.5rem",
+    "fontFamily": "Georgia, serif",
+    "transition": "border-color .2s"
+  },
+
+  "css": [
+    "&:hover { border-color: var(--gold); }",
+    "h2 { margin: 0; font: 700 clamp(2rem, 5vw, 2.6rem)/1.05 Fraunces, Georgia, serif; color: var(--gold); }",
+    ".tagline { font-style: italic; color: #8a8698; }",
+    ".cell-face, .cell-back { background: #15131c; }",
+    ".cell-back { border: 1.5px solid var(--gold); }",
+    ".cell-back::before { content: \"\"; width: 26%; height: 26%; border: 1.5px solid var(--gold); transform: rotate(45deg); }",
+    ".cell-face { border: 1.5px solid var(--c); color: var(--c); font: 500 clamp(.9rem, 2.4vw, 1.3rem)/1 Fraunces, Georgia, serif; background: #0c0b10; }",
+    ".meta { color: #8a8698; font-size: .95rem; }",
+    ".go { padding: .5rem 1.3rem; color: var(--gold); border: 1px solid var(--gold); border-radius: 8px; }",
+    "&:hover .go { background: color-mix(in srgb, var(--gold) 14%, transparent); }"
+  ],
+
+  "preview": {
+    "type": "grid",
+    "columns": 4,
+    "values": [-2, 0, 5, 12, 3, 9, 1, 7, 10, 4, 8, -1],
+    "revealed": [0, 5, 6, 11],
+    "colors": [
+      { "max": -1, "color": "#4a8cff" },
+      { "max": 0, "color": "#6fd6e6" },
+      { "max": 4, "color": "#5fcf80" },
+      { "max": 8, "color": "#e9d24c" },
+      { "color": "#ef5b5b" }
+    ]
+  }
+}

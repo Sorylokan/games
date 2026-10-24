@@ -1,0 +1,344 @@
+# Shadow Hunters — Official Rules Reference
+
+> Reference document for **Shadow Hunter Remake**.
+>
+> This document is a **paraphrased rules reference**, not a reproduction of the official rulebook. It is intended to help understand the source game's mechanics. The remake must use its own names, data, artwork and adapted rules.
+
+## 1. Source and scope
+
+Primary source: the official Z-Man Games rulebook for *Shadow Hunters*.
+
+The base game is for **4–8 players**, with 5 or more recommended in the rulebook.
+
+The game is a hidden-role survival game involving three groups:
+
+- Shadows
+- Hunters
+- Neutrals
+
+Each player receives one secret Character. Players attempt to identify allies and enemies while fulfilling their own Character's victory condition.
+
+## 2. Components
+
+The base game contains:
+
+- 1 game board
+- 6 Area cards
+- 10 Character cards in the base set
+- 16 Hermit cards
+- 16 White cards
+- 16 Black cards
+- Player boards / pieces and health markers
+- 1 six-sided die
+- 1 four-sided die
+- Rulebook
+
+The Character cards and other content may differ when using the separate character expansion. This reference concerns the base game unless explicitly stated otherwise.
+
+## 3. Character distribution
+
+The character mix depends on player count:
+
+| Players | Hunters | Shadows | Neutrals |
+|---:|---:|---:|---:|
+| 4 | 2 | 2 | 0 |
+| 5 | 2 | 2 | 1 |
+| 6 | 2 | 2 | 2 |
+| 7 | 2 | 2 | 3 |
+| 8 | 3 | 3 | 2 |
+
+The required Characters are selected, shuffled together and dealt face-down.
+
+Each player secretly reads their Character's affiliation, HP, special ability and Win Condition.
+
+## 4. Setup
+
+1. Place the board in the center of the table.
+2. Shuffle the six Area cards and place them randomly in the six Area positions.
+3. Shuffle the White, Black and Hermit decks separately.
+4. Each player chooses a player color and takes the corresponding pieces.
+5. Prepare the Character pool for the player count.
+6. Deal one Character face-down to each player.
+7. Players secretly inspect their Character.
+8. Determine the first player randomly.
+9. Begin play.
+
+The original physical game tracks **damage received** with a marker rather than tracking remaining HP. This is important when adapting the rules to the remake.
+
+## 5. Factions
+
+### Hunters
+
+The general Hunter objective is to eliminate all Shadows.
+
+### Shadows
+
+The general Shadow objective is to eliminate all Hunters. Shadow Characters can also have an alternative victory condition involving the death of three Neutrals.
+
+### Neutrals
+
+Neutrals do not share one common victory condition. Each Neutral Character has its own objective.
+
+## 6. Victory
+
+The game ends when one or more Characters satisfy their Win Condition.
+
+Victory is not limited to living players or to one faction. Every player whose condition has been fulfilled is a winner.
+
+A victory condition can therefore be satisfied because of another player's action, and it should be checked immediately when relevant game state changes.
+
+## 7. Original HP / damage system
+
+The original game tracks **damage received**.
+
+A Character has a maximum HP value and starts at **0 damage**.
+
+Taking damage increases the damage counter. Healing reduces it.
+
+A Character dies when:
+
+`damage >= maximum HP`
+
+For an 8 HP Character:
+
+| Damage | Status |
+|---:|---|
+| 0 | Alive |
+| 4 | Alive |
+| 7 | Alive |
+| 8 | Dead |
+
+The remake intentionally replaces this with conventional remaining HP.
+
+## 8. Turn structure
+
+A normal turn consists conceptually of:
+
+1. Move.
+2. Optionally resolve the Area's action.
+3. Optionally attack another player in range.
+4. Resolve effects caused by the action.
+5. Check relevant deaths and victory conditions.
+6. End the turn and continue with the next player.
+
+Special Character abilities and card effects can modify this sequence.
+
+## 9. Movement
+
+At the beginning of the turn, the player rolls both dice:
+
+- 1d6
+- 1d4
+
+Add the two results.
+
+Possible totals are 2–10.
+
+The player moves to the Area whose number matches the total.
+
+### Result of 7
+
+There is no Area numbered 7. On a total of 7, the player may choose any Area except their current Area.
+
+### Result matching the current Area
+
+A player must move on every turn. If the result corresponds to the Area where they already are, they roll again until they can move to a different Area.
+
+Character abilities can modify the normal movement procedure.
+
+## 10. Areas and attack range
+
+The six Areas are arranged in three pairs. Each pair forms one attack-range zone.
+
+A player may normally attack a player located on either:
+
+- their own Area; or
+- the Area paired with their Area.
+
+The six base Areas and their normal actions are:
+
+### Hermit's Cabin
+
+Draw one Hermit card, secretly read it, then give it to another player.
+
+### Church
+
+Draw one White card and follow its instructions.
+
+### Cemetery
+
+Draw one Black card and follow its instructions.
+
+### Underworld Gate
+
+Choose one of the three card decks and draw one card from it, then follow its instructions.
+
+### Weird Woods
+
+Choose a player and either:
+
+- give them 2 damage; or
+- remove 1 damage from them.
+
+You may choose yourself.
+
+### Erstwhile Altar
+
+Steal one Equipment card from another player. If no player has Equipment, nothing happens.
+
+Area actions are optional after movement.
+
+## 11. Attacking
+
+At the end of the turn, the player may attack another player in their attack range.
+
+The attacker chooses a target and rolls both dice.
+
+Damage equals the numerical difference between the two dice:
+
+`damage = |d6 - d4|`
+
+If both dice show the same value, the attack fails and deals no damage.
+
+Example:
+
+- d6 = 2
+- d4 = 4
+- damage = 2
+
+Some effects can cause one roll to affect multiple targets. In that case, the same roll result is applied to all affected targets unless the effect says otherwise.
+
+## 12. Hermit cards
+
+A Hermit card is drawn privately by one player and then given to another player.
+
+The receiving player reads the instruction and must follow it honestly.
+
+A typical Hermit effect checks either the recipient's Character identity or their faction.
+
+If the condition does not match, the recipient announces that nothing happens.
+
+The player who drew the card and the player who received it must not reveal the card's exact information to the other players.
+
+The recipient resolves the card and then discards it face-down.
+
+When the Hermit deck is exhausted, its discard pile is shuffled to create a new deck.
+
+## 13. White and Black cards
+
+White and Black cards are divided into two broad categories.
+
+### Single-use
+
+A Single-use card is resolved immediately according to its instructions and then discarded face-up.
+
+### Equipment
+
+An Equipment card is placed face-up in front of its owner and becomes active.
+
+Equipment remains active while owned unless its own effect or another game effect removes it.
+
+Multiple Equipment cards can be active at the same time.
+
+When a White or Black deck is exhausted, its discard pile is shuffled to form a new deck.
+
+## 14. Character abilities
+
+Characters have individual special abilities.
+
+The exact timing and restrictions are Character-specific.
+
+Some abilities are activated by the Character's owner, while others trigger in response to an event.
+
+Some Characters have restrictions concerning revelation or the number of times an ability may be used.
+
+The remake should therefore model abilities as rules/triggers rather than assuming every ability is simply an activated button.
+
+## 15. Character revelation
+
+Players normally keep their Character secret.
+
+When a player reveals their Character, their identity and affiliation become public.
+
+Some Character abilities depend on being revealed or have special rules about when revelation occurs.
+
+The exact behavior is Character-specific.
+
+## 16. Death
+
+A Character dies when accumulated damage reaches or exceeds its maximum HP.
+
+When a Character dies:
+
+1. Their identity is revealed.
+2. Their Character is removed from normal play.
+3. Death-related effects are resolved.
+4. If another player caused the death, the killer may take one Equipment card of their choice from the dead player; the remaining Equipment is discarded.
+5. Victory conditions are checked immediately.
+
+A dead player normally no longer takes turns.
+
+However, death does **not** universally mean that the player loses: a Character whose Win Condition has been fulfilled can still be a winner even if they die during the game.
+
+## 17. Simultaneous winners
+
+The game must allow multiple winners.
+
+When victory is checked, evaluate all Character Win Conditions rather than stopping after finding the first one.
+
+This includes cases where a player's victory condition becomes true because another player performed an action.
+
+## 18. Rule priority for reference
+
+When interpreting the original game, use the following practical order:
+
+1. Specific Character rule.
+2. Specific card rule.
+3. Specific Area rule.
+4. General game rule.
+
+A specific effect overrides a general rule when the effect explicitly says so.
+
+Do not infer mechanics from flavor text.
+
+## 19. Remake warning
+
+This document is **reference material only**.
+
+The remake deliberately changes:
+
+- faction names;
+- Character names;
+- Character abilities;
+- Win Conditions;
+- card names;
+- card effects;
+- Area names;
+- HP representation;
+- presentation and artwork;
+- networking architecture;
+- selected mechanics.
+
+The remake's data is authoritative for implementation.
+
+If `cards.md`, Character data, Area data or the project brief contradicts this document, use the remake data.
+
+## 20. Sources
+
+Primary source:
+
+- Z-Man Games, *Shadow Hunters Rule Book*.
+
+Secondary reference:
+
+- French-language *Shadow Hunters* rulebook.
+
+The official rulebook should remain the authority when a source disagrees with a secondary rules summary.
+
+
+                   ▉▉▉
+         Slot 2  ▉     ▉  Slot 3
+       Slot 1   ▉       ▉  Slot 4
+                 ▉     ▉
+                   ▉▉▉
+                 6   5

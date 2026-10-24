@@ -1,0 +1,17 @@
+/* THEME BUREAU 2004 : le look "bureau d'ordinateur" historique, devenu un theme.
+   Activation : <link> après styles.css + class="theme-desktop-2004" sur <body>.
+   Ne contient QUE l'apparence (couleurs, fond, ombres, police) : la structure
+   vit dans styles.css. Sert aussi de reference pour ecrire un nouveau theme. */
+
+body.theme-desktop-2004 {
+  --desk: #2a3fd8; --ink: #101020; --paper: #fff; --chrome: #dcdcec; --muted: #5a5a78;
+  --pink: #ff5fa2; --lemon: #ffe44d; --mint: #35e0a1; --sky: #8ad0ff;
+  --pc0: #ff5fa2; --pc1: #ffe44d; --pc2: #35e0a1; --pc3: #8ad0ff;
+  --pc4: #ff9a4d; --pc5: #b69cff; --pc6: #d6ff5f; --pc7: #ff7a7a;
+  --shadow: 4px 4px 0 var(--ink);
+  font-family: Tahoma, Verdana, "Segoe UI", sans-serif;
+  background:
+    linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--desk);
+}

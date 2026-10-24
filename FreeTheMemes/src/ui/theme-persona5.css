@@ -1,0 +1,159 @@
+@import url("https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Narrow:wght@500;700&display=swap");
+
+/* THEME PERSONA 5 : surcouche du Bureau 2004.
+   Activation : <link> après styles.css + class="theme-persona5" sur <body>.
+   Rouge #e60012 / noir / blanc, formes obliques, texte italique condensé.
+   Les variables du Bureau (--ink, --paper, --pink...) sont redéfinies : la plupart des règles existantes se recolorent seules. */
+
+body.theme-persona5 {
+  --desk: #0a0a0a; --ink: #0a0a0a; --paper: #f1f1f1; --chrome: #ececec; --muted: #555;
+  --red: #e60012; --pink: #e60012; --lemon: #f1f1f1; --mint: #f5e000; --sky: #b8b8b8;
+  --pc0: #e60012; --pc1: #f5e000; --pc2: #f1f1f1; --pc3: #00b7ff; --pc4: #ff7a00; --pc5: #9b5cff; --pc6: #2be37a; --pc7: #9a9a9a;
+  --shadow: 5px 5px 0 var(--red);
+  --display: Anton, Impact, "Arial Narrow", sans-serif;
+  font-family: "Archivo Narrow", "Arial Narrow", Tahoma, sans-serif;
+  font-size: 15px;
+  background:
+    linear-gradient(115deg, #0a0a0a 0 62%, var(--red) 62% 64.5%, #0a0a0a 64.5% 100%);
+}
+body.theme-persona5 #app { position: relative; z-index: 1; }
+/* Trame de points rouges, visible surtout dans les coins */
+body.theme-persona5::before {
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .5;
+  background: radial-gradient(circle, var(--red) 1.6px, transparent 2.1px) 0 0 / 15px 15px;
+  -webkit-mask-image: linear-gradient(115deg, #000 0, transparent 30%, transparent 72%, #000 100%);
+  mask-image: linear-gradient(115deg, #000 0, transparent 30%, transparent 72%, #000 100%);
+}
+
+/* ---- Titres : onglets rouges coupés en biais ---- */
+body.theme-persona5 .win { border: 3px solid var(--ink); }
+body.theme-persona5 .win-title {
+  margin: -3px 30px 0 -3px; padding: 4px 18px 4px 12px;
+  background: var(--red); color: #f1f1f1;
+  font: italic 400 15px/1.2 var(--display); letter-spacing: .07em; text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+}
+body.theme-persona5 .win-title::after { content: none; }
+body.theme-persona5 .zone .win-title { margin-right: 0; background: var(--zc); color: var(--ink); clip-path: none; }
+body.theme-persona5 .dice-slot .win-title { background: var(--red); color: #f1f1f1; clip-path: none; margin: -3px -3px 0; }
+
+/* ---- Typo ---- */
+body.theme-persona5 .wordmark { font: italic 400 26px var(--display); color: #f1f1f1; text-shadow: 3px 3px 0 var(--red); }
+body.theme-persona5 .home-copy h1, body.theme-persona5 .room-main h1 { font-family: var(--display); font-style: italic; font-weight: 400; transform: rotate(-2deg); transform-origin: left; }
+body.theme-persona5 .home-copy h1 { text-shadow: 6px 6px 0 var(--red); }
+body.theme-persona5 .home-copy h1 em { color: var(--red); text-shadow: 6px 6px 0 #f1f1f1; }
+body.theme-persona5 .eyebrow { background: var(--red); color: #f1f1f1; clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); padding-right: 16px; }
+body.theme-persona5 .online-actions::before, body.theme-persona5 .invite-block::before, body.theme-persona5 .room-roster::before { background: var(--red); font: italic 400 14px var(--display); letter-spacing: .07em; text-transform: uppercase; }
+
+/* ---- Boutons : étiquettes penchées, ombre rouge ---- */
+body.theme-persona5 .action {
+  background: var(--ink); color: #f1f1f1; border: 2px solid #f1f1f1; border-radius: 0;
+  box-shadow: 4px 4px 0 var(--red);
+  font: italic 400 15px var(--display); letter-spacing: .06em; text-transform: uppercase;
+  transform: skewX(-8deg);
+}
+body.theme-persona5 .action.secondary { background: #f1f1f1; color: var(--ink); border-color: var(--ink); }
+body.theme-persona5 .action:hover { background: var(--red); color: #f1f1f1; border-color: #f1f1f1; transform: skewX(-8deg) translate(-1px, -1px); box-shadow: 6px 6px 0 #f1f1f1; }
+body.theme-persona5 .action:active { transform: skewX(-8deg) translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
+body.theme-persona5 .action:disabled { transform: skewX(-8deg); box-shadow: 4px 4px 0 var(--red); }
+body.theme-persona5 .create-room-action { background: var(--red); }
+body.theme-persona5 .locale-select { border-radius: 0; font-family: inherit; }
+
+/* ---- Plateau ---- */
+body.theme-persona5 .tri polygon { fill: rgba(230, 0, 18, .14); stroke: var(--red); stroke-width: 5; stroke-dasharray: none; }
+body.theme-persona5 .zone { transform: translate(-50%, -50%) rotate(var(--tilt, 0deg)); }
+body.theme-persona5 .zone.z0 { --tilt: -2deg; } body.theme-persona5 .zone.z1 { --tilt: 1.5deg; }
+body.theme-persona5 .zone.z2 { --tilt: -1.5deg; } body.theme-persona5 .zone.z3 { --tilt: 2deg; }
+body.theme-persona5 .zone.z4 { --tilt: -1deg; } body.theme-persona5 .zone.z5 { --tilt: 1.5deg; }
+body.theme-persona5 .zone.here { box-shadow: 0 0 0 5px var(--red), 11px 11px 0 5px #f1f1f1; z-index: 2; }
+body.theme-persona5 .zone-dice { background: var(--ink); color: #f1f1f1; font: italic 400 13px var(--display); }
+body.theme-persona5 .zone-effect { color: #222; font-weight: 700; }
+body.theme-persona5 .dice-body { background: var(--ink); }
+body.theme-persona5 .dice-slot .dice-tray { --gold: 255, 255, 255; --die-bg: #0a0a0a; }
+
+/* ---- Pions : étiquettes carrées inclinées ---- */
+body.theme-persona5 .piece { border: 2px solid var(--ink); border-radius: 0; background: #f1f1f1; font-weight: 700; transform: skewX(-8deg); }
+body.theme-persona5 .piece-avatar, body.theme-persona5 .pl-avatar { border-radius: 0; }
+body.theme-persona5 .piece.current { background: var(--red); color: #f1f1f1; }
+body.theme-persona5 .piece.attackable { box-shadow: 0 0 0 3px var(--red); outline: 2px dashed #f1f1f1; }
+body.theme-persona5 .piece.attackable:hover { background: var(--red); color: #f1f1f1; }
+
+/* ---- Bandeau de tour, dock, victoire ---- */
+body.theme-persona5 .turnline { background: var(--ink); color: #f1f1f1; border: 2px solid #f1f1f1; border-radius: 0; box-shadow: 4px 4px 0 var(--red); font: italic 400 16px var(--display); letter-spacing: .06em; text-transform: uppercase; transform: skewX(-8deg); padding: 5px 18px; }
+body.theme-persona5 .turnline.mine { background: var(--red); }
+body.theme-persona5 .dock { background: var(--ink); color: #f1f1f1; border: 3px solid #f1f1f1; box-shadow: 6px 6px 0 var(--red); }
+body.theme-persona5 .dock-title { font: italic 400 22px var(--display); letter-spacing: .05em; text-transform: uppercase; }
+body.theme-persona5 .pending-label { color: #f1f1f1; font-size: 14px; }
+body.theme-persona5 .victory { background: var(--red); color: #f1f1f1; border: 3px solid #f1f1f1; }
+body.theme-persona5 .victory h2 { font: italic 400 44px var(--display); text-shadow: 4px 4px 0 var(--ink); }
+
+/* ---- Panneaux latéraux ---- */
+body.theme-persona5 .hp-bar { border: 2px solid var(--ink); background: #f1f1f1; transform: skewX(-20deg); }
+body.theme-persona5 .hp-fill { background: var(--red); }
+body.theme-persona5 .me-name b { font: italic 400 20px var(--display); letter-spacing: .04em; text-transform: uppercase; }
+body.theme-persona5 .badge { border-radius: 0; font-family: var(--display); font-weight: 400; letter-spacing: .05em; }
+body.theme-persona5 .f-troller { color: #f1f1f1; }
+body.theme-persona5 .sheet dt { color: var(--red); font-family: var(--display); font-weight: 400; letter-spacing: .08em; font-size: 13px; }
+/* Corps des reponses (ability, win condition) : assez gros pour rester lisible en Archivo Narrow. */
+body.theme-persona5 .sheet dd { font-size: 14px; line-height: 1.5; font-weight: 500; }
+body.theme-persona5 .pl.active b::after { content: " \25B6"; color: var(--red); }
+body.theme-persona5 .pl.revealed { border-left-color: var(--red); }
+body.theme-persona5 .tags-box { border-top-color: var(--red); }
+body.theme-persona5 .tag-hint, body.theme-persona5 .roster-foot { color: #555; }
+body.theme-persona5 .note { border-radius: 0; font-family: var(--display); font-weight: 400; letter-spacing: .04em; }
+body.theme-persona5 .n0 { background: var(--red); color: #f1f1f1; } body.theme-persona5 .n1 { background: var(--ink); color: #f1f1f1; }
+body.theme-persona5 .n2 { background: #f5e000; } body.theme-persona5 .n3 { background: var(--sky); }
+body.theme-persona5 .n4 { background: #732424; color: #f1f1f1; } body.theme-persona5 .n5 { background: #f1f1f1; }
+
+/* ---- Journal ---- */
+body.theme-persona5 .term { background: var(--ink); border: 2px solid #f1f1f1; box-shadow: 6px 6px 0 var(--red); }
+body.theme-persona5 .term-bar { background: var(--red); }
+body.theme-persona5 .term-body div::before { color: var(--red); }
+body.theme-persona5 .dice-slot { top: 43%; transform: translate(-50%, -50%) scale(1.3); }
+/* ---- Mobile : les zones perdent leur position absolue, on garde seulement l'inclinaison ---- */
+@media (max-width: 860px) {
+  body.theme-persona5 .zone { transform: rotate(var(--tilt, 0deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.theme-persona5 .action, body.theme-persona5 .piece { transition: none; }
+}
+
+/* Le plateau agrandi vit dans le socle (styles.css), pas ici.
+   Décalage volontaire des dés, si tu veux garder l'effet "pas tout à fait centré" :
+   body.theme-persona5 .dice-slot { left: 48.5%; } */
+
+/* Texte courant un cran au-dessus du Bureau 2004 : 12px -> 14px, 11px -> 12px.
+   Obligé de lister les sélecteurs : le socle fixe ces tailles en px, l'héritage
+   ne suffit pas. (Les titres/boutons en Anton sont déjà à 15px+, on n'y touche pas.) */
+body.theme-persona5 .eyebrow,
+body.theme-persona5 .name-field,
+body.theme-persona5 .join-room-block > label,
+body.theme-persona5 .invite-block > label,
+body.theme-persona5 .room-status,
+body.theme-persona5 .hp,
+body.theme-persona5 .pl,
+body.theme-persona5 .sheet,
+body.theme-persona5 .eq b,
+body.theme-persona5 .seat-picker,
+body.theme-persona5 .tag-new input,
+body.theme-persona5 .invite-field input,
+body.theme-persona5 .term { font-size: 14px; }
+
+body.theme-persona5 .connection-state,
+body.theme-persona5 .home-topbar > span,
+body.theme-persona5 .home-footer,
+body.theme-persona5 .roster-foot,
+body.theme-persona5 .bar .chip,
+body.theme-persona5 .locale-select,
+body.theme-persona5 .zone .empty,
+body.theme-persona5 .piece-avatar,
+body.theme-persona5 .pl-avatar,
+body.theme-persona5 .chip-eq,
+body.theme-persona5 .eq small,
+body.theme-persona5 .note,
+body.theme-persona5 .tag-hint,
+body.theme-persona5 .tag-err { font-size: 12px; }
+
+/* Ces deux-là utilisent un clamp() dans le socle : on remonte juste le plancher 11 -> 12. */
+body.theme-persona5 .piece { font-size: clamp(12px, 1vw, 15px); }
+body.theme-persona5 .zone-effect { font-size: clamp(12px, .85vw, 14px); }

@@ -1,0 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700&display=swap");
+
+/* THEME JARDIN : fond vert forêt, boutons fermés sur tuile sombre, fleurs écloses sur tuile sauge.
+   Activé par <link> après styles.css et class="theme-garden" sur <body>.
+   Verts volontairement doux (pas de vert fluo : ça fatigue les yeux). */
+body.theme-garden {
+  --bg: #12332c; --card: #1d4a3f; --line: #307457; --txt: #eef6ee; --mut: #a9c7b3;
+  --accent: #F29F58; --accent-ink: #12332c;
+  --on: #173f36; --off: #4b8c5f;
+  --font: Nunito, "Trebuchet MS", system-ui, sans-serif;
+  --display: Fredoka, Nunito, "Trebuchet MS", system-ui, sans-serif;
+}
+
+/* Décor : lumière dorée en haut, ombre de sous-bois en bas, feuilles et pétales en filigrane. */
+body.theme-garden {
+  background-image:
+    radial-gradient(50rem 32rem at 50% -6%, rgba(242, 159, 88, .16), transparent 64%),
+    radial-gradient(58rem 36rem at 10% 100%, rgba(75, 140, 95, .28), transparent 62%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%2370ac74' fill-opacity='.10'%3E%3Cpath d='M30 60 Q50 30 70 60 Q50 78 30 60 Z'/%3E%3Cpath d='M100 140 Q120 110 140 140 Q120 158 100 140 Z' transform='rotate(40 120 134)'/%3E%3C/g%3E%3Cg fill='%23F29F58' fill-opacity='.10'%3E%3Ccircle cx='120' cy='40' r='5'/%3E%3Ccircle cx='128' cy='34' r='5'/%3E%3Ccircle cx='128' cy='46' r='5'/%3E%3Ccircle cx='136' cy='40' r='5'/%3E%3Ccircle cx='40' cy='120' r='4'/%3E%3Ccircle cx='46' cy='115' r='4'/%3E%3Ccircle cx='46' cy='125' r='4'/%3E%3Ccircle cx='52' cy='120' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: auto, auto, 160px 160px;
+}

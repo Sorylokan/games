@@ -1,0 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700&display=swap");
+
+/* THEME NIGHTFALL : nuit profonde, guirlande d'ampoules colorées à éteindre.
+   Activé par <link> après styles.css et class="theme-nightfall" sur <body>.
+   Case allumée = lueur chaude sombre, case éteinte = bleu nuit. */
+body.theme-nightfall {
+  --bg: #0e1226; --card: #1a2038; --line: #2c3352; --txt: #eef0fa; --mut: #9aa0c4;
+  --accent: #f4d47c; --accent-ink: #0e1226;
+  --on: #43391c; --off: #232a45;
+  --font: Nunito, "Trebuchet MS", system-ui, sans-serif;
+  --display: Fredoka, Nunito, "Trebuchet MS", system-ui, sans-serif;
+}
+
+/* Décor : clair de lune en haut à droite, ciel profond en bas, étoiles en filigrane. */
+body.theme-nightfall {
+  background-image:
+    radial-gradient(44rem 30rem at 88% 4%, rgba(244, 212, 124, .14), transparent 60%),
+    radial-gradient(56rem 40rem at 8% 100%, rgba(44, 51, 82, .55), transparent 62%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%23ffffff' fill-opacity='.10'%3E%3Ccircle cx='20' cy='30' r='2'/%3E%3Ccircle cx='70' cy='14' r='1.5'/%3E%3Ccircle cx='120' cy='44' r='2.2'/%3E%3Ccircle cx='45' cy='80' r='1.6'/%3E%3Ccircle cx='100' cy='100' r='1.8'/%3E%3Ccircle cx='150' cy='80' r='1.4'/%3E%3Ccircle cx='30' cy='140' r='2'/%3E%3Ccircle cx='85' cy='150' r='1.5'/%3E%3Ccircle cx='135' cy='128' r='1.7'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: auto, auto, 160px 160px;
+}

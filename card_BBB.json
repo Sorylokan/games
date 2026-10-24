@@ -1,0 +1,73 @@
+{
+  "title": "Bit by Bit",
+  "path": "BitByBit/",
+  "mode": "solo",
+  "tagline": {
+    "fr": "Un petit puzzle relaxant, pixel par pixel.",
+    "en": "A relaxing little puzzle, pixel by pixel."
+  },
+  "description": {
+    "fr": "Des porteurs (fourmis, crabes, fées, renards…) démontent une fresque en pixel art. Pose leurs boîtes dans le bon ordre : si plus personne n'atteint sa couleur, la colonie est coincée.",
+    "en": "Carriers (ants, crabs, fairies, foxes…) take apart a pixel-art mural. Place their boxes in the right order: if no one can reach their colour anymore, the colony is stuck."
+  },
+  "tags": {
+    "fr": ["Solo", "9 fresques", "12 thèmes"],
+    "en": ["Solo", "9 murals", "12 themes"]
+  },
+  "fonts": ["Fredoka:wght@600", "Nunito:wght@400;700"],
+  "badge": "⚠ BETA ⚠",
+  "warning": {
+    "fr": "À vos risques et périls : ça peut bugger !",
+    "en": "At your own risk: it may be buggy!"
+  },
+  "button": { "fr": "Jouer →", "en": "Play →" },
+
+  "style": {
+    "--accent": "#7fa8d9",
+    "--line": "#26344c",
+    "--mural-board": "#0a0e18",
+    "--mural-line": "#26344c",
+    "background": "#101827",
+    "color": "#c3cfe2",
+    "border": "1px solid var(--line)",
+    "borderRadius": "12px",
+    "padding": "1.5rem",
+    "fontFamily": "Georgia, serif",
+    "transition": "border-color .2s"
+  },
+
+  "css": [
+    "&:hover { border-color: var(--accent); }",
+    "h2 { margin: 0; font: 700 clamp(2rem, 5vw, 2.6rem)/1.05 Fraunces, Georgia, serif; color: var(--accent); }",
+    ".tagline { font-style: italic; color: #6f7f9a; }",
+    ".mural-label { color: #6f7f9a; font-size: .85rem; font-style: italic; }",
+    ".tags span { padding: .1rem .6rem; border: 1px solid var(--line); border-radius: 6px; font-size: .85rem; color: #c3cfe2; }",
+    ".go { padding: .5rem 1.3rem; color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; }",
+    "&:hover .go { background: color-mix(in srgb, var(--accent) 14%, transparent); }"
+  ],
+
+  "preview": {
+    "type": "mural",
+    "label": { "fr": "Survole pour démonter la fresque", "en": "Hover to take the mural apart" },
+    "map": [
+      "BBBBBBBBBB",
+      "BBBKKKKBBB",
+      "BBKOOOOKBK",
+      "BKOWKOOOKK",
+      "BKOKKOYOOK",
+      "BKOOOOYOOK",
+      "BKOOOOOOKK",
+      "BBKOOOOKBK",
+      "BBBKKKKBBB",
+      "NNNNNNNNNN"
+    ],
+    "colors": {
+      "B": "#7fa6c9",
+      "K": "#665e90",
+      "O": "#d98a4e",
+      "W": "#ece4d6",
+      "Y": "#e0b65a",
+      "N": "#34477a"
+    }
+  }
+}

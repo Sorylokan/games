@@ -1,0 +1,60 @@
+/* Base : couleurs du thème par défaut (Nuit), police, boutons et listes déroulantes.
+   Les autres thèmes ne font que redéfinir les variables --bg, --card, --accent, --line, --txt, --mut. */
+
+:root {
+  --bg: #0a0e18;
+  --card: #101827;
+  --accent: #7fa8d9;
+  --line: #26344c;
+  --txt: #c3cfe2;
+  --mut: #6f7f9a;
+  --warn: #ef5b5b;
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --body: Georgia, "Times New Roman", serif;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html { background: var(--bg); min-height: 100%; }
+
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at 85% 6%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 32%),
+    radial-gradient(1px 1px at 22% 28%, color-mix(in srgb, var(--txt) 45%, transparent), transparent 65%),
+    radial-gradient(1px 1px at 64% 72%, color-mix(in srgb, var(--txt) 30%, transparent), transparent 65%);
+  background-size: auto, 300px 300px, 260px 260px;
+  background-repeat: no-repeat, repeat, repeat;
+  margin: 0;
+  color: var(--txt);
+  font: 15px/1.45 var(--body);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+button { font: inherit; color: var(--accent); background: none; border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+
+button:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+
+button:disabled { opacity: .45; cursor: default; }
+
+button:disabled:hover { background: none; }
+
+button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+button.ghost { border-color: var(--line); color: var(--txt); }
+
+.icon-btn { padding: 7px; line-height: 0; border-color: var(--line); color: var(--txt); }
+
+.icon-btn svg { width: 18px; height: 18px; }
+
+.speed-btn { font: 500 14px var(--display); min-width: 46px; padding: 6px 10px; border-color: var(--line); color: var(--txt); }
+
+.speed-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+
+select { font: inherit; font-size: 13px; color: var(--txt); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }

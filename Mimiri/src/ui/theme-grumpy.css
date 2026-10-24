@@ -1,0 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,600&family=Nunito:wght@600;700&display=swap");
+
+/* THEME GRINCHEUX : cases violettes orageuses pour les chats de mauvaise humeur,
+   gris-bleu une fois ravis. Activé par <link> après styles.css et class="theme-grumpy" sur <body>. */
+body.theme-grumpy {
+  --bg: #1B1833; --card: #404258; --line: #50577A; --txt: #f1eefb; --mut: #b4b8d2;
+  --accent: #7ed9a2; --accent-ink: #1B1833;
+  --on: #441752; --off: #50577A;
+  --font: Nunito, "Trebuchet MS", system-ui, sans-serif;
+  --display: Fraunces, Georgia, serif;
+}
+body.theme-grumpy h1 { font-style: italic; }
+
+/* Décor : ciel d'orage violet en haut, éclaircie verte en bas, petits nuages en filigrane. */
+body.theme-grumpy {
+  background-image:
+    radial-gradient(54rem 36rem at 85% 6%, rgba(68, 23, 82, .75), transparent 64%),
+    radial-gradient(46rem 34rem at 8% 96%, rgba(126, 217, 162, .10), transparent 62%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='130' viewBox='0 0 170 130'%3E%3Cg fill='%236B728E' fill-opacity='.10'%3E%3Cellipse cx='40' cy='40' rx='20' ry='10'/%3E%3Cellipse cx='26' cy='46' rx='14' ry='8'/%3E%3Cellipse cx='54' cy='46' rx='14' ry='8'/%3E%3Cellipse cx='120' cy='100' rx='20' ry='10'/%3E%3Cellipse cx='106' cy='106' rx='14' ry='8'/%3E%3Cellipse cx='134' cy='106' rx='14' ry='8'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: auto, auto, 170px 130px;
+}

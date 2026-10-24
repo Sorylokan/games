@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dice Odometer – compact</title>
+
+<!-- Optionnel : police du rendu. Sans réseau, repli sur Arial Narrow. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300&display=swap" rel="stylesheet">
+
+<style>
+
+/* =========================================================
+   COMPOSANT  (tout est piloté par --cell, posé par le JS)
+   ========================================================= */
+
+.dice-tray {
+    --gold: 238, 229, 139;
+    --die-bg: #0b100d;
+    --stroke: max(2px, calc(var(--cell) * .035));
+
+    --fade: linear-gradient(to bottom,
+        transparent 0,
+        rgba(var(--gold), .08) calc(var(--T) * .20),
+        rgba(var(--gold), .28) calc(var(--T) * .44),
+        rgba(var(--gold), .62) calc(var(--T) * .68),
+        rgb(var(--gold)) var(--T),
+        rgb(var(--gold)) calc(var(--T) + var(--cell)),
+        rgba(var(--gold), .62) calc(var(--T) + var(--cell) + var(--B) * .32),
+        rgba(var(--gold), .28) calc(var(--T) + var(--cell) + var(--B) * .56),
+        rgba(var(--gold), .08) calc(var(--T) + var(--cell) + var(--B) * .79),
+        transparent calc(var(--T) + var(--cell) + var(--B)));
+
+    --ext: calc(var(--cell) * .9);
+
+    position: relative;
+    display: inline-flex;
+    align-items: flex-start;
+    gap: calc(var(--cell) * .45);
+    height: calc(var(--T) + var(--cell) + var(--B));
+    font-family: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
+}
+
+.dice-tray .center-line {
+    position: absolute;
+    left: calc(var(--ext) * -1);
+    right: calc(var(--ext) * -1);
+    top: calc(var(--T) + var(--cell) / 2);
+    height: max(2px, calc(var(--cell) * .025));
+    transform: translateY(-50%);
+    background: linear-gradient(to right,
+        transparent 0,
+        rgba(var(--gold), .9) var(--ext),
+        rgba(var(--gold), .9) calc(100% - var(--ext)),
+        transparent 100%);
+    z-index: 0;
+}
+.dice-tray .center-line::before,
+.dice-tray .center-line::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: max(5px, calc(var(--cell) * .08));
+    aspect-ratio: 1;
+    background: rgb(var(--gold));
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+.dice-tray .center-line::before { left: calc(var(--ext) - var(--cell) * .14); }
+.dice-tray .center-line::after  { left: calc(100% - var(--ext) + var(--cell) * .14); }
+
+.dice-tray .die {
+    position: relative;
+    width: calc(var(--cell) * .8);
+    height: calc(var(--T) + var(--cell) + var(--B));
+    overflow: hidden;
+    z-index: 1;
+    user-select: none;
+    -webkit-user-select: none;
+    background:
+        linear-gradient(to bottom,
+            transparent var(--T),
+            rgba(var(--gold), .07) var(--T),
+            rgba(var(--gold), .02) calc(var(--T) + var(--cell) / 2),
+            rgba(var(--gold), .07) calc(var(--T) + var(--cell)),
+            transparent calc(var(--T) + var(--cell))),
+        var(--die-bg);
+}
+
+/* Traits verticaux droits */
+.dice-tray .die::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border: calc(var(--stroke) * 1.5) solid transparent;
+    z-index: 20;
+    background:
+        var(--fade) left top  / var(--stroke) 100% no-repeat,
+        var(--fade) right top / var(--stroke) 100% no-repeat;
+}
+
+.dice-tray .window {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    -webkit-mask-image: var(--fade);
+    mask-image: var(--fade);
+}
+.dice-tray .roller { position: absolute; inset: 0; }
+
+.dice-tray .number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: var(--cell);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgb(var(--gold));
+    font-size: calc(var(--cell) * .77);
+    font-weight: 300;
+    line-height: 1;
+    will-change: transform;
+}
+
+.dice-tray .separator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--stroke);
+    background: rgb(var(--gold));
+    box-shadow: 0 0 calc(var(--cell) * .07) rgba(var(--gold), .35);
+    z-index: 5;
+    pointer-events: none;
+}
+.dice-tray .separator.top    { top: calc(var(--T) - var(--stroke) / 2); }
+.dice-tray .separator.bottom { top: calc(var(--T) + var(--cell) - var(--stroke) / 2); }
+
+.dice-tray .die.settled .separator { animation: dice-flash .6s ease-out; }
+@keyframes dice-flash {
+    0%   { filter: brightness(1.6); box-shadow: 0 0 calc(var(--cell) * .2) rgba(var(--gold), .9); }
+    100% { filter: brightness(1); }
+}
+
+
+/* =========================================================
+   DÉMO
+   ========================================================= */
+html, body { width: 100%; height: 100%; margin: 0; }
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 26px;
+    background: #0b100d;
+}
+
+/* Bouton "Lancer" : visible uniquement pour le joueur dont c'est le tour.
+   visibility (et non display) : la place reste réservée, rien ne saute. */
+.dice-roll {
+    --gold: 238, 229, 139;
+
+    padding: 7px 20px 7px 24px;
+    border: 2px solid rgb(var(--gold));
+    border-radius: 3px;
+    background: rgba(var(--gold), .06);
+    color: rgb(var(--gold));
+    font: 300 15px/1 "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+    font-weight: 500;
+    letter-spacing: .4em;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .35s, transform .35s, visibility 0s .35s,
+                background .15s, box-shadow .15s;
+}
+.dice-roll.show {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition: opacity .35s, transform .35s, visibility 0s,
+                background .15s, box-shadow .15s;
+}
+.dice-roll.show:hover {
+    background: rgba(var(--gold), .16);
+    box-shadow: 0 0 14px rgba(var(--gold), .35);
+}
+.dice-roll.show:active { transform: translateY(1px); }
+.dice-roll:disabled { cursor: default; }
+.dice-roll:focus-visible { outline: 2px solid rgba(var(--gold), .6); outline-offset: 4px; }
+</style>
+</head>
+
+<body>
+
+<div id="tray"></div>
+
+<button class="dice-roll" id="roll" type="button">Lancer</button>
+
+<script>
+
+/* =========================================================
+   COURBE DE VITESSE (continue)
+   ========================================================= */
+
+const ACC = 0.10, DEC = 0.28, POW = 4;
+const V = 1 / (ACC / 2 + (1 - ACC - DEC) + DEC / POW);
+
+function ease(t) {
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    if (t < ACC) return V * t * t / (2 * ACC);
+    if (t < 1 - DEC) return V * (ACC / 2 + (t - ACC));
+    const p = (t - (1 - DEC)) / DEC;
+    const before = V * (ACC / 2 + (1 - DEC - ACC));
+    return before + (V * DEC / POW) * (1 - Math.pow(1 - p, POW));
+}
+
+const REDUCED = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const SLOTS = 8;
+
+
+/* =========================================================
+   ODOMÈTRE (un dé)
+   ========================================================= */
+
+class Odometer {
+
+    constructor(element, sides, o) {
+        this.element = element;
+        this.sides   = sides;
+        this.o       = o;
+
+        this.cell = o.cell;
+        this.T    = o.cell * o.peekTop;      // hauteur visible au-dessus
+        this.position = sides - 1;           // affiche la valeur "sides"
+        this.frame = null;
+        this.finish = null;
+
+        element.innerHTML =
+            '<div class="window"><div class="roller"></div></div>' +
+            '<div class="separator top"></div><div class="separator bottom"></div>';
+
+        this.roller = element.querySelector(".roller");
+        this.slots = [];
+        for (let k = 0; k < SLOTS; k++) {
+            const el = document.createElement("div");
+            el.className = "number";
+            el._i = null;
+            this.roller.appendChild(el);
+            this.slots.push(el);
+        }
+
+        this.setPosition(this.position);
+    }
+
+    get value() { return this.valueAt(Math.round(this.position)); }
+
+    valueAt(i) {
+        return (((i % this.sides) + this.sides) % this.sides) + 1;
+    }
+
+    /* Perspective : échelle s(d) et position y(d) (intégrale de s) */
+    shape(d) {
+        const a = Math.abs(d);
+        const k = 1 - (d < 0 ? this.o.topScale : this.o.bottomScale);
+        const s = 1 - k * Math.min(a, 1);
+        const integral = a <= 1
+            ? a - k * a * a / 2
+            : (1 - k / 2) + (1 - k) * (a - 1);
+        return { y: d < 0 ? -integral : integral, s };
+    }
+
+    setPosition(position) {
+        this.position = position;
+        const base = Math.floor(position) - 3;
+        const c = this.cell;
+
+        for (let k = 0; k < SLOTS; k++) {
+            const i  = base + k;
+            const el = this.slots[((i % SLOTS) + SLOTS) % SLOTS];
+
+            if (el._i !== i) {
+                el._i = i;
+                el.textContent = this.valueAt(i);
+            }
+
+            const d = i - position;
+            const { y, s } = this.shape(d);
+
+            el.style.transform =
+                `translate3d(0, ${this.T + y * c}px, 0) scaleY(${s})`;
+
+            const near = Math.max(0, 1 - Math.abs(d));
+            el.style.textShadow =
+                `0 0 ${(c * .04 + c * .13 * near).toFixed(1)}px rgba(var(--gold), ${(0.08 + 0.5 * near).toFixed(2)})`;
+        }
+    }
+
+    /* Affichage immédiat, sans animation */
+    set(value) {
+        this.cancel();
+        this.setPosition(Math.round(this.position) + ((value - this.value + this.sides) % this.sides));
+    }
+
+    cancel() {
+        if (this.frame !== null) cancelAnimationFrame(this.frame);
+        this.frame = null;
+        if (this.finish) { this.finish(null); this.finish = null; }   // ancien lancer : null
+    }
+
+    /* Retourne une Promise résolue avec "result" à l'arrêt */
+    roll(result) {
+        this.cancel();
+
+        return new Promise((resolve) => {
+            this.finish = resolve;
+
+            const startPos = this.position;
+            const from     = Math.round(startPos);
+            const current  = this.valueAt(from);
+            const dir      = Math.random() < 0.5 ? 1 : -1;
+
+            let delta = dir === 1
+                ? (result - current + this.sides) % this.sides
+                : (current - result + this.sides) % this.sides;
+            if (delta === 0) delta = this.sides;
+
+            const turns = REDUCED ? 1 : (this.sides === 6 ? 4 : 5);
+            const end   = from + (turns * this.sides + delta) * dir;
+            const dur   = (this.sides === 6 ? 1450 : 1350) * (REDUCED ? 0.35 : 1);
+            const t0    = performance.now();
+
+            let lastRound = from;
+
+            const animate = (now) => {
+                const t = Math.min((now - t0) / dur, 1);
+                this.setPosition(startPos + (end - startPos) * ease(t));
+
+                const r = Math.round(this.position);
+                if (r !== lastRound) {
+                    lastRound = r;
+                    if (this.o.onTick) this.o.onTick(this);
+                }
+
+                if (t < 1) { this.frame = requestAnimationFrame(animate); return; }
+
+                this.frame = null;
+                this.setPosition(end);
+
+                this.element.classList.remove("settled");
+                void this.element.offsetWidth;
+                this.element.classList.add("settled");
+
+                if (this.o.onSettle) this.o.onSettle(this, result);
+
+                this.finish = null;
+                resolve(result);
+            };
+
+            this.frame = requestAnimationFrame(animate);
+        });
+    }
+}
+
+
+/* =========================================================
+   PLATEAU (plusieurs dés)
+   =========================================================
+   new DiceTray(element, [6, 4], options)
+
+   options (toutes facultatives) :
+     cell         taille de la case centrale en px        (56)
+     topScale     hauteur de la case du dessus, 0..1      (.72)
+     bottomScale  hauteur de la case du dessous, 0..1     (.50)
+     peekTop      partie visible au-dessus, en cases      (.55)
+     peekBottom   partie visible au-dessous, en cases     (.40)
+     onTick(die)           à chaque chiffre qui défile
+     onSettle(die, value)  quand un dé s'arrête
+   ========================================================= */
+
+class DiceTray {
+
+    constructor(container, sidesList = [6, 4], options = {}) {
+        const o = Object.assign({
+            cell: 56,
+            topScale: .72,
+            bottomScale: .50,
+            peekTop: .55,
+            peekBottom: .40
+        }, options);
+
+        this.container = container;
+        container.classList.add("dice-tray");
+        container.style.setProperty("--cell", o.cell + "px");
+        container.style.setProperty("--T", (o.cell * o.peekTop) + "px");
+        container.style.setProperty("--B", (o.cell * o.peekBottom) + "px");
+
+        container.innerHTML = '<div class="center-line"></div>';
+
+        this.dice = sidesList.map((sides) => {
+            const el = document.createElement("div");
+            el.className = "die";
+            container.appendChild(el);
+            return new Odometer(el, sides, o);
+        });
+    }
+
+    /* roll([5, 2]) -> Promise<[5, 2]>.  Sans argument : tirage aléatoire. */
+    roll(results) {
+        return Promise.all(this.dice.map((die, i) => {
+            const r = results && results[i] != null
+                ? results[i]
+                : Math.floor(Math.random() * die.sides) + 1;
+            return die.roll(r);
+        }));
+    }
+
+    set(values) { this.dice.forEach((die, i) => die.set(values[i])); }
+
+    get values() { return this.dice.map((d) => d.value); }
+}
+
+
+/* =========================================================
+   DÉMO   (?cell=40 pour tester une autre taille)
+   ========================================================= */
+
+const cell = Number(new URLSearchParams(location.search).get("cell")) || 56;
+
+const tray = new DiceTray(document.getElementById("tray"), [6, 4], { cell });
+
+const btn = document.getElementById("roll");
+
+/* Début du tour du joueur : le bouton apparaît */
+function startTurn() {
+    btn.disabled = false;
+    btn.classList.add("show");
+}
+
+btn.addEventListener("click", async () => {
+    btn.disabled = true;                      // évite le double lancer
+    btn.classList.remove("show");
+
+    const values = await tray.roll();         // ou tray.roll([a, b]) si le serveur impose
+    console.log("Résultat :", values);
+
+    // DÉMO : on simule le tour suivant. Dans le jeu : jouerLeCoup(...) puis
+    // startTurn() quand c'est de nouveau à ce joueur de jouer.
+    setTimeout(startTurn, 1800);
+});
+
+setTimeout(startTurn, 400);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,305 @@
+/* Feuille de style unique (base neutre). Le look sombre/or du brief vit ici ;
+   la table jouable héritera de ces variables (voir maquette Dev_Files/). */
+:root {
+  /* Thème par défaut = night (bleu nuit) */
+  --bg: #0a0e18;
+  --card: #101827;
+  --gold: #7fa8d9;
+  --line: #26344c;
+  --txt: #c3cfe2;
+  --mut: #6f7f9a;
+  --neg: #4a8cff;
+  --zero: #6fd6e6;
+  --low: #5fcf80;
+  --mid: #e9d24c;
+  --high: #ef5b5b;
+  /* Repli avant le premier calcul JS de fitBoard() : sans eux tout vaut 0. */
+  --u: 48px;
+  --k: 0.7;
+}
+
+/* Classique : palace reprend l'ancienne palette « casino », ruby est inchangé. */
+:root[data-theme="palace"] { --bg: #07140e; --card: #0f2318; --gold: #d4af37; --line: #2f5a43; --txt: #d6e6dc; --mut: #7fa08d; }
+:root[data-theme="ruby"] { --bg: #140a0e; --card: #231319; --gold: #d99a5b; --line: #5a2f3c; --txt: #e6d3d8; --mut: #a0808a; }
+/* Casino : poker = feutrine verte, jackpot = or/rouge machine à sous. */
+:root[data-theme="poker"] { --bg: #0b1f14; --card: #12291c; --gold: #d9b44a; --line: #2a4f38; --txt: #d2e4d6; --mut: #7ba184; }
+:root[data-theme="jackpot"] { --bg: #170a08; --card: #241110; --gold: #efb63f; --line: #55282a; --txt: #eed9c8; --mut: #a07a6e; }
+/* Mystic : wizard reprend l'ancienne palette « night » (violet/or). */
+:root[data-theme="wizard"] { --bg: #0c0b10; --card: #15131c; --gold: #b8923a; --line: #3a3648; --txt: #c9c4d6; --mut: #8a8698; }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--bg);
+  color: var(--txt);
+  font: 15px/1.4 Georgia, serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Décor de fond subtil par thème (dégradés uniquement, aucune image externe) */
+[data-theme="night"] body {
+  background-image:
+    radial-gradient(circle at 85% 8%, rgba(127,168,217,.12), transparent 30%),
+    radial-gradient(1px 1px at 22% 28%, rgba(198,218,245,.5), transparent 65%),
+    radial-gradient(1px 1px at 64% 72%, rgba(198,218,245,.35), transparent 65%);
+  background-size: auto, 300px 300px, 260px 260px;
+}
+[data-theme="wizard"] body {
+  background-image:
+    radial-gradient(1.5px 1.5px at 16% 24%, rgba(233,210,76,.55), transparent 65%),
+    radial-gradient(1px 1px at 58% 60%, rgba(201,196,214,.4), transparent 65%),
+    radial-gradient(1.5px 1.5px at 86% 14%, rgba(201,196,214,.35), transparent 65%),
+    radial-gradient(1px 1px at 36% 86%, rgba(184,146,58,.45), transparent 65%);
+  background-size: 300px 300px, 240px 240px, 340px 340px, 280px 280px;
+}
+[data-theme="poker"] body { background-image: radial-gradient(ellipse at 50% 38%, rgba(214,230,220,.06), transparent 62%); }
+[data-theme="jackpot"] body { background-image: radial-gradient(ellipse at 50% -10%, rgba(239,182,63,.14), transparent 55%); }
+
+/* Top-bar : 7,37 % de la hauteur, contenu aligné sur la zone utile (marges de 10 %) */
+.topbar { flex: 0 0 7.37%; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 10%; border-bottom: 1px solid var(--line); }
+.brand { font: 700 20px Fraunces, Georgia, serif; color: var(--gold); }
+.bar-tools { display: flex; align-items: center; gap: 8px; }
+.topbar select { padding: 4px 8px; font-size: 13px; }
+#toggle-sound[aria-pressed="true"] .i-off, #toggle-sound[aria-pressed="false"] .i-on { display: none; }
+
+/* Zone sous la top-bar : accueil, salon et table s'y affichent */
+.stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: auto; }
+
+main { padding: 24px; }
+[hidden] { display: none !important; }
+
+h1, h2 {
+  margin: 0 0 4px;
+  font: 700 34px Fraunces, Georgia, serif;
+  color: var(--gold);
+  text-align: center;
+}
+
+.tagline {
+  margin: 0 0 24px;
+  text-align: center;
+  color: var(--mut);
+  font-style: italic;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(320px, 90vw);
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+label { display: flex; flex-direction: column; gap: 6px; }
+label span { color: var(--mut); font-size: 13px; }
+
+input {
+  font: inherit;
+  color: var(--txt);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+input:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+#code { text-transform: uppercase; letter-spacing: 0.12em; }
+
+button {
+  font: inherit;
+  color: var(--gold);
+  background: none;
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  padding: 9px 14px;
+  cursor: pointer;
+}
+button:hover { background: color-mix(in srgb, var(--gold) 14%, transparent); }
+button:disabled { opacity: 0.45; cursor: default; }
+button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+button.ghost { border-color: var(--line); color: var(--txt); }
+
+.join-row { display: flex; gap: 8px; }
+.join-row input { flex: 1; min-width: 0; }
+
+.error { margin: 0; color: var(--high); font-size: 13px; }
+.muted { color: var(--mut); font-size: 13px; }
+
+/* --- Salon --- */
+.lobby { display: flex; flex-direction: row; align-items: stretch; justify-content: center; gap: 20px; flex-wrap: wrap; }
+.lobby .panel { width: min(380px, 92vw); }
+.lobby h2 { text-align: left; font-size: 34px; }
+.copy-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.room-code { font: 700 28px Fraunces, Georgia, serif; letter-spacing: .05em; }
+.room-link {
+  flex: 1;
+  min-width: 0;              /* indispensable pour que le texte puisse être coupé dans une ligne flex */
+  padding: 8px 10px;
+  background: var(--bg);     /* rectangle plus sombre que le panneau, sans bordure */
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--mut);
+  white-space: nowrap;       /* une seule ligne */
+  overflow: hidden;          /* pas de barre de défilement */
+  text-overflow: ellipsis;   /* on voit le début, la fin est coupée avec « … » */
+}
+.row-btns { display: flex; gap: 6px; }
+#toggle-code[aria-pressed="false"] .i-eye-off,
+#toggle-code[aria-pressed="true"] .i-eye { display: none; }
+.icon-btn { padding: 6px; line-height: 0; flex: none; border-color: var(--line); color: var(--txt); }
+.icon-btn .i-ok { display: none; }
+.icon-btn.copied { color: var(--low); border-color: var(--low); }
+.icon-btn.copied .i-ok { display: block; }
+.icon-btn.copied .i-copy { display: none; }
+select { font: inherit; color: var(--txt); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+select:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+select:disabled { opacity: .6; }
+.count { margin: 0; color: var(--mut); }
+.players { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.players li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
+.players li.me { border-color: var(--gold); }
+.players li.free { justify-content: center; border-style: dashed; color: var(--mut); font-style: italic; opacity: .7; }
+.players li .tag { color: var(--mut); font-size: 12px; }
+#start { margin-top: auto; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > span { color: var(--mut); font-size: 13px; }
+.stepper { display: flex; align-items: center; gap: 12px; }
+.stepper output { min-width: 2ch; text-align: center; font: 700 22px Fraunces, Georgia, serif; }
+.stepper .icon-btn { width: 34px; height: 34px; padding: 0; font-size: 20px; line-height: 1; }
+
+/* --- Table (repris de la maquette Dev_Files/grid-of-greed-table.html) --- */
+/* Table : 80 % de la largeur ; zone de jeu 65,10 %, gap 0,65 %, colonne droite 34,24 % */
+main.table { display: grid; grid-template-columns: 65.1% 34.24%; grid-template-rows: minmax(0, 1fr); column-gap: .65%; width: 80%; height: 100%; padding: 0; }
+.table-zone { position: relative; min-width: 0; min-height: 0; }
+
+/* Colonne de droite */
+.side { display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow-y: auto; margin: 5px 0px; }
+.side-card { padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.side-card.grow { flex: 1 1 auto; min-height: 90px; overflow: auto; }
+.side-card h3 { margin: 0 0 6px; font: 700 14px Fraunces, Georgia, serif; color: var(--gold); }
+.side .muted { margin: 0; }
+.stbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.stbl th, .stbl td { padding: 3px 6px; text-align: center; border-bottom: 1px solid var(--line); }
+.stbl th:first-child, .stbl td:first-child { text-align: left; }
+.stbl th { color: var(--mut); font-weight: 400; font-size: 12px; }
+/* Scores : leader (moins de points) en gras/or, dernier en rouge */
+.stbl tr.best td { color: var(--gold); font-weight: 700; }
+.stbl tr.worst td { color: var(--high); }
+/* Marqueurs couronne/crâne du tableau des scores (SVG inline, currentColor) */
+svg.rank { width: 1em; height: 1em; margin-left: 4px; vertical-align: -0.15em; }
+/* Historique : badge ×2 sur le finisher puni (score affiché = score de base) */
+.dbl { color: var(--high); font-weight: 700; font-size: 11px; }
+.plist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.plist li { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border: 1px solid transparent; border-radius: 6px; }
+.plist li.active { border-color: var(--gold); }
+.plist li.me .pn { color: var(--gold); }
+.plist .arrow { width: 12px; color: var(--gold); }
+.plist .pn { flex: 1; }
+.plist .tag { color: var(--mut); font-size: 12px; }
+.pdot { display: inline-block; flex: none; width: .7em; height: .7em; border-radius: 50%; background: var(--pc); }
+.pdot.host { width: auto; height: auto; border-radius: 0; background: none; color: var(--pc); line-height: 1; cursor: help; }
+.meta .pdot { align-self: center; }
+/* Zone de jeu découpée en 3x3 zones égales : le plateau remplit sa zone sans
+   dépendre d'une hauteur en pourcentage (positionné en absolu dans .table-zone) */
+.board { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+.seat { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 10px; --su: calc(var(--u) * var(--k)); padding: calc(var(--su) * .12); margin: 5px; }
+.seat.me { --su: var(--u); border-color: var(--gold); }
+.seat.active { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.meta { display: flex; gap: 8px; align-items: baseline; font-size: max(11px, calc(var(--su) * .4)); margin-bottom: calc(var(--su) * .15); }
+.meta b { font-weight: 500; }
+.meta span { color: var(--mut); }
+.me .meta b { color: var(--gold); }
+.meta .tag { font-size: 0.85em; color: var(--low); }
+.grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(3, var(--su));
+  grid-auto-columns: var(--su);
+  gap: calc(var(--su) * .18);
+  /* Pas de width:100% : la grille garde sa largeur naturelle et le siège
+     (flex, align-items:center) la centre — colonnes retirées = recentrage auto. */
+}
+/* Centre : pioche/défausse au milieu de la zone, consigne juste en dessous (les cartes ne bougent jamais) */
+.mid { grid-area: 2 / 2; display: grid; grid-template-rows: 1fr auto 1fr; justify-items: center; min-height: 0; --su: var(--u); }
+.mid .cards { grid-row: 2; }
+.mid .tpanel { grid-row: 3; align-self: start; max-width: 100%; min-height: 0; padding-top: calc(var(--u) * .25); text-align: center; font-size: max(12px, calc(var(--u) * .26)); }
+.mid .cards { display: flex; gap: calc(var(--u) * .3); align-items: center; }
+.pile { position: relative; }
+.pile .count { position: absolute; inset: auto -6px -6px auto; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 0 5px; font-size: 11px; color: var(--mut); }
+
+.card { width: var(--su); height: var(--su); padding: 0; border: 0; background: none; perspective: 400px; cursor: default; transition: filter .15s; }
+.card.can { cursor: pointer; }
+.card.can:hover { z-index: 2; }
+.card.can:hover { filter: brightness(1.4); }
+.card.can:hover .in { scale: 1.05; }
+.card.pick .in { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: calc(var(--su) * .1); }
+.in { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .5s ease, filter .15s, scale .15s; }
+.card.up .in { transform: rotateY(180deg); }
+.f, .b { position: absolute; inset: 0; border-radius: calc(var(--su) * .1); backface-visibility: hidden; background: var(--card); display: flex; align-items: center; justify-content: center; }
+.b { border: 1.5px solid var(--gold); }
+.b::before { content: ""; position: absolute; inset: 12%; border: 1px solid var(--gold); opacity: .4; border-radius: calc(var(--su) * .06); }
+.b::after { content: ""; width: 26%; height: 26%; border: 1.5px solid var(--gold); transform: rotate(45deg); }
+/* Dos distincts par thème : symbole centré unique en SVG inline (ni emoji ni police).
+   palace et ruby gardent le losange or par défaut ci-dessus. */
+[data-theme="night"] .b::after, [data-theme="poker"] .b::after,
+[data-theme="jackpot"] .b::after, [data-theme="wizard"] .b::after {
+  content: ""; /* requis : content explicit, sinon boîte 0x0 après border: 0 */
+  width: 46%; height: 46%; border: 0; transform: none;
+  background: center / contain no-repeat;
+}
+/* night : croissant de lune (contour fin, fill retiré du style inline qui masquait la couleur) */
+[data-theme="night"] .b::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%237fa8d9' stroke-width='1.2' stroke-linejoin='round' d='M12,2h-.46a1,1,0,0,0-.44,1.86A5.94,5.94,0,0,1,14,9,6,6,0,0,1,3.93,13.4a1,1,0,0,0-1.65,1A10,10,0,1,0,12,2Z'/%3E%3C/svg%3E"); }
+/* poker : les quatre enseignes en grand — le cadre intérieur ::before est retiré
+   pour laisser la place (pique/trèfle or, cœur/carreau rouges) */
+[data-theme="poker"] .b::before { content: none; }
+[data-theme="poker"] .b::after { width: 62%; height: 62%; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cg fill='%23d9b44a'%3E%3Ccircle cx='8.3' cy='13.6' r='3.3'/%3E%3Ccircle cx='13.7' cy='13.6' r='3.3'/%3E%3Cpolygon points='5.5,12.6 16.5,12.6 11,5'/%3E%3Cpolygon points='10.1,15.8 11.9,15.8 12.9,19.4 9.1,19.4'/%3E%3C/g%3E%3Cg fill='%23d64545'%3E%3Ccircle cx='33.3' cy='9.4' r='3.3'/%3E%3Ccircle cx='38.7' cy='9.4' r='3.3'/%3E%3Cpolygon points='30.5,10.4 41.5,10.4 36,18'/%3E%3C/g%3E%3Cpolygon fill='%23d64545' points='12,28.6 16.2,35 12,41.4 7.8,35'/%3E%3Cg fill='%23d9b44a'%3E%3Ccircle cx='36' cy='31.3' r='3.2'/%3E%3Ccircle cx='33.1' cy='34.6' r='3.2'/%3E%3Ccircle cx='38.9' cy='34.6' r='3.2'/%3E%3Cpolygon points='35.2,36 36.8,36 37.8,40.4 34.2,40.4'/%3E%3C/g%3E%3C/svg%3E"); }
+/* jackpot : le 7 de la machine à sous */
+[data-theme="jackpot"] .b::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath fill='%23efb63f' d='M5 5H35V12L20 35H11L26 12H5Z'/%3E%3C/svg%3E"); }
+/* wizard : étoile à quatre branches */
+[data-theme="wizard"] .b::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpolygon fill='%23b8923a' points='20,3 24.5,15.5 37,20 24.5,24.5 20,37 15.5,24.5 3,20 15.5,15.5'/%3E%3C/svg%3E"); }
+.f { transform: rotateY(180deg); border: 1.5px solid var(--c); color: var(--c); font: 500 calc(var(--su) * .52)/1 Fraunces, Georgia, serif; }
+[data-r=n] { --c: var(--neg); } [data-r=z] { --c: var(--zero); } [data-r=l] { --c: var(--low); }
+[data-r=m] { --c: var(--mid); } [data-r=h] { --c: var(--high); }
+.drawn { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: calc(var(--su) * .1); }
+.drawn.can:hover { filter: brightness(1.5); }
+
+/* Cases vides d'une colonne retirée */
+.hole { width: var(--su); height: var(--su); border: 1px dashed var(--line); border-radius: calc(var(--su) * .1); opacity: .4; }
+/* Animation de disparition d'une colonne (3 cases vides qui "respirent") */
+@keyframes holePulse { 0%, 100% { opacity: .4; } 50% { opacity: .15; } }
+.hole { animation: holePulse 2s ease-in-out infinite; }
+
+.tpanel { display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; min-height: 40px; color: var(--mut); }
+.tpanel h3 { margin: 0; color: var(--gold); font: 700 18px Fraunces, Georgia, serif; }
+.tpanel button.ghost { padding: 4px 10px; font-size: 13px; }
+table.scores { border-collapse: collapse; }
+table.scores th, table.scores td { padding: 3px 14px; text-align: center; border-bottom: 1px solid var(--line); }
+table.scores th { color: var(--mut); font-weight: 400; font-size: 12px; }
+
+/* Carte fantôme qui vole d'une position à l'autre (voir fly() dans table.js) */
+.flying { position: fixed; margin: 0; z-index: 50; pointer-events: none; transform-origin: top left; }
+
+@media (prefers-reduced-motion: reduce) {
+  .in { transition: none; }
+  .card.can:hover .in { scale: none; }
+  .card.up .in { transform: rotateY(180deg); }
+  .hole { animation: none; }
+}
+
+/* Fenêtre étroite ou portrait (ratio largeur/hauteur ≤ 1,3) :
+   plateau carré, colonne d'infos en dessous sous forme de mosaïque. */
+@media (max-aspect-ratio: 13/10) {
+  .topbar { padding: 0 3%; }
+  .stage { align-items: flex-start; }
+  main.table { grid-template-columns: 1fr; grid-template-rows: auto auto; width: 96%; height: auto; row-gap: 12px; padding: 8px 0 20px; }
+  .table-zone { width: min(100%, 88dvh); aspect-ratio: 1 / 1; margin: 0 auto; }
+  .side { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); align-items: start; overflow: visible; }
+  .side-card.grow { min-height: 0; }
+}

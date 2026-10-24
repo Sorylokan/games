@@ -1,0 +1,90 @@
+/* Thèmes « Saisons » : Printemps, Été, Automne, Hiver. */
+
+:root[data-skin="spring"]    { --bg: #f7eef0; --card: #fffdfb; --accent: #c4577a; --line: #ecd8de; --txt: #3a2e33; --mut: #8b7880; color-scheme: light; }
+
+:root[data-skin="summer"]    { --bg: #fde9c4; --card: #fffaf0; --accent: #d9702a; --line: #f0d9ad; --txt: #3b2a17; --mut: #8e7350; color-scheme: light; }
+
+:root[data-skin="autumn"]    { --bg: #2a1a12; --card: #33211a; --accent: #e39b4a; --line: #5a3a28; --txt: #f0e0cf; --mut: #b39079; }
+
+:root[data-skin="winter"]    { --bg: #e7eff7; --card: #fbfdff; --accent: #4a7bb0; --line: #d2dfeb; --txt: #22303d; --mut: #6f8396; color-scheme: light; }
+
+:root[data-skin="spring"] body {
+  /* hanami : ciel blanc rosé qui descend vers un vert tendre */
+  background-image:
+    radial-gradient(circle at 10% 0%, rgba(255,255,255,.75), transparent 40%),
+    linear-gradient(to bottom, #fbf1f3 0%, #f6eaec 55%, #e9f0de 100%);
+  background-size: auto, auto;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
+}
+
+:root[data-skin="spring"] body::before {
+  /* branche de cerisier en fleurs qui dépasse du coin */
+  content: ""; position: fixed; left: 0; top: 0; width: 400px; height: 230px; max-width: 70vw; pointer-events: none; z-index: 0;
+  background: url("../../assets/spring-branch.svg") no-repeat left top / contain;
+  opacity: .9;
+}
+
+/* le titre passe dans une capsule claire pour rester lisible par-dessus la branche */
+:root[data-skin="spring"] .brand {
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px 16px 5px;
+  backdrop-filter: blur(3px); box-shadow: 0 2px 10px rgba(196, 87, 122, .10);
+}
+
+:root[data-skin="spring"] body::after {
+  /* pétales qui tombent en dérivant, sur deux plans */
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: url("../../assets/spring-petals-a.svg"), url("../../assets/spring-petals-b.svg");
+  background-size: 390px 390px, 560px 560px;
+  animation: petals 34s linear infinite;
+}
+
+:root[data-skin="spring"] .app { position: relative; z-index: 1; }
+
+@keyframes petals { from { background-position: 0 0, 80px 0; } to { background-position: 390px 390px, -120px 560px; } }
+
+@media (prefers-reduced-motion: reduce) { :root[data-skin="spring"] body::after { animation: none; } }
+
+:root[data-skin="summer"] body {
+  /* grand soleil chaud */
+  background-image:
+    radial-gradient(circle at 85% 4%, rgba(255,250,215,1) 0 40px, rgba(255,230,160,.55) 41px, transparent 220px),
+    linear-gradient(to bottom, #fff2d2 0%, #fde3b6 60%, #f9cf96 100%);
+  background-size: auto, auto;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
+}
+
+:root[data-skin="autumn"] body {
+  /* lumière rasante de fin d'après-midi */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 0% 0%, rgba(227,155,74,.22), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(170,70,40,.18), transparent 70%),
+    linear-gradient(to bottom, #2e1c13 0%, #24160f 100%);
+  background-size: auto, auto, auto;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-attachment: fixed, fixed, fixed;
+}
+
+:root[data-skin="winter"] body {
+  /* ciel blanc bleuté */
+  background-image: linear-gradient(to bottom, #f4f8fc 0%, #e3ecf5 60%, #d6e3ef 100%);
+  background-attachment: fixed;
+  background-size: auto;
+  background-repeat: no-repeat;
+}
+
+:root[data-skin="winter"] body::after {
+  /* flocons qui tombent lentement, sur deux plans à vitesses différentes */
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: url("../../assets/winter-flakes-a.svg"), url("../../assets/winter-flakes-b.svg");
+  background-size: 430px 430px, 610px 610px;
+  animation: snow 38s linear infinite;
+}
+
+:root[data-skin="winter"] .app { position: relative; z-index: 1; }
+
+@keyframes snow { from { background-position: 0 0, 120px 0; } to { background-position: 40px 430px, 60px 610px; } }
+
+@media (prefers-reduced-motion: reduce) { :root[data-skin="winter"] body::after { animation: none; } }

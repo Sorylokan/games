@@ -1,0 +1,20 @@
+{
+  "page.title": "Jeux – Sorylokan",
+  "nav.home": "Sorylokan",
+  "nav.homeLabel": "Retour à l'accueil de Sorylokan",
+  "lang.label": "Langue",
+  "hero.eyebrow": "{n} jeux · dans le navigateur · gratuits",
+  "hero.title": "Les petits jeux de <i>Sorylokan</i>",
+  "hero.sub": "Des jeux à lancer dans le navigateur, seul ou entre amis. Pas de compte, rien à installer. Pour jouer ensemble, un code de salon suffit.",
+  "featured.label": "Le jeu du moment",
+  "list.others": "Les autres jeux",
+  "list.all": "Tous les jeux",
+  "filter.label": "Filtrer les jeux",
+  "filter.all": "Tous",
+  "filter.solo": "Solo",
+  "filter.multi": "Entre amis",
+  "footer.p2p": "Les parties en ligne se jouent en pair à pair : l'hôte crée un salon et partage le code ou le lien. Aucun serveur de jeu, aucun compte.",
+  "footer.source": "Code source sur GitHub",
+  "error.load": "Impossible de charger le catalogue. Recharge la page.",
+  "noscript": "Active JavaScript pour afficher le catalogue des jeux."
+}

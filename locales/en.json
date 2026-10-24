@@ -1,0 +1,20 @@
+{
+  "page.title": "Games – Sorylokan",
+  "nav.home": "Sorylokan",
+  "nav.homeLabel": "Back to Sorylokan's home page",
+  "lang.label": "Language",
+  "hero.eyebrow": "{n} games · in your browser · free",
+  "hero.title": "<i>Sorylokan</i>'s little games",
+  "hero.sub": "Games you launch right in your browser, alone or with friends. No account, nothing to install: to play together, a room code is all you need.",
+  "featured.label": "Featured game",
+  "list.others": "More games",
+  "list.all": "All games",
+  "filter.label": "Filter games",
+  "filter.all": "All",
+  "filter.solo": "Solo",
+  "filter.multi": "With friends",
+  "footer.p2p": "Online games are peer-to-peer: the host opens a room and shares the code or link. No game server, no account.",
+  "footer.source": "Source code on GitHub",
+  "error.load": "Could not load the catalog. Please reload the page.",
+  "noscript": "Enable JavaScript to see the game catalog."
+}

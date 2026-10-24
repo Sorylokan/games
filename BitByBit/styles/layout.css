@@ -1,0 +1,26 @@
+/* Mise en page : barre du haut, plateau à gauche, colonne de cartes à droite (empilés en étroit). */
+
+.app {
+  max-width: 1080px; margin: 0 auto;
+  padding-block: 0 28px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Barre du haut */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 14px; border-bottom: 1px solid var(--line); margin-bottom: 18px; flex-wrap: wrap; }
+
+.brand { font: 700 21px var(--display); color: var(--accent); letter-spacing: .01em; }
+
+.tools { display: flex; align-items: center; gap: 8px; }
+
+/* Table : plateau + colonne */
+.table { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, 1fr); gap: 18px; align-items: start; }
+
+@media (max-width: 780px) { .table { grid-template-columns: minmax(0, 1fr); } }
+
+.board { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+
+canvas { display: block; width: 100%; }
+
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }

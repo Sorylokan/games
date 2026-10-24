@@ -1,0 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700&display=swap");
+
+/* THEME CHIOTS : bleu ardoise, chiots sable et caramel. Activé par <link> après styles.css
+   et class="theme-puppies" sur <body>. Cases endormies sombres, cases réveillées plus claires. */
+body.theme-puppies {
+  --bg: #17202e; --card: #2d3a4f; --line: #4b5d7a; --txt: #eef1f8; --mut: #a9b6cc;
+  --accent: #e6c08a; --accent-ink: #17202e;
+  --on: #1e2a3c; --off: #4f6b90;
+  --font: Nunito, "Trebuchet MS", system-ui, sans-serif;
+  --display: Fredoka, Nunito, "Trebuchet MS", system-ui, sans-serif;
+}
+
+/* Décor : lueur sable en haut à droite, brume bleue en bas à gauche, os en filigrane. */
+body.theme-puppies {
+  background-image:
+    radial-gradient(48rem 34rem at 90% 6%, rgba(230, 192, 138, .15), transparent 62%),
+    radial-gradient(52rem 38rem at 6% 98%, rgba(79, 107, 144, .34), transparent 62%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170' viewBox='0 0 170 170'%3E%3Cg fill='%23e6c08a' fill-opacity='.07'%3E%3Cg transform='rotate(-24 50 50)'%3E%3Crect x='30' y='46' width='40' height='9' rx='4'/%3E%3Ccircle cx='30' cy='45' r='7'/%3E%3Ccircle cx='30' cy='56' r='7'/%3E%3Ccircle cx='70' cy='45' r='7'/%3E%3Ccircle cx='70' cy='56' r='7'/%3E%3C/g%3E%3Cg transform='rotate(32 124 124)'%3E%3Crect x='104' y='120' width='40' height='9' rx='4'/%3E%3Ccircle cx='104' cy='119' r='7'/%3E%3Ccircle cx='104' cy='130' r='7'/%3E%3Ccircle cx='144' cy='119' r='7'/%3E%3Ccircle cx='144' cy='130' r='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-size: auto, auto, 170px 170px;
+}

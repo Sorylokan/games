@@ -1,0 +1,111 @@
+/* Thèmes « Escapades » : Plage, Forêt, Jardin. */
+
+:root[data-skin="beach"]  { --bg: #eadcbf; --card: #f5ecd9; --accent: #2f7f8c; --line: #d8c6a2; --txt: #3d3326; --mut: #8a7759; color-scheme: light; }
+
+:root[data-skin="forest"] { --bg: #004130; --card: #05362a; --accent: #d6e59c; --line: #1f5a46; --txt: #dcebd9; --mut: #8db3a0; }
+
+:root[data-skin="garden"] { --bg: #cfe8f3; --card: #f7fbf1; --accent: #3e8a3c; --line: #c6dbb2; --txt: #27361f; --mut: #6b8061; color-scheme: light; }
+
+/* Décors de fond des thèmes « Escapades » (dégradés uniquement) */
+:root[data-skin="beach"] body {
+  /* la mer en haut, l'écume, puis le sable moucheté (points placés, sans répétition) */
+  background-image:
+    radial-gradient(1.9px 1.9px at 45.2% 61.3%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.2px 1.2px at 45.2% 87.2%, rgba(255,255,255,.75), transparent 70%),
+    radial-gradient(1.2px 1.2px at 47.6% 66.0%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.8px 1.8px at 30.3% 20.0%, rgba(255,255,255,.75), transparent 70%),
+    radial-gradient(1.4px 1.4px at 63.4% 64.4%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.2px 1.2px at 65.4% 66.2%, rgba(140,110,70,.35), transparent 70%),
+    radial-gradient(1.0px 1.0px at 83.2% 17.6%, rgba(140,110,70,.35), transparent 70%),
+    radial-gradient(1.3px 1.3px at 60.0% 80.5%, rgba(255,255,255,.75), transparent 70%),
+    radial-gradient(1.6px 1.6px at 84.2% 57.7%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.7px 1.7px at 0.5% 19.5%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.8px 1.8px at 99.8% 99.6%, rgba(255,255,255,.75), transparent 70%),
+    radial-gradient(1.5px 1.5px at 25.4% 78.7%, rgba(140,110,70,.35), transparent 70%),
+    radial-gradient(1.4px 1.4px at 7.0% 79.4%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.8px 1.8px at 38.7% 96.3%, rgba(140,110,70,.35), transparent 70%),
+    radial-gradient(1.1px 1.1px at 21.4% 93.6%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.1px 1.1px at 98.0% 47.0%, rgba(255,255,255,.75), transparent 70%),
+    radial-gradient(1.3px 1.3px at 19.8% 71.4%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.8px 1.8px at 33.3% 96.8%, rgba(140,110,70,.35), transparent 70%),
+    radial-gradient(1.0px 1.0px at 13.5% 74.2%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.6px 1.6px at 79.7% 27.6%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.8px 1.8px at 50.9% 98.7%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.4px 1.4px at 64.4% 22.3%, rgba(140,110,70,.35), transparent 70%),
+    radial-gradient(2.0px 2.0px at 0.0% 88.1%, rgba(255,255,255,.75), transparent 70%),
+    radial-gradient(1.2px 1.2px at 30.4% 89.9%, rgba(140,110,70,.25), transparent 70%),
+    radial-gradient(1.6px 1.6px at 99.6% 65.0%, rgba(140,110,70,.35), transparent 70%),
+    radial-gradient(1.3px 1.3px at 98.9% 30.8%, rgba(255,255,255,.75), transparent 70%),
+    linear-gradient(to bottom, #7fbfc8 0, #a9d6d4 54px, #f3ead6 60px, #f3ead6 63px, transparent 120px);
+  background-size: auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  background-attachment: fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, scroll;
+}
+
+:root[data-skin="garden"] body::after {
+  /* nuages qui dérivent lentement, derrière le jeu */
+  content: ""; position: fixed; left: 0; right: 0; top: 0; height: 300px; pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(64px 22px at 200px 36px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(40px 24px at 236px 24px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(32px 18px at 170px 32px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(36px 16px at 268px 38px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(78px 22px at 700px 30px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(46px 24px at 738px 18px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(34px 18px at 668px 26px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(30px 14px at 776px 34px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(54px 18px at 1120px 44px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(32px 18px at 1146px 34px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(26px 14px at 1096px 42px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(52px 16px at 430px 170px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(30px 16px at 456px 160px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(24px 12px at 410px 166px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(60px 18px at 980px 240px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(34px 18px at 1010px 228px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%),
+    radial-gradient(26px 13px at 952px 236px, rgba(255,255,255,.95) 55%, rgba(255,255,255,0) 72%);
+  background-size: 1400px 300px; background-repeat: repeat-x;
+  opacity: .9;
+  animation: drift 180s linear infinite;
+}
+
+:root[data-skin="garden"] .app { position: relative; z-index: 1; }
+
+@keyframes drift { from { background-position: 0 0; } to { background-position: 1400px 0; } }
+
+@media (prefers-reduced-motion: reduce) { :root[data-skin="garden"] body::after { animation: none; } }
+
+:root[data-skin="beach"] .topbar { border-bottom-color: transparent; }
+
+:root[data-skin="beach"] .brand { color: #f7f3ea; text-shadow: 0 1px 2px rgba(30, 70, 80, .35); }
+
+:root[data-skin="forest"] body {
+  /* sous-bois : rais de lumière qui tombent de la canopée, lucioles éparses */
+  background-image:
+    radial-gradient(2.1px 2.1px at 34.3% 41.1%, rgba(230,245,154,.7), transparent 70%),
+    radial-gradient(2.0px 2.0px at 23.2% 67.7%, rgba(230,245,154,.5), transparent 70%),
+    radial-gradient(3.4px 3.4px at 38.2% 53.4%, rgba(230,245,154,.5), transparent 70%),
+    radial-gradient(2.6px 2.6px at 80.6% 28.6%, rgba(170,235,255,.45), transparent 70%),
+    radial-gradient(3.2px 3.2px at 18.2% 88.9%, rgba(230,245,154,.7), transparent 70%),
+    radial-gradient(2.9px 2.9px at 70.7% 30.4%, rgba(170,235,255,.45), transparent 70%),
+    radial-gradient(3.3px 3.3px at 22.1% 92.1%, rgba(170,235,255,.45), transparent 70%),
+    radial-gradient(2.2px 2.2px at 11.2% 21.7%, rgba(170,235,255,.45), transparent 70%),
+    radial-gradient(3.1px 3.1px at 92.6% 36.6%, rgba(230,245,154,.5), transparent 70%),
+    linear-gradient(112deg, transparent 18%, rgba(214,229,156,.07) 22%, transparent 30%),
+    linear-gradient(104deg, transparent 52%, rgba(214,229,156,.06) 57%, transparent 64%),
+    linear-gradient(118deg, transparent 72%, rgba(214,229,156,.05) 76%, transparent 81%),
+    radial-gradient(ellipse 70% 40% at 50% -5%, rgba(214,229,156,.14), transparent 70%),
+    linear-gradient(to bottom, #004130 0%, #003527 55%, #00261c 100%);
+  background-size: auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto, auto;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  background-attachment: fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed;
+}
+
+:root[data-skin="garden"] body {
+  /* ciel de plein jour qui descend vers la pelouse, soleil en haut à droite */
+  background-image:
+    radial-gradient(circle at 88% 6%, rgba(255, 246, 200, .95) 0 34px, rgba(255, 240, 180, .35) 35px, transparent 140px),
+    linear-gradient(to bottom, #a8d4ee 0%, #d7edf6 38%, #cfe6ad 62%, #a3cc7d 100%);
+  background-size: auto, auto;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
+}

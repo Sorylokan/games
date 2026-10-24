@@ -1,0 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700&display=swap");
+
+/* THEME CHATONS : nuit bleutée, chatons orange. Activé par <link> après styles.css
+   et class="theme-kittens" sur <body>. Cases endormies sombres, cases réveillées plus claires. */
+body.theme-kittens {
+  --bg: #1B1833; --card: #404258; --line: #50577A; --txt: #f1eefb; --mut: #b4b8d2;
+  --accent: #F29F58; --accent-ink: #1B1833;
+  --on: #1B1833; --off: #50577A;
+  --font: Nunito, "Trebuchet MS", system-ui, sans-serif;
+  --display: Fredoka, Nunito, "Trebuchet MS", system-ui, sans-serif;
+}
+
+/* Décor : lueur orange en haut à gauche, brume bleutée en bas à droite, empreintes de pattes en filigrane. */
+body.theme-chatons {
+  background-image:
+    radial-gradient(48rem 34rem at 12% 8%, rgba(242, 159, 88, .16), transparent 62%),
+    radial-gradient(52rem 38rem at 92% 96%, rgba(107, 114, 142, .32), transparent 62%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Cg fill='%23F29F58' fill-opacity='.07'%3E%3Cellipse cx='38' cy='46' rx='11' ry='9'/%3E%3Ccircle cx='25' cy='30' r='4.6'/%3E%3Ccircle cx='35' cy='24' r='4.6'/%3E%3Ccircle cx='46' cy='26' r='4.6'/%3E%3Ccircle cx='54' cy='34' r='4.6'/%3E%3Cg transform='rotate(28 110 110)'%3E%3Cellipse cx='110' cy='116' rx='11' ry='9'/%3E%3Ccircle cx='97' cy='100' r='4.6'/%3E%3Ccircle cx='107' cy='94' r='4.6'/%3E%3Ccircle cx='118' cy='96' r='4.6'/%3E%3Ccircle cx='126' cy='104' r='4.6'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-size: auto, auto, 150px 150px;
+}

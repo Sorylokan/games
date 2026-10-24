@@ -1,0 +1,49 @@
+{
+  "title": "Free<br>the Memes",
+  "path": "FreeTheMemes/",
+  "mode": "multi",
+  "ribbon": "freethememes.exe",
+  "description": {
+    "fr": "Un remake mémesque de Shadow Hunters : identités cachées, bagarres dans une chambre de mamie et équipements absurdes. Users, Memers ou Trollers, à toi de deviner qui est qui.",
+    "en": "A meme-flavoured remake of Shadow Hunters: hidden identities, brawls in grandma's bedroom and absurd gear. Users, Memers or Trollers: figure out who's who."
+  },
+  "tags": {
+    "fr": ["4 à 8 joueurs", "Rôles cachés", "5 thèmes"],
+    "en": ["4–8 players", "Hidden roles", "5 themes"]
+  },
+  "button": { "fr": "Jouer →", "en": "Play →" },
+  "fonts": ["Barlow+Condensed:wght@300"],
+
+  "style": {
+    "--red": "#e60012",
+    "--paper": "#f1f1f1",
+    "--ink": "#0a0a0a",
+    "background": "var(--ink)",
+    "color": "var(--paper)",
+    "border": "3px solid var(--paper)",
+    "boxShadow": "8px 8px 0 var(--red)",
+    "transform": "rotate(-1deg)",
+    "transition": "transform .15s, box-shadow .15s"
+  },
+
+  "css": [
+    "&:hover { transform: rotate(0deg) translate(-2px, -2px); box-shadow: 12px 12px 0 var(--red); }",
+    ".ribbon { margin: -3px 3rem 0 -3px; padding: .35rem 1.5rem .35rem .9rem; background: var(--red); font: italic 400 1rem/1.2 Anton, Impact, sans-serif; letter-spacing: .07em; text-transform: uppercase; clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%); }",
+    ".body { padding: 1.25rem 1.25rem 1.5rem; }",
+    "h2 { margin: 0; font: italic 400 clamp(2.4rem, 6vw, 3.4rem)/.95 Anton, Impact, sans-serif; text-transform: uppercase; text-shadow: 4px 4px 0 var(--red); transform: rotate(-2deg); transform-origin: left; }",
+    ".die { display: grid; place-items: center; width: 2.6rem; height: 3.2rem; background: #012456; color: rgb(255, 228, 77); font: 300 2.2rem/1 \"Barlow Condensed\", \"Arial Narrow\", sans-serif; border-left: 2px solid rgb(255, 228, 77); border-right: 2px solid rgb(255, 228, 77); }",
+    ".dice-label { font: 400 .8rem Anton, sans-serif; letter-spacing: .1em; opacity: .7; }",
+    ".tags span { padding: 0 .55rem; background: var(--paper); color: var(--ink); font-weight: 700; font-size: .85rem; transform: skewX(-8deg); }",
+    ".go { padding: .5rem 1.3rem; background: var(--ink); color: var(--paper); border: 2px solid var(--paper); box-shadow: 4px 4px 0 var(--red); transform: skewX(-8deg); font: italic 400 1.1rem Anton, Impact, sans-serif; letter-spacing: .06em; text-transform: uppercase; }",
+    "&:hover .go { background: var(--red); }"
+  ],
+
+  "preview": {
+    "type": "dice",
+    "label": "d6 + d4",
+    "dice": [
+      { "sides": 6, "value": 4 },
+      { "sides": 4, "value": 2 }
+    ]
+  }
+}

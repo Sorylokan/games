@@ -1,0 +1,642 @@
+import { createTranslator } from "../i18n.js";
+import { createLocalGame } from "../game/setup.js";
+import { GAME_PHASES } from "../game/game-state.js";
+import { startGame, beginTurn, completeAreaAction, completeAttack, completeMovement, endTurn } from "../game/turn-manager.js";
+import { isValidMovementDestination, resolveMovementAction, resolveMovementDestination, resolveMovementRollChoice } from "../movement.js";
+import { attack, canTargetWithAttack, resolveCombatPendingAction } from "../game/combat.js";
+import { getCharacter } from "../data/characters.js";
+import { AREAS } from "../data/areas.js";
+import { createRoomId, createRoomLink, getRoomIdFromLocation } from "../networking/room.js";
+import { createHostSession, createClientSession } from "../networking/game-session.js";
+import { createActionRequest } from "../networking/messages.js";
+
+const app = document.querySelector("#app");
+let state;
+let translate;
+let localPlayerId = "player-1";
+let network;
+let roomId = getRoomIdFromLocation();
+let roomStatus = "offline";
+let peers = [];
+let roomPlayers = [];
+let isHost = false;
+let hostSession;
+let clientSession;
+let localPlayerName = localStorage.getItem("ftm-player-name") || "Alice";
+let assignedPlayerId = "player-1";
+let roomRole = roomId ? "client" : "local";
+
+const players = [
+  { id: "player-1", name: "Alice" },
+  { id: "player-2", name: "Bob" },
+  { id: "player-3", name: "Cara" },
+  { id: "player-4", name: "Dan" }
+];
+
+const AREA_NAME_KEYS = Object.fromEntries(Object.values(AREAS).map((area) => [area.id, area.nameKey]));
+const getAreaLabel = (areaId) => (areaId ? translate(AREA_NAME_KEYS[areaId] ?? areaId) : "Nowhere yet");
+
+// Purely decorative - not game data, just a visual identifier per Area so the board
+// doesn't read as a grid of identical boxes.
+const AREA_ICONS = Object.freeze({
+  "otakus-paradise": "🎌",
+  "bed-of-your-dreams": "🛏️",
+  "grandmas-new-bedroom": "🕯️",
+  "attic-hatch": "🪜",
+  "toxic-relationship": "💔",
+  "pickpocket-boulevard": "🧤"
+});
+
+// A player's board piece/token, colored by their fixed turn-order slot so the same
+// player keeps the same color across the zone tokens and the character cards below.
+const pieceIndexFor = (playerId) => {
+  const index = state.turnOrder.indexOf(playerId);
+  return index < 0 ? 0 : index % 8;
+};
+
+const renderPieceToken = (player, active) => `
+  <span class="piece piece-${pieceIndexFor(player.id)} ${player.id === active.id ? "current" : ""} ${player.alive ? "" : "dead"}" title="${player.alive ? player.name : `${player.name}, eliminated`}">
+    <span class="piece-avatar">${player.name.slice(0, 1).toUpperCase()}</span>
+    <span class="piece-name">${player.name}</span>
+  </span>`;
+
+const renderCharacterCard = (player, active) => {
+  const character = player.characterId ? getCharacter(player.characterId) : null;
+  const revealed = player.revealed || player.id === localPlayerId;
+  const factionClass = revealed && character ? `faction-${character.faction}` : "faction-hidden";
+  // HP is public board state in the original game (the damage marker sits on the
+  // shared board) — only Character identity/faction is secret, never HP.
+  const hpPercent = Math.max(0, Math.round((player.hp / player.maxHp) * 100));
+
+  return `
+    <article class="char-card ${factionClass} piece-${pieceIndexFor(player.id)} ${player.id === active.id ? "active" : ""} ${player.alive ? "" : "dead"}">
+      <header class="char-card-head">
+        <span class="char-avatar">${player.name.slice(0, 1).toUpperCase()}</span>
+        <div class="char-card-identity">
+          <strong>${player.name}</strong>
+          <small>${revealed && character ? translate(character.nameKey) : "Hidden identity"}</small>
+        </div>
+      </header>
+      ${player.alive
+        ? `<div class="hp-bar"><div class="hp-fill" style="width:${hpPercent}%"></div></div>
+           <p class="char-meta">${player.hp}/${player.maxHp} HP &middot; ${getAreaLabel(player.areaId)}</p>`
+        : `<p class="char-meta">Eliminated</p>`}
+      ${player.equipment.length ? `<div class="equip-row">${player.equipment.map((cardId) => `<span class="equip-chip">${cardId.replaceAll("-", " ")}</span>`).join("")}</div>` : ""}
+    </article>`;
+};
+
+const randomRoll = (sides) => Math.floor(Math.random() * sides) + 1;
+const actionForPhase = Object.freeze({
+  [GAME_PHASES.START_TURN]: "BEGIN_TURN",
+  [GAME_PHASES.MOVEMENT]: "MOVE",
+  [GAME_PHASES.AREA_ACTION]: "COMPLETE_AREA_ACTION",
+  [GAME_PHASES.ATTACK]: "COMPLETE_ATTACK",
+  [GAME_PHASES.END_TURN]: "END_TURN"
+});
+const playerLabel = (playerId) => {
+  const player = state?.players[playerId];
+  if (!player) return playerId ?? "unknown player";
+
+  if (!player.characterId) return player.name;
+  const character = getCharacter(player.characterId);
+  const mayRevealCharacter = player.id === localPlayerId || player.revealed;
+  return mayRevealCharacter ? `${player.name} (${translate(character.nameKey)})` : player.name;
+};
+
+const describeEvent = (event) => {
+  if (event.type === "UI_LOG") return event.message;
+  if (event.type === "PLAYER_MOVED") return `${playerLabel(event.playerId)} moved to ${getAreaLabel(event.areaId)}${event.total ? ` (roll ${event.total})` : ""}.`;
+  if (event.type === "ATTACK_STARTED") return `${playerLabel(event.attackerId)} attacked ${playerLabel(event.targetId)}.`;
+  if (event.type === "ATTACK_RESOLVED") return `${playerLabel(event.attackerId)} dealt ${event.damage} damage to ${playerLabel(event.targetId)} (${event.d6 ?? "d4"}/${event.d4}).`;
+  if (event.type === "DAMAGE_DEALT") return `${playerLabel(event.playerId)} lost ${event.amount} HP.`;
+  if (event.type === "DAMAGE_PREVENTED") return `Damage to ${playerLabel(event.playerId)} was prevented${event.reason ? ` (${event.reason})` : ""}.`;
+  if (event.type === "HEAL_APPLIED") return `${playerLabel(event.playerId)} recovered ${event.amount} HP.`;
+  if (event.type === "PLAYER_DIED") return `${playerLabel(event.playerId)} died. Body count: ${event.bodyCountAtDeath}.`;
+  if (event.type === "ABILITY_USED") return `${playerLabel(event.playerId)} used ${event.abilityId}.`;
+  if (event.type === "CHARACTER_REVEALED") return `${playerLabel(event.playerId)} revealed their Character.`;
+  if (event.type === "EQUIPMENT_STOLEN") return `${playerLabel(event.toPlayerId)} stole Equipment from ${playerLabel(event.fromPlayerId)}.`;
+  if (event.type === "TURN_STARTED") return `${playerLabel(event.playerId)}'s turn started.`;
+  if (event.type === "TURN_ENDED") return `${playerLabel(event.playerId)}'s turn ended.`;
+  if (event.type === "VICTORY_REACHED") return `Victory reached by ${event.playerId}.`;
+  return `${event.type.replaceAll("_", " ")}${event.playerId ? ` - ${playerLabel(event.playerId)}` : ""}.`;
+};
+
+const addLog = (message) => {
+  state = { ...state, events: [...state.events, { type: "UI_LOG", message }] };
+};
+
+const run = (result, label = "action") => {
+  if (!result.ok) {
+    addLog(`RESULT ${label}: REJECTED - ${result.error}: ${result.message ?? "Action rejected"}`);
+    return false;
+  }
+  state = result.state;
+  addLog(`RESULT ${label}: accepted; phase is now ${state.phase}.`);
+  return true;
+};
+
+// Routes the host's own actions through HostAuthority too, so the resulting state is
+// broadcast to connected peers instead of only updating the host's local view.
+const runAsHost = (action, payload, label) => {
+  const result = hostSession.authority.handleRequest(createActionRequest(assignedPlayerId, action, payload));
+  if (!result.ok) {
+    addLog(`RESULT ${label}: REJECTED - ${result.message.error}: ${result.message.message}`);
+    return false;
+  }
+  state = result.state;
+  addLog(`RESULT ${label}: accepted; phase is now ${state.phase}.`);
+  return true;
+};
+
+const currentPlayer = () => state.players[state.currentPlayerId];
+const phaseLabel = () => state.phase.replaceAll("-", " ");
+const canControlCurrentPlayer = () => roomRole === "local" || state?.currentPlayerId === assignedPlayerId;
+
+const handleStart = () => {
+  if (!isHost || !hostSession || peers.length === 0) return;
+  const lobbyState = hostSession.authority.state;
+  const playerIds = lobbyState.turnOrder.slice(0, Math.min(4, peers.length + 1));
+  const matchState = {
+    ...lobbyState,
+    players: Object.fromEntries(playerIds.map((playerId) => [playerId, lobbyState.players[playerId]])),
+    turnOrder: playerIds
+  };
+  const started = startGame(matchState);
+  if (!run(started, "start room match")) return;
+  hostSession.authority.replaceState(state);
+  render();
+};
+
+const lobbyStatusLabel = () => {
+  if (roomStatus === "connected") {
+    return isHost
+      ? `Host lobby: ${peers.length} peer(s) connected.`
+      : "Connected to host. Waiting for the host to start the match.";
+  }
+
+  return roomStatus;
+};
+
+const connectToRoom = async (requestedRoomId) => {
+  try {
+    roomId = requestedRoomId;
+    if (!network) {
+      const { TrysteroNetwork } = await import("../networking/trystero-network.js");
+      network = new TrysteroNetwork();
+    }
+    network.on("connected", () => { roomStatus = "connected"; render(); });
+    network.on("PLAYER_JOINED", ({ peerId }) => {
+      peers = [...new Set([...peers, peerId])];
+      hostSession?.authority.broadcast();
+      if (!isHost) network.sendHello(localPlayerName);
+      render();
+    });
+    network.on("PLAYER_LEFT", ({ peerId }) => { peers = peers.filter((currentPeerId) => currentPeerId !== peerId); render(); });
+    if (!isHost) {
+      clientSession?.dispose();
+      clientSession = createClientSession(network, ({ publicState }) => {
+        if (publicState) {
+          if (publicState.phase === GAME_PHASES.SETUP) {
+            roomPlayers = Object.values(publicState.players ?? {});
+            roomStatus = "Connected to host. Waiting for the host to start the match.";
+            render();
+            return;
+          }
+          state = { ...state, ...publicState, players: publicState.players };
+          roomStatus = "game synchronized";
+          render();
+        }
+      }, (playerSlot) => {
+        localPlayerId = playerSlot;
+        assignedPlayerId = playerSlot;
+        roomStatus = `Assigned to ${localPlayerName} (${playerSlot}). Waiting for host.`;
+        render();
+      });
+    }
+    await network.connect(roomId);
+    if (isHost && !hostSession) {
+      const localPlayers = players.map((player, index) => (
+        index === 0 ? { ...player, name: localPlayerName } : player
+      ));
+      const lobbyState = createLocalGame(localPlayers, { startingPlayerIndex: 0 });
+      hostSession = createHostSession(lobbyState, network);
+      roomPlayers = Object.values(lobbyState.players);
+    }
+    roomStatus = "connected";
+    render();
+  } catch (error) {
+    roomStatus = `error: ${error.message}`;
+    render();
+  }
+};
+
+const handleCreateRoom = () => {
+  isHost = true;
+  roomRole = "host";
+  roomId = createRoomId();
+  roomPlayers = [];
+  roomStatus = `Room created: ${roomId}. Connecting...`;
+  render();
+  connectToRoom(roomId);
+};
+
+const handleJoinRoom = () => {
+  isHost = false;
+  roomRole = "client";
+  const input = app.querySelector("[data-room-input]");
+  const requestedRoomId = input.value.trim();
+  if (!requestedRoomId) {
+    roomStatus = "Enter a room code first.";
+    render();
+    return;
+  }
+
+  roomId = requestedRoomId;
+  roomStatus = `Joining room ${requestedRoomId}...`;
+  render();
+  connectToRoom(requestedRoomId);
+};
+
+const handleCopyInvite = async () => {
+  const invite = createRoomLink(roomId);
+  try {
+    await navigator.clipboard.writeText(invite);
+    roomStatus = "Invite link copied.";
+  } catch {
+    const inviteInput = app.querySelector("[data-invite-link]");
+    inviteInput?.select();
+    roomStatus = "Copy the selected invite link.";
+  }
+  render();
+};
+
+const handleNameChange = (event) => {
+  localPlayerName = event.target.value.trim() || "Player";
+  localStorage.setItem("ftm-player-name", localPlayerName);
+};
+
+const handlePrimaryAction = () => {
+  if (!canControlCurrentPlayer()) {
+    addLog(`BLOCKED primary action: it is ${playerLabel(state.currentPlayerId)}'s turn.`);
+    render();
+    return;
+  }
+
+  if (state.pendingActions.length > 0) {
+    addLog(`BLOCKED primary action: ${state.pendingActions[0].type} must be resolved first.`);
+    render();
+    return;
+  }
+
+  const playerId = roomRole === "local" ? state.currentPlayerId : assignedPlayerId;
+  if (!isHost && clientSession) {
+    addLog(`NETWORK REQUEST ${state.phase}.`);
+    clientSession.requestAction(createActionRequest(playerId, actionForPhase[state.phase]));
+    return;
+  }
+  const label = `${state.phase} primary button by ${playerLabel(playerId)}`;
+  addLog(`CLICK ${label}.`);
+  if (isHost && hostSession) {
+    runAsHost(actionForPhase[state.phase], {}, label);
+    render();
+    return;
+  }
+  if (state.phase === GAME_PHASES.START_TURN) run(beginTurn(state, playerId), "begin turn");
+  else if (state.phase === GAME_PHASES.MOVEMENT) {
+    const movement = resolveMovementAction(state, playerId, { rollDie: randomRoll });
+    if (run(movement, "roll and move") && !movement.reroll && !movement.pendingAction) {
+      run(completeMovement(state, playerId), "complete movement");
+    }
+  }
+  else if (state.phase === GAME_PHASES.AREA_ACTION) run(completeAreaAction(state, playerId), "resolve area");
+  else if (state.phase === GAME_PHASES.ATTACK) run(completeAttack(state, playerId), "skip attack");
+  else if (state.phase === GAME_PHASES.END_TURN) run(endTurn(state, playerId), "end turn");
+  render();
+};
+
+const handleAttack = (targetId) => {
+  if (!state || state.phase !== GAME_PHASES.ATTACK) return;
+  if (!canControlCurrentPlayer()) {
+    addLog(`BLOCKED attack: it is ${playerLabel(state.currentPlayerId)}'s turn.`);
+    render();
+    return;
+  }
+  addLog(`CLICK Attack ${playerLabel(targetId)} by ${playerLabel(state.currentPlayerId)}.`);
+  if (!isHost && clientSession) {
+    clientSession.requestAction(createActionRequest(state.currentPlayerId, "ATTACK", { targetId }));
+    return;
+  }
+  if (isHost && hostSession) {
+    runAsHost("ATTACK", { targetId }, `attack ${playerLabel(targetId)}`);
+    render();
+    return;
+  }
+  const attackerId = roomRole === "local" ? state.currentPlayerId : assignedPlayerId;
+  const result = attack(state, attackerId, targetId, { rollDie: randomRoll });
+  if (run(result) && !state.gameOver && state.pendingActions.length === 0) {
+    run(completeAttack(state, state.currentPlayerId), "complete attack");
+  }
+  render();
+};
+
+const handlePendingReaction = (selectedDestination = null) => {
+  const pendingAction = state?.pendingActions[0];
+  if (!pendingAction) return;
+
+  addLog(`CLICK Resolve pending reaction: ${pendingAction.type}.`);
+  if (pendingAction.type === "CHOOSE_MOVEMENT_DESTINATION") {
+    const destinationAreaId = selectedDestination ?? Object.values(state.board.areaAtPosition)
+      .find((areaId) => isValidMovementDestination(state.board, areaId) && areaId !== pendingAction.excludedAreaId);
+
+    if (isHost && hostSession) {
+      runAsHost("CHOOSE_MOVEMENT_DESTINATION", { areaId: destinationAreaId }, "resolve movement destination");
+      render();
+      return;
+    }
+
+    const result = resolveMovementDestination(state, pendingAction, destinationAreaId);
+
+    if (run(result, "resolve movement destination") && state.phase === GAME_PHASES.MOVEMENT && state.pendingActions.length === 0) {
+      run(completeMovement(state, pendingAction.playerId), "complete movement after destination");
+    }
+    render();
+    return;
+  }
+
+  if (pendingAction.type === "CHOOSE_MOVEMENT_ROLL") {
+    if (isHost && hostSession) {
+      runAsHost("CHOOSE_MOVEMENT_ROLL", { rollIndex: 0 }, "resolve movement roll");
+      render();
+      return;
+    }
+
+    const result = resolveMovementRollChoice(state, pendingAction, 0);
+    if (run(result, "resolve movement roll") && state.phase === GAME_PHASES.MOVEMENT && state.pendingActions.length === 0) {
+      run(completeMovement(state, pendingAction.playerId), "complete movement after roll choice");
+    }
+    render();
+    return;
+  }
+};
+
+// Combat reactions (Doge, Pay-to-Win, Life Stonks, Surprise MF, John Wick, Telescopic Lance)
+// belong to whichever player the pendingAction names, which may not be the active player.
+const resolveReaction = (choice, label) => {
+  const pendingAction = state?.pendingActions[0];
+  if (!pendingAction) return;
+
+  addLog(`CLICK Resolve pending reaction: ${label}.`);
+
+  if (!isHost && clientSession) {
+    clientSession.requestAction(createActionRequest(pendingAction.playerId, "RESOLVE_COMBAT_REACTION", { choice }));
+    return;
+  }
+  if (isHost && hostSession) {
+    runAsHost("RESOLVE_COMBAT_REACTION", { choice }, label);
+    render();
+    return;
+  }
+
+  const result = resolveCombatPendingAction(state, pendingAction, choice, { rollDie: randomRoll });
+  if (run(result, label) && !state.gameOver && state.pendingActions.length === 0 && state.phase === GAME_PHASES.ATTACK) {
+    const reactionPlayerId = state.currentPlayerId;
+    if (run(completeAttack(state, reactionPlayerId), "complete attack after reaction") && !state.players[reactionPlayerId].alive) {
+      run(endTurn(state, reactionPlayerId), "skip dead player's turn");
+    }
+  }
+  render();
+};
+
+// Reveal-gated reactions share the same "reveal & activate" / "decline" shape; only the
+// wording changes per character. Pay-to-Win and Telescopic Lance have their own payloads.
+const OPTIONAL_REACTION_PROMPTS = Object.freeze({
+  DOGE_ATTACK_REACTION: { reveal: "Reveal & try to dodge (coin flip)", decline: "Take the hit" },
+  LIFE_STONKS_REACTION: { reveal: "Reveal & heal 2 HP", decline: "Skip healing" },
+  SURPRISE_COUNTERATTACK: { reveal: "Reveal & counterattack", decline: "Skip counterattack" },
+  JOHN_WICK_SECOND_ATTACK: { reveal: "Reveal & attack again (-2 HP)", decline: "Skip second attack" }
+});
+
+const renderPendingReactionPanel = (pendingReaction, pendingMovementDestinations) => {
+  if (!pendingReaction) return "";
+
+  const ownerLabel = playerLabel(pendingReaction.playerId);
+  const canResolve = roomRole === "local" || pendingReaction.playerId === assignedPlayerId;
+
+  if (!canResolve) {
+    return `<p class="pending-label" style="margin-top:8px">Waiting for ${ownerLabel} to resolve ${pendingReaction.type.replaceAll("_", " ").toLowerCase()}.</p>`;
+  }
+
+  if (pendingReaction.type === "CHOOSE_MOVEMENT_DESTINATION") {
+    return `<div class="pending-choices"><p class="pending-label">Choose your destination</p>${pendingMovementDestinations.map((areaId) => `<button class="action secondary" data-destination="${areaId}">${getAreaLabel(areaId)}</button>`).join("")}</div>`;
+  }
+
+  if (pendingReaction.type === "CHOOSE_MOVEMENT_ROLL") {
+    return `<button class="action" data-action="pending" style="margin-top:8px;width:100%">Resolve movement roll</button>`;
+  }
+
+  if (pendingReaction.type === "PAY_TO_WIN_REACTION") {
+    const target = state.players[pendingReaction.targetId];
+    return `<div class="pending-choices">
+      <p class="pending-label">${ownerLabel}: deal ${pendingReaction.damage} damage, or steal an Equipment card instead?</p>
+      <button class="action secondary" data-reaction="pay-to-win-damage">Deal ${pendingReaction.damage} damage</button>
+      ${target.equipment.map((cardId) => `<button class="action secondary" data-reaction="pay-to-win-steal" data-card="${cardId}">Steal ${cardId}</button>`).join("")}
+    </div>`;
+  }
+
+  if (pendingReaction.type === "TELESCOPIC_LANCE_REACTION") {
+    return `<div class="pending-choices">
+      <p class="pending-label">${ownerLabel}: reveal your identity for +2 damage?</p>
+      <button class="action secondary" data-reaction="lance-plain">Deal ${pendingReaction.damage} damage</button>
+      <button class="action secondary" data-reaction="lance-bonus">Reveal & deal ${pendingReaction.damage + 2} damage</button>
+    </div>`;
+  }
+
+  const prompt = OPTIONAL_REACTION_PROMPTS[pendingReaction.type];
+  return `<div class="pending-choices">
+    <p class="pending-label">${ownerLabel}'s optional reaction</p>
+    <button class="action secondary" data-reaction="optional-reveal">${prompt.reveal}</button>
+    <button class="action secondary" data-reaction="optional-decline">${prompt.decline}</button>
+  </div>`;
+};
+
+const renderTurnActionModal = ({ active, canAct, pendingReaction, isGameOver, otherPlayers }) => {
+  if (isGameOver || pendingReaction || !canAct) return "";
+
+  const phaseContent = {
+    [GAME_PHASES.START_TURN]: {
+      title: "À toi de jouer",
+      body: `<button class="action modal-action" data-action="primary">Commencer le tour</button>`
+    },
+    [GAME_PHASES.MOVEMENT]: {
+      title: "Déplacement",
+      body: `<button class="action modal-action" data-action="primary">🎲 Lancer les dés</button>`
+    },
+    [GAME_PHASES.AREA_ACTION]: {
+      title: getAreaLabel(active.areaId),
+      body: `
+        <button class="action modal-action" data-action="primary">Résoudre la zone</button>
+        <button class="action modal-action secondary" data-action="skip-area">Ignorer l'effet</button>`
+    },
+    [GAME_PHASES.ATTACK]: {
+      title: "Phase d'attaque",
+      body: `
+        ${otherPlayers.map((player) => `<button class="action modal-action secondary" data-target="${player.id}">⚔️ Attaquer ${player.name}</button>`).join("")}
+        <button class="action modal-action" data-action="primary">Passer l'attaque</button>`
+    },
+    [GAME_PHASES.END_TURN]: {
+      title: "Fin de ton tour",
+      body: `<button class="action modal-action" data-action="primary">Terminer le tour</button>`
+    }
+  };
+
+  const content = phaseContent[state.phase];
+  if (!content) return "";
+
+  return `
+    <div class="turn-modal-overlay">
+      <div class="turn-modal">
+        <p class="turn-modal-title">${content.title}</p>
+        <div class="turn-modal-actions">${content.body}</div>
+      </div>
+    </div>`;
+};
+
+const render = () => {
+  if (!state) {
+    if (roomId && roomRole !== "local") {
+      const knownPlayers = roomRole === "host" && hostSession
+        ? Object.values(hostSession.authority.state.players)
+        : roomPlayers;
+      const connectedSeatCount = Math.min(4, peers.length + 1);
+      const playersInRoom = knownPlayers.slice(0, connectedSeatCount);
+      const occupiedSlots = new Set(playersInRoom.map((player) => player.id));
+      const roomRoster = playersInRoom.length
+        ? playersInRoom.map((player) => `<li class="room-player"><span class="room-player-mark">${player.name.slice(0, 1).toUpperCase()}</span><span>${player.name}</span><small>${player.id === "player-1" ? "HOST" : "SEAT"}</small></li>`).join("")
+        : `<li class="room-player room-player-waiting"><span class="room-player-mark">+</span><span>Waiting for players</span></li>`;
+      const waitingSlots = Math.max(0, 4 - occupiedSlots.size);
+      app.innerHTML = `
+        <main class="room-screen">
+          <header class="room-topbar"><a class="wordmark" href="./">FREE THE MEMES</a><span class="connection-state"><i></i>${isHost ? "ROOM OPEN" : peers.length > 0 ? "HOST FOUND" : "SEARCHING FOR HOST"}</span></header>
+          <div class="room-content">
+            <section class="room-main">
+              <p class="eyebrow">ONLINE ROOM / ${isHost ? "HOST" : "GUEST"}</p>
+              <h1>${isHost ? "Your room is ready." : "You are joining."}</h1>
+              <p class="room-intro">${isHost ? "Share the invite with your friends. The match begins when you start it." : "You are connected to the host. The match will begin when everyone is ready."}</p>
+              <div class="invite-block"><label for="invite-link">INVITATION LINK</label><div class="invite-field"><input id="invite-link" data-invite-link readonly value="${createRoomLink(roomId)}"><button class="action" data-action="copy-invite" aria-label="Copy invitation link" title="Copy invitation link">Copy</button></div><code class="room-code">${roomId}</code></div>
+              ${isHost
+                ? `<button type="button" class="action start-room-action" data-action="start" ${roomStatus === "connected" && peers.length > 0 ? "" : "disabled"}>${peers.length > 0 ? "Start match" : "Waiting for one player"} <span aria-hidden="true">${peers.length > 0 ? "→" : "···"}</span></button>`
+                : `<p class="waiting-note"><span class="waiting-pulse"></span>Waiting for the host to start the match</p>`}
+              <p class="room-status">${lobbyStatusLabel()}</p>
+            </section>
+            <aside class="room-roster"><div class="roster-heading"><h2>Room seats</h2><span>${playersInRoom.length}/4</span></div><ul>${roomRoster}${Array.from({ length: waitingSlots }, () => `<li class="room-player room-player-open"><span class="room-player-mark">·</span><span>Open seat</span></li>`).join("")}</ul><p class="roster-foot">Up to four players</p></aside>
+          </div>
+        </main>`;
+      app.querySelector("[data-action=start]")?.addEventListener("click", handleStart);
+      app.querySelector("[data-action=copy-invite]")?.addEventListener("click", handleCopyInvite);
+      return;
+    }
+
+    app.innerHTML = `
+      <main class="home-screen">
+        <header class="home-topbar"><a class="wordmark" href="./">FREE THE MEMES</a><span>ONLINE PARTY GAME</span></header>
+        <section class="home-content">
+          <div class="home-copy"><p class="eyebrow">A SOCIAL GAME, PLAYED APART</p><h1>Read the room.<br><em>From anywhere.</em></h1><p class="home-intro">Gather your people in a private room. Everyone plays from their own screen.</p><label class="name-field">PLAYER NAME<input data-player-name value="${localPlayerName}" maxlength="24" aria-label="Your nickname"></label></div>
+          <div class="online-actions"><button type="button" class="action create-room-action" data-action="create-room"><span>Create a room</span><span aria-hidden="true">↗</span></button><div class="join-room-block"><label for="room-code-input">HAVE A ROOM CODE?</label><div class="room-join"><input id="room-code-input" data-room-input placeholder="Paste room code" value="${roomId ?? ""}" aria-label="Room code"><button type="button" class="action secondary" data-action="join-room">Join room <span aria-hidden="true">→</span></button></div></div><p class="room-status">${roomStatus === "offline" ? "Private room · No account needed" : lobbyStatusLabel()}</p></div>
+        </section>
+        <footer class="home-footer"><span>01 / CREATE OR JOIN</span><span>02 / INVITE YOUR TABLE</span><span>03 / PLAY TOGETHER, APART</span></footer>
+      </main>`;
+    app.querySelector("[data-action=create-room]").addEventListener("click", handleCreateRoom);
+    app.querySelector("[data-action=join-room]").addEventListener("click", handleJoinRoom);
+    app.querySelector("[data-player-name]").addEventListener("input", handleNameChange);
+    return;
+  }
+
+  const active = currentPlayer();
+  const boardAreas = Object.entries(state.board.areaAtPosition);
+  const otherPlayers = Object.values(state.players).filter((player) => (
+    player.id !== state.currentPlayerId &&
+    player.alive &&
+    canTargetWithAttack(state, state.currentPlayerId, player.id)
+  ));
+  const pendingReaction = state.pendingActions[0];
+  const pendingMovementDestinations = pendingReaction?.type === "CHOOSE_MOVEMENT_DESTINATION"
+    ? Object.values(state.board.areaAtPosition).filter((areaId) => areaId !== pendingReaction.excludedAreaId)
+    : [];
+  const canAttack = state.phase === GAME_PHASES.ATTACK && !pendingReaction;
+  const canAct = canControlCurrentPlayer();
+  const isGameOver = state.gameOver || state.phase === GAME_PHASES.GAME_OVER;
+  const winnerNames = state.winners.map((playerId) => state.players[playerId]?.name ?? playerId);
+
+  app.innerHTML = `
+    <main class="game-screen">
+      <header class="game-topbar"><a class="wordmark" href="./">FREE THE MEMES</a><div class="game-session-label"><span class="connection-state"><i></i>${roomRole === "host" ? "HOST" : "ONLINE ROOM"}</span><span class="game-room-code">${roomId ?? "LOCAL"}</span></div><span class="phase">${phaseLabel()}</span></header>
+      <div class="turn-banner ${canAct ? "turn-banner-you" : ""}">
+        <span class="turn-banner-label">${isGameOver ? "Partie terminée" : "Tour de"}</span>
+        ${!isGameOver ? `<strong class="turn-banner-name">${active.name}</strong>` : ""}
+      </div>
+      <section class="board-panel">
+        ${isGameOver ? `<section class="victory-banner"><p class="eyebrow">Match complete</p><h2>${winnerNames.length > 1 ? "Multiple winners" : "Winner"}</h2><p>${winnerNames.join(", ")}</p><small>${state.bodyCount} character${state.bodyCount === 1 ? "" : "s"} eliminated</small></section>` : ""}
+        <div class="panel-head"><h2>The table</h2></div>
+        <div class="board-ring">
+          ${boardAreas.map(([position, areaId], index) => {
+            const occupants = Object.values(state.players).filter((player) => player.areaId === areaId);
+            return `
+            <article class="zone pair-${Math.floor(index / 2)} ${areaId === active.areaId ? "you-are-here" : ""}">
+              <div class="zone-head">
+                <span class="zone-icon">${AREA_ICONS[areaId] ?? "📍"}</span>
+                <div class="zone-title"><h3>${getAreaLabel(areaId)}</h3><span class="zone-position">Spot ${position}</span></div>
+              </div>
+              <div class="zone-tokens">
+                ${occupants.map((player) => renderPieceToken(player, active)).join("") || "<span class=empty>Empty</span>"}
+              </div>
+            </article>`;
+          }).join("")}
+        </div>
+      </section>
+      <section class="players-strip"><div class="players-strip-head"><h2>Players</h2><span>${state.turnOrder.length} IN THE ROOM</span></div><div class="character-cards">
+          ${state.turnOrder.map((playerId) => state.players[playerId]).filter(Boolean).map((player) => renderCharacterCard(player, active)).join("")}
+      </div></section>
+      <!-- <footer class="game-toolbar"><div class="turn-summary"><small>${isGameOver ? "Game over" : pendingReaction ? `Action for ${playerLabel(pendingReaction.playerId)}` : canAct ? "Your turn" : "Turn in progress"}</small><strong>${isGameOver ? `Winners: ${winnerNames.join(", ")}` : canAct ? active.name : active.name}</strong></div><div class="game-actions"><button class="action" data-action="primary" ${isGameOver || pendingReaction || !canAct ? "disabled" : ""}>${isGameOver ? "Match complete" : pendingReaction ? "Resolve pending reaction" : !canAct ? `Waiting for ${active.name}` : state.phase === GAME_PHASES.START_TURN ? "Begin turn" : state.phase === GAME_PHASES.MOVEMENT ? "Roll & move" : state.phase === GAME_PHASES.AREA_ACTION ? "Resolve area" : state.phase === GAME_PHASES.ATTACK ? "Skip attack" : state.phase === GAME_PHASES.END_TURN ? "End turn" : "Continue"}</button><button class="action secondary" data-action="reset">Return to room</button></div><div class="toolbar-extras">${canAttack && otherPlayers.length ? `<details class="attack-menu"><summary>Attack</summary><div>${otherPlayers.map((player) => `<button class="action secondary" data-target="${player.id}">${player.name}</button>`).join("")}</div></details>` : ""}<details class="event-log"><summary>Game log</summary><div class="log">${state.events.slice(-40).reverse().map((event) => `<div class="log-line">${describeEvent(event)}</div>`).join("")}</div></details></div>${renderPendingReactionPanel(pendingReaction, pendingMovementDestinations)}</footer> -->
+      <footer class="game-toolbar">
+        <button class="action secondary" data-action="reset">Return to room</button>
+        <details class="event-log"><summary>Game log</summary><div class="log">${state.events.slice(-40).reverse().map((event) => `<div class="log-line">${describeEvent(event)}</div>`).join("")}</div></details>
+        ${renderPendingReactionPanel(pendingReaction, pendingMovementDestinations)}
+      </footer>
+      ${renderTurnActionModal({ active, canAct, pendingReaction, isGameOver, otherPlayers })}
+    </main>`;
+
+  app.querySelector("[data-action=primary]").addEventListener("click", handlePrimaryAction);
+  app.querySelector("[data-action=pending]")?.addEventListener("click", handlePendingReaction);
+  app.querySelectorAll("[data-destination]").forEach((button) => button.addEventListener("click", () => handlePendingReaction(button.dataset.destination)));
+  app.querySelector("[data-action=reset]").addEventListener("click", () => {
+    if (isHost && hostSession) {
+      const currentPlayers = hostSession.authority.state.players;
+      const lobbyPlayers = players.map((player, index) => ({
+        ...player,
+        name: index === 0 ? localPlayerName : currentPlayers[player.id]?.name ?? player.name
+      }));
+      const lobbyState = createLocalGame(lobbyPlayers, { startingPlayerIndex: 0 });
+      hostSession.authority.replaceState(lobbyState);
+      roomPlayers = Object.values(lobbyState.players);
+    }
+    state = null;
+    render();
+  });
+  app.querySelectorAll("[data-target]").forEach((button) => button.addEventListener("click", () => handleAttack(button.dataset.target)));
+  app.querySelector("[data-reaction=pay-to-win-damage]")?.addEventListener("click", () => resolveReaction({ action: "damage" }, "Pay-to-Win: deal damage"));
+  app.querySelectorAll("[data-reaction=pay-to-win-steal]").forEach((button) => button.addEventListener("click", () => (
+    resolveReaction({ action: "steal", cardId: button.dataset.card, confirmReveal: true }, `Pay-to-Win: steal ${button.dataset.card}`)
+  )));
+  app.querySelector("[data-reaction=lance-plain]")?.addEventListener("click", () => resolveReaction({}, "Telescopic Lance: plain damage"));
+  app.querySelector("[data-reaction=lance-bonus]")?.addEventListener("click", () => resolveReaction({ confirmReveal: true }, "Telescopic Lance: bonus damage"));
+  app.querySelector("[data-reaction=optional-reveal]")?.addEventListener("click", () => resolveReaction({ confirmReveal: true }, "reveal & activate reaction"));
+  app.querySelector("[data-reaction=optional-decline]")?.addEventListener("click", () => resolveReaction({ decline: true }, "decline reaction"));
+};
+
+fetch("./locales/en.json")
+  .then((response) => response.json())
+  .then((messages) => {
+    translate = createTranslator({ locale: "en", messages: { en: messages } });
+    render();
+    if (roomId) connectToRoom(roomId);
+  });

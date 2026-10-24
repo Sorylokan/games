@@ -1,0 +1,63 @@
+const card = (id, deck, type, nameKey, textKey, effect) => Object.freeze({
+  id,
+  deck,
+  type,
+  nameKey,
+  textKey,
+  effect
+});
+
+export const CARDS = Object.freeze([
+  card("grandpas-advice", "notifications", "single-use", "cards.notifications.grandpasAdvice.name", "cards.notifications.grandpasAdvice.text", "faction-heal-or-damage"),
+  card("unsolicited-life-advice", "notifications", "single-use", "cards.notifications.unsolicitedLifeAdvice.name", "cards.notifications.unsolicitedLifeAdvice.text", "faction-heal-or-damage"),
+  card("get-over-here", "notifications", "single-use", "cards.notifications.getOverHere.name", "cards.notifications.getOverHere.text", "faction-heal-or-damage"),
+  card("pay-me-or-else", "notifications", "single-use", "cards.notifications.payMeOrElse.name", "cards.notifications.payMeOrElse.text", "faction-or-equipment"),
+  card("pay-me-or-else-2", "notifications", "single-use", "cards.notifications.payMeOrElse.name", "cards.notifications.payMeOrElse.text", "faction-or-equipment"),
+  card("unresolved-issues", "notifications", "single-use", "cards.notifications.unresolvedIssues.name", "cards.notifications.unresolvedIssues.text", "faction-or-equipment"),
+  card("unresolved-issues-2", "notifications", "single-use", "cards.notifications.unresolvedIssues.name", "cards.notifications.unresolvedIssues.text", "faction-or-equipment"),
+  card("tax-collection", "notifications", "single-use", "cards.notifications.taxCollection.name", "cards.notifications.taxCollection.text", "faction-or-equipment"),
+  card("tax-collection-2", "notifications", "single-use", "cards.notifications.taxCollection.name", "cards.notifications.taxCollection.text", "faction-or-equipment"),
+  card("bonk", "notifications", "single-use", "cards.notifications.bonk.name", "cards.notifications.bonk.text", "faction-damage"),
+  card("bonk-2", "notifications", "single-use", "cards.notifications.bonk.name", "cards.notifications.bonk.text", "faction-damage"),
+  card("emotional-alt-f4", "notifications", "single-use", "cards.notifications.emotionalAltF4.name", "cards.notifications.emotionalAltF4.text", "faction-damage"),
+  card("rest-in-piss", "notifications", "single-use", "cards.notifications.restInPiss.name", "cards.notifications.restInPiss.text", "faction-damage-2"),
+  card("skill-issue", "notifications", "single-use", "cards.notifications.skillIssue.name", "cards.notifications.skillIssue.text", "max-hp-damage"),
+  card("character-development", "notifications", "single-use", "cards.notifications.characterDevelopment.name", "cards.notifications.characterDevelopment.text", "max-hp-damage-2"),
+  card("spoiler-alert", "notifications", "single-use", "cards.notifications.spoilerAlert.name", "cards.notifications.spoilerAlert.text", "reveal-to-current-player"),
+  card("judgement-beam", "white", "single-use", "cards.white.judgementBeam.name", "cards.white.judgementBeam.text", "damage-all-except-self-2"),
+  card("emotional-damage", "white", "single-use", "cards.white.emotionalDamage.name", "cards.white.emotionalDamage.text", "set-hp-2"),
+  card("forbidden-google-search", "white", "single-use", "cards.white.forbiddenGoogleSearch.name", "cards.white.forbiddenGoogleSearch.text", "extra-turn"),
+  card("personal-bodyguard", "white", "single-use", "cards.white.personalBodyguard.name", "cards.white.personalBodyguard.text", "attack-immunity"),
+  card("ctrl-z-enchantment", "white", "single-use", "cards.white.ctrlZEnchantment.name", "cards.white.ctrlZEnchantment.text", "conditional-reveal-v-or-w"),
+  card("devine-juice", "white", "single-use", "cards.white.devineJuice.name", "cards.white.devineJuice.text", "heal-self-2"),
+  card("devine-juice-2", "white", "single-use", "cards.white.devineJuice.name", "cards.white.devineJuice.text", "heal-self-2"),
+  card("plus-one-from-god", "white", "single-use", "cards.white.plusOneFromGod.name", "cards.white.plusOneFromGod.text", "target-heal-die-6"),
+  card("therapy-snack", "white", "single-use", "cards.white.therapySnack.name", "cards.white.therapySnack.text", "conditional-full-heal-a-e-u"),
+  card("christmas-dlc", "white", "single-use", "cards.white.christmasDlc.name", "cards.white.christmasDlc.text", "conditional-full-heal-memer"),
+  card("luck-exe", "white", "equipment", "cards.equipment.luckExe.name", "cards.equipment.luckExe.text", "immune-toxic-relationship"),
+  card("suspicious-necklace", "white", "equipment", "cards.equipment.suspiciousNecklace.name", "cards.equipment.suspiciousNecklace.text", "immune-black-cards"),
+  card("google-maps-medieval-edition", "white", "equipment", "cards.equipment.googleMapsMedievalEdition.name", "cards.equipment.googleMapsMedievalEdition.text", "optional-double-movement-roll"),
+  card("gods-hand-spinner", "white", "equipment", "cards.equipment.godsHandSpinner.name", "cards.equipment.godsHandSpinner.text", "steal-all-equipment-on-kill"),
+  card("telescopic-lance", "white", "equipment", "cards.equipment.telescopicLance.name", "cards.equipment.telescopicLance.text", "optional-memer-attack-bonus"),
+  card("jesus-last-pajamas", "white", "equipment", "cards.equipment.jesusLastPajamas.name", "cards.equipment.jesusLastPajamas.text", "forced-four-sided-attack"),
+  card("bloodthirsty-flying-rat", "black", "single-use", "cards.black.bloodthirstyFlyingRat.name", "cards.black.bloodthirstyFlyingRat.text", "damage-2-heal-self-1"),
+  card("bloodthirsty-flying-rat-2", "black", "single-use", "cards.black.bloodthirstyFlyingRat.name", "cards.black.bloodthirstyFlyingRat.text", "damage-2-heal-self-1"),
+  card("bloodthirsty-flying-rat-3", "black", "single-use", "cards.black.bloodthirstyFlyingRat.name", "cards.black.bloodthirstyFlyingRat.text", "damage-2-heal-self-1"),
+  card("gimme-that", "black", "single-use", "cards.black.gimmeThat.name", "cards.black.gimmeThat.text", "steal-one-equipment"),
+  card("borrowing-without-asking", "black", "single-use", "cards.black.borrowingWithoutAsking.name", "cards.black.borrowingWithoutAsking.text", "steal-one-equipment"),
+  card("mischievous-spider", "black", "single-use", "cards.black.mischievousSpider.name", "cards.black.mischievousSpider.text", "damage-2-self-2"),
+  card("authentic-voodoo-doll", "black", "single-use", "cards.black.authenticVoodooDoll.name", "cards.black.authenticVoodooDoll.text", "voodoo-die-6"),
+  card("explosive-stick", "black", "single-use", "cards.black.explosiveStick.name", "cards.black.explosiveStick.text", "area-damage-3"),
+  card("not-a-banana-peel", "black", "single-use", "cards.black.notABananaPeel.name", "cards.black.notABananaPeel.text", "give-equipment-or-damage"),
+  card("questionable-life-choices", "black", "single-use", "cards.black.questionableLifeChoices.name", "cards.black.questionableLifeChoices.text", "conditional-full-heal-troller"),
+  card("shark-teeth", "black", "equipment", "cards.equipment.sharkTeeth.name", "cards.equipment.sharkTeeth.text", "attack-bonus-1"),
+  card("free-circumcision", "black", "equipment", "cards.equipment.freeCircumcision.name", "cards.equipment.freeCircumcision.text", "attack-bonus-1"),
+  card("plank-rusty-nails", "black", "equipment", "cards.equipment.plankRustyNails.name", "cards.equipment.plankRustyNails.text", "attack-bonus-1"),
+  card("pfrt-tube", "black", "equipment", "cards.equipment.pfrtTube.name", "cards.equipment.pfrtTube.text", "attack-all-in-range"),
+  card("finger-bullet", "black", "equipment", "cards.equipment.fingerBullet.name", "cards.equipment.fingerBullet.text", "attack-all-other-areas"),
+  card("cursed-japanese-chopsticks", "black", "equipment", "cards.equipment.cursedJapaneseChopsticks.name", "cards.equipment.cursedJapaneseChopsticks.text", "forced-four-sided-attack")
+]);
+
+export const getCardsByDeck = (deck) => CARDS.filter((currentCard) => currentCard.deck === deck);
+
+export const getCard = (cardId) => CARDS.find((currentCard) => currentCard.id === cardId) ?? null;

@@ -1,0 +1,21 @@
+{
+  "ui.gridSize": "Taille de la grille",
+  "ui.daily": "Défi du jour",
+  "ui.new": "Nouvelle grille",
+  "ui.restart": "Recommencer",
+  "ui.moves": "Coups",
+  "ui.best": "Record",
+  "ui.newRecord": "Nouveau record !",
+  "ui.movesCount": "{n} coups",
+  "ui.dailyNote": "Défi du jour : même grille pour tout le monde.",
+  "ui.loadError": "Impossible de charger le jeu. Recharge la page.",
+  "ui.themeLabel": "Thème",
+  "ui.chaos": "Chaos",
+  "ui.langLabel": "Langue",
+  "ui.boardLabel": "Grille de jeu",
+  "theme.kittens": "Chatons câlins",
+  "theme.puppies": "Chiots câlins",
+  "theme.grumpy": "Chats grincheux",
+  "theme.garden": "Jardin fleuri",
+  "theme.nightfall": "Nightfall"
+}

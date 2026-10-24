@@ -1,0 +1,131 @@
+/* Odomètre de dés. Tout est piloté par --cell, posé par le JS.
+   Police optionnelle : Barlow Condensed (sinon repli sur Arial Narrow). */
+
+.dice-tray {
+    --gold: 238, 229, 139;
+    --die-bg: #0b100d;
+    --stroke: max(2px, calc(var(--cell) * .035));
+
+    --fade: linear-gradient(to bottom,
+        transparent 0,
+        rgba(var(--gold), .08) calc(var(--T) * .20),
+        rgba(var(--gold), .28) calc(var(--T) * .44),
+        rgba(var(--gold), .62) calc(var(--T) * .68),
+        rgb(var(--gold)) var(--T),
+        rgb(var(--gold)) calc(var(--T) + var(--cell)),
+        rgba(var(--gold), .62) calc(var(--T) + var(--cell) + var(--B) * .32),
+        rgba(var(--gold), .28) calc(var(--T) + var(--cell) + var(--B) * .56),
+        rgba(var(--gold), .08) calc(var(--T) + var(--cell) + var(--B) * .79),
+        transparent calc(var(--T) + var(--cell) + var(--B)));
+
+    --ext: calc(var(--cell) * .9);
+
+    position: relative;
+    display: inline-flex;
+    align-items: flex-start;
+    gap: calc(var(--cell) * .45);
+    height: calc(var(--T) + var(--cell) + var(--B));
+    font-family: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
+}
+
+.dice-tray .center-line {
+    position: absolute;
+    left: calc(var(--ext) * -1);
+    right: calc(var(--ext) * -1);
+    top: calc(var(--T) + var(--cell) / 2);
+    height: max(2px, calc(var(--cell) * .025));
+    transform: translateY(-50%);
+    background: linear-gradient(to right,
+        transparent 0,
+        rgba(var(--gold), .9) var(--ext),
+        rgba(var(--gold), .9) calc(100% - var(--ext)),
+        transparent 100%);
+    z-index: 0;
+}
+.dice-tray .center-line::before,
+.dice-tray .center-line::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: max(5px, calc(var(--cell) * .08));
+    aspect-ratio: 1;
+    background: rgb(var(--gold));
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+.dice-tray .center-line::before { left: calc(var(--ext) - var(--cell) * .14); }
+.dice-tray .center-line::after  { left: calc(100% - var(--ext) + var(--cell) * .14); }
+
+.dice-tray .die {
+    position: relative;
+    width: calc(var(--cell) * .8);
+    height: calc(var(--T) + var(--cell) + var(--B));
+    overflow: hidden;
+    z-index: 1;
+    user-select: none;
+    -webkit-user-select: none;
+    background:
+        linear-gradient(to bottom,
+            transparent var(--T),
+            rgba(var(--gold), .07) var(--T),
+            rgba(var(--gold), .02) calc(var(--T) + var(--cell) / 2),
+            rgba(var(--gold), .07) calc(var(--T) + var(--cell)),
+            transparent calc(var(--T) + var(--cell))),
+        var(--die-bg);
+}
+
+/* Traits verticaux droits */
+.dice-tray .die::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border: calc(var(--stroke) * 1.5) solid transparent;
+    z-index: 20;
+    background:
+        var(--fade) left top  / var(--stroke) 100% no-repeat,
+        var(--fade) right top / var(--stroke) 100% no-repeat;
+}
+
+.dice-tray .window {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    -webkit-mask-image: var(--fade);
+    mask-image: var(--fade);
+}
+.dice-tray .roller { position: absolute; inset: 0; }
+
+.dice-tray .number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: var(--cell);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgb(var(--gold));
+    font-size: calc(var(--cell) * .77);
+    font-weight: 300;
+    line-height: 1;
+    will-change: transform;
+}
+
+.dice-tray .separator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--stroke);
+    background: rgb(var(--gold));
+    box-shadow: 0 0 calc(var(--cell) * .07) rgba(var(--gold), .35);
+    z-index: 5;
+    pointer-events: none;
+}
+.dice-tray .separator.top    { top: calc(var(--T) - var(--stroke) / 2); }
+.dice-tray .separator.bottom { top: calc(var(--T) + var(--cell) - var(--stroke) / 2); }
+
+.dice-tray .die.settled .separator { animation: dice-flash .6s ease-out; }
+@keyframes dice-flash {
+    0%   { filter: brightness(1.6); box-shadow: 0 0 calc(var(--cell) * .2) rgba(var(--gold), .9); }
+    100% { filter: brightness(1); }
+}

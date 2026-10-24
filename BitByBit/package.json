@@ -1,0 +1,9 @@
+{
+  "name": "bit-by-bit",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "serve": "npx --yes serve ."
+  }
+}
