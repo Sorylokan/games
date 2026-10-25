@@ -8,8 +8,10 @@
 
 # Development documentation
 # ─────────────────────────────────────────
-/#Dev_Files/
-**/Dev_Files/
+# Root #Dev_Files: instructions shared by all projects. Each game: its own !Dev_Files.
+# "\#" because a leading "#" starts a comment; never start a line with "!" (it means "do NOT ignore").
+/\#Dev_Files/
+**/!Dev_Files/
 
 
 # Tests / Coverage reports
