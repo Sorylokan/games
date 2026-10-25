@@ -87,10 +87,10 @@ Le brouillon est sauvé à chaque coup de pinceau : recharger la page ne perd ri
 ## Fresques de la communauté
 
 Dans l'atelier, « Proposer cette fresque » ouvre un ticket GitHub pré-rempli
-(formulaire `.github/ISSUE_TEMPLATE/fresque.yml`, étiquette `fresque`). Ensuite, un robot GitHub
+(formulaire `.github/ISSUE_TEMPLATE/fresque.yml`, étiquette `mural`). Ensuite, un robot GitHub
 (`.github/workflows/fresque.yml` + `.github/scripts/fresque.mjs`) s'occupe du reste :
 1. **ticket ouvert ou modifié** : il vérifie le code et répond (taille, couleurs, lien ▶ pour jouer la fresque) ;
-2. **étiquette `acceptée` posée** (seuls les mainteneurs peuvent) : il ajoute la ligne dans `src/data/community.js`,
+2. **étiquette `accepted` posée** (seuls les mainteneurs peuvent) : il ajoute la ligne dans `src/data/community.js`,
    lance les tests et ouvre une pull request qui fermera le ticket ;
 3. **il reste à fusionner la pull request** : GitHub Pages met le site à jour.
 

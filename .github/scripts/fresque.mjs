@@ -9,7 +9,7 @@ import { decodeMural, encodeMural, pixelCount, cleanName } from '../../BitByBit/
 
 const COMMUNITY_FILE = 'BitByBit/src/data/community.js';
 const PLAY_URL = 'https://sorylokan.github.io/games/BitByBit/#play=';
-const ACCEPT_LABEL = 'acceptée';
+const ACCEPT_LABEL = 'accepted'; // doit correspondre à .github/workflows/fresque.yml
 
 // Réponses d'un formulaire de ticket GitHub : des blocs « ### Question » suivis de la réponse.
 export function parseForm(body) {

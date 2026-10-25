@@ -4,7 +4,7 @@
 name: "Bit by Bit : proposer une fresque / suggest a mural"
 description: "Propose ta fresque pour la série « Fresques de la communauté » / Suggest your mural for the community series."
 title: "[Fresque] "
-labels: ["fresque"]
+labels: ["mural"]
 body:
   - type: markdown
     attributes:

@@ -1,6 +1,7 @@
 # Fresques de la communauté (Bit by Bit) : vérification des propositions et pull request à l'acceptation.
-# - Ticket « fresque » ouvert ou modifié → le robot vérifie le code et répond (lien pour jouer la fresque).
-# - Étiquette « acceptée » posée par un mainteneur → la fresque est ajoutée à BitByBit/src/data/community.js,
+# Étiquettes GitHub en anglais (sans accent : une faute de frappe ne déclencherait rien, sans prévenir).
+# - Ticket « mural » ouvert ou modifié → le robot vérifie le code et répond (lien pour jouer la fresque).
+# - Étiquette « accepted » posée par un mainteneur → la fresque est ajoutée à BitByBit/src/data/community.js,
 #   les tests tournent, et une pull request est ouverte (à fusionner à la main).
 # Le contenu du ticket n'est jamais collé dans les commandes : il passe par des variables d'environnement.
 name: Fresques de la communauté
@@ -19,7 +20,7 @@ concurrency:
 
 jobs:
   check:
-    if: github.event.action != 'labeled' && contains(github.event.issue.labels.*.name, 'fresque')
+    if: github.event.action != 'labeled' && contains(github.event.issue.labels.*.name, 'mural')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,8 +41,8 @@ jobs:
 
   accept:
     if: >-
-      github.event.action == 'labeled' && github.event.label.name == 'acceptée'
-      && contains(github.event.issue.labels.*.name, 'fresque')
+      github.event.action == 'labeled' && github.event.label.name == 'accepted'
+      && contains(github.event.issue.labels.*.name, 'mural')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
