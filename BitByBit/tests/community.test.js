@@ -18,5 +18,5 @@ test('une fresque de la communauté se joue comme une fresque perso, avec son au
   assert.equal(lvl.custom, true);
   assert.equal(lvl.community, true);
   assert.equal(lvl.author, 'Sorylokan');
-  assert.equal(customLevel(mural).community, false); // fresque perso ordinaire
+  assert.equal(customLevel(mural).community, false); // plain custom mural
 });

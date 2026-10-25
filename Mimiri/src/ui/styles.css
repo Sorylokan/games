@@ -1,15 +1,13 @@
-/* MIMIRI - socle neutre : structure (layout), variables et composants génériques.
-   NE METS ICI AUCUN look de thème (couleurs, polices, décor) : il vit dans theme-*.css.
-   Les valeurs ci-dessous sont des REPLIS neutres, écrasés par le thème actif
-   (classe .theme-* sur <body>, feuille chargée après celle-ci).
+/* Mimiri base: layout, variables, generic components. No theme look here: it lives in theme-*.css.
+   Values below are neutral fallbacks, overridden by the active theme (.theme-* class on <body>).
 
-   Variables que chaque thème redéfinit :
-     --bg          fond de la page            --card     fond du plateau et des panneaux
-     --line        bordures                   --txt      texte
-     --mut         texte discret              --accent   titres, boutons, record
-     --accent-ink  texte sur fond accent      --on       case « à corriger »
-     --off         case « gagnée »            --font / --display   polices (texte / titres)
-   Un thème peut aussi poser un décor de fond (background-image sur body.theme-*). */
+   Variables each theme redefines:
+     --bg          page background            --card     board and panel background
+     --line        borders                    --txt      text
+     --mut         muted text                 --accent   titles, buttons, record
+     --accent-ink  text on accent             --on       cell to fix
+     --off         solved cell                --font / --display   fonts (body / titles)
+   A theme may also set a background decoration (background-image on body.theme-*). */
 :root {
   --bg: #1f1f26; --card: #2c2c36; --line: #4a4a58; --txt: #eceaf2; --mut: #a8a6b6;
   --accent: #e0a458; --accent-ink: #1a1a20; --on: #15151a; --off: #4a4a58;
@@ -19,7 +17,7 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 
-/* Page = une seule vue : barre du haut + scène qui prend toute la hauteur restante. */
+/* Single view: top bar + stage filling the remaining height. */
 body {
   margin: 0;
   height: 100vh;
@@ -33,11 +31,11 @@ body {
   transition: background-color .3s;
 }
 
-/* Barre du haut (comme Grid of Greed) : marque à gauche, outils à droite */
+/* Top bar: name on the left, tools on the right */
 .topbar { flex: none; min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 max(14px, 3%); border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: blur(6px); }
 .brand { font: 700 22px var(--display); color: var(--accent); letter-spacing: .03em; }
 .bar-tools { display: flex; align-items: center; gap: 8px; }
-/* Retour au catalogue, à gauche du nom du jeu (mêmes bords que les listes déroulantes) */
+/* Back-to-catalog link, left of the game name */
 .brand-group { display: flex; align-items: center; gap: 10px; }
 .back { display: inline-flex; padding: 6px; color: var(--txt); border: 1px solid var(--line); border-radius: 10px; }
 .back:hover { border-color: var(--accent); color: var(--accent); }
@@ -47,7 +45,7 @@ select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .stage { flex: 1; min-height: 0; display: flex; overflow: auto; }
 
-/* Trois colonnes : infos | grille | score. La grille prend toute la place restante. */
+/* Three columns: info | grid | score. The grid takes the remaining space. */
 main.game {
   width: min(1480px, 96%);
   height: 100%;
@@ -71,11 +69,11 @@ main.game {
   backdrop-filter: blur(4px);
 }
 
-/* Colonne de gauche */
+/* Left column */
 .intro { justify-content: space-between; text-align: left; }
 h1 { margin: 0 0 .5rem; font: 700 clamp(2.1rem, 1.9vw + 3.2vh, 3.7rem)/1.02 var(--display); color: var(--accent); }
 .tagline { margin: 0; color: var(--mut); font-size: 1.05rem; font-style: italic; }
-/* Schéma de la croix : la case cliquée (au centre) et ses 4 voisines changent d'état */
+/* Cross diagram: the clicked cell and its 4 neighbors flip */
 .how { display: flex; align-items: center; gap: 1rem; }
 .cross { flex: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: clamp(84px, 13vh, 128px); }
 .cross i { aspect-ratio: 1; border-radius: 28%; background: color-mix(in srgb, var(--off) 55%, transparent); }
@@ -94,7 +92,7 @@ h1 { margin: 0 0 .5rem; font: 700 clamp(2.1rem, 1.9vw + 3.2vh, 3.7rem)/1.02 var(
 .pill.active { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
 .actions .pill { width: 100%; }
 
-/* Centre : la grille mesure le plus petit côté de la zone (unités de conteneur) */
+/* Center: the grid matches the area's shorter side (container units) */
 .board-zone { container-type: size; display: grid; place-items: center; min-width: 0; min-height: 0; }
 #board {
   --side: min(100cqw, 100cqh);
@@ -117,7 +115,7 @@ h1 { margin: 0 0 .5rem; font: 700 clamp(2.1rem, 1.9vw + 3.2vh, 3.7rem)/1.02 var(
 .cell svg { width: 100%; height: 100%; display: block; overflow: visible; }
 .locked .cell { cursor: default; pointer-events: none; }
 
-/* Colonne de droite : trois grosses tuiles de score, puis message et aide */
+/* Right column: three big score tiles, then message */
 .score { justify-content: space-between; }
 .stats { flex: 1; min-height: 0; display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .stat { display: flex; flex-direction: column; justify-content: center; gap: .3rem; padding: 0 20px; background: color-mix(in srgb, var(--bg) 45%, transparent); border: 1px solid var(--line); border-radius: 18px; }
@@ -128,7 +126,7 @@ h1 { margin: 0 0 .5rem; font: 700 clamp(2.1rem, 1.9vw + 3.2vh, 3.7rem)/1.02 var(
 #message.win { padding: 14px 16px; border-radius: 16px; background: var(--accent); color: var(--accent-ink); font-weight: 700; }
 .hint { margin: 0; color: var(--mut); font-size: .92rem; }
 
-/* Animations des dessins SVG (les classes viennent des fichiers src/themes/*.js) */
+/* SVG drawing animations (classes come from src/themes/*.js) */
 .cell svg.wig { animation: wiggle 2.8s ease-in-out infinite; }
 .z, .cloud { animation: float 2.4s ease-in-out infinite; }
 .cell.pop svg { animation: pop .3s ease; }
@@ -136,7 +134,7 @@ h1 { margin: 0 0 .5rem; font: 700 clamp(2.1rem, 1.9vw + 3.2vh, 3.7rem)/1.02 var(
 @keyframes float { 0%, 100% { transform: translateY(0); opacity: .95; } 50% { transform: translateY(-4px); opacity: .55; } }
 @keyframes pop { 0% { transform: scale(.85); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
 
-/* Écran étroit ou en hauteur : tout s'empile, la page défile */
+/* Narrow or portrait screen: everything stacks, the page scrolls */
 @media (max-width: 900px), (max-aspect-ratio: 1/1) {
   body { height: auto; min-height: 100dvh; overflow: visible; }
   .stage { overflow: visible; }

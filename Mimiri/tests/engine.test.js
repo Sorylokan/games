@@ -1,4 +1,4 @@
-// Tests du moteur de Mimiri (règles pures, sans navigateur).
+// Mimiri engine tests (pure rules, no browser).
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -34,7 +34,7 @@ test("toutes les grilles générées sont résolubles et non résolues", () => {
       const { cells, solution } = scramble(n, mulberry32(seed));
       assert.equal(cells.length, n * n);
       assert.ok(!isSolved(cells), `grille ${n}x${n} (graine ${seed}) déjà résolue`);
-      for (const i of solution) applyPress(cells, n, i); // rejouer la solution
+      for (const i of solution) applyPress(cells, n, i); // replay the solution
       assert.ok(isSolved(cells), `grille ${n}x${n} (graine ${seed}) non résoluble`);
     }
   }

@@ -7,8 +7,8 @@ import { COLORS } from '../src/data/colors.js';
 test('rle et unrle sont inverses', () => {
   assert.equal(rle('BBBBKK.'), '4B2K1.');
   assert.equal(unrle('4B2K1.'), 'BBBBKK.');
-  assert.equal(unrle('4B2'), null);         // abîmé
-  assert.equal(unrle('99999B'), null);      // trop long
+  assert.equal(unrle('4B2'), null);         // broken
+  assert.equal(unrle('99999B'), null);      // too long
 });
 
 test('chaque fresque officielle survit à un aller-retour en code', () => {
@@ -23,7 +23,7 @@ test('un code invalide renvoie null', () => {
   assert.equal(decodeMural(''), null);
   assert.equal(decodeMural('BB1-!!!'), null);
   assert.equal(decodeMural('XX1-abc'), null);
-  // Couleur inconnue : une lettre que la palette n'utilise pas (cherchée, pour survivre aux ajouts de couleurs).
+  // Unknown color: a letter the palette doesn't use (looked up, so adding colors won't break the test).
   const free = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].find((ch) => !COLORS[ch]);
   if (free) {
     const bad = encodeMural({ name: 'x', map: Array(4).fill(free.repeat(4)) });

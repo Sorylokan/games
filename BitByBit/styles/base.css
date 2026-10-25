@@ -1,5 +1,5 @@
-/* Base : couleurs du thème par défaut (Nuit), police, boutons et listes déroulantes.
-   Les autres thèmes ne font que redéfinir les variables --bg, --card, --accent, --line, --txt, --mut. */
+/* Base: default (Night) theme colors, font, buttons, selects.
+   Other themes only redefine --bg, --card, --accent, --line, --txt, --mut. */
 
 :root {
   --bg: #0a0e18;
@@ -59,12 +59,12 @@ button.ghost { border-color: var(--line); color: var(--txt); }
 
 select { font: inherit; font-size: 13px; color: var(--txt); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
 
-/* Liens en forme de bouton icône (ex. « Créer une fresque » dans la barre du haut) */
+/* Links styled as icon buttons */
 a.icon-btn { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; color: var(--txt); }
 a.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
 a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* Champs de saisie */
+/* Inputs */
 input:not([type="range"]):not([type="checkbox"]):not([type="file"]), textarea {
   font: inherit; color: var(--txt); background: var(--bg);
   border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px;

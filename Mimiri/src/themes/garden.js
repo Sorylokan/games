@@ -1,13 +1,12 @@
-// Thème « Jardin fleuri » : on arrose les boutons pour faire éclore tout le jardin.
-// render(on, idx) : on = 1 = bouton fermé (à faire éclore), on = 0 = fleur éclose (gagné).
-// Les couleurs de la page vivent dans theme-garden.css ; ici, les textes et le dessin.
+// "Garden" theme: water the buds until the whole garden blooms. on = closed bud (to fix), off = flower.
+// Page colors live in theme-garden.css; texts and drawing here.
 
-const PETALS = ["#F29F58", "#ff8fa3", "#f6d28b", "#d9a7ff"]; // une couleur de fleur par case
+const PETALS = ["#F29F58", "#ff8fa3", "#f6d28b", "#d9a7ff"]; // flower color per cell
 const LEAF = "#2f7a4d";
 const LEAF_DARK = "#235c3a";
 const EYE = "#2b2236";
 
-// Tige et deux feuilles, communes aux deux états.
+// Stem and two leaves, shared by both states.
 const STEM = `
   <path d="M50 62 Q49 80 50 97" fill="none" stroke="${LEAF}" stroke-width="5" stroke-linecap="round"/>
   <path d="M50 84 Q34 82 27 70 Q43 68 50 84 Z" fill="${LEAF}"/>
@@ -27,7 +26,7 @@ export default {
   render(on, idx) {
     const c = PETALS[idx % PETALS.length];
     if (on) {
-      // Bouton fermé, un peu penché, sans visage, avec un croissant de lune.
+      // Closed bud, slightly tilted, no face, with a crescent moon.
       return `<svg viewBox="0 0 100 100" aria-hidden="true">
         ${STEM}
         <g transform="rotate(-7 50 64)">
@@ -38,7 +37,7 @@ export default {
         <path transform="translate(168 0) scale(-1 1)" d="M82.7 16.6 A10.5 10.5 0 1 0 94.0 30.3 A9 9 0 1 1 82.7 16.6 Z" fill="#c6d195" stroke="#c6d195" stroke-width="3" stroke-linejoin="round"/>
       </svg>`;
     }
-    // Fleur éclose : six pétales, cœur doré avec un petit visage content.
+    // Open flower: six petals, golden heart with a happy face.
     const petals = [0, 60, 120, 180, 240, 300]
       .map((a) => `<ellipse cx="50" cy="26" rx="11.5" ry="17" fill="${c}" transform="rotate(${a} 50 44)"/>`)
       .join("");

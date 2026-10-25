@@ -1,6 +1,5 @@
-// Codes de salle lisibles a voix haute : 8 symboles sans ambiguite (ni 0/O,
-// ni 1/I/L), groupes 4-4. L'appId Trystero isole deja ces salles des autres
-// applications, et ~32^8 combinaisons suffisent pour des parties privees.
+// Room codes easy to read aloud: 8 unambiguous symbols (no 0/O, 1/I/L), grouped 4-4.
+// The Trystero appId already isolates rooms; ~32^8 codes is plenty for private games.
 const ROOM_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const ROOM_CODE_LENGTH = 8;
 
@@ -22,7 +21,7 @@ export const createRoomId = (random = null) => {
   return `${symbols.slice(0, 4).join("")}-${symbols.slice(4).join("")}`;
 };
 
-// Accepte une saisie souple : minuscules, espaces, tiret omis ou souligne.
+// Lenient input: lowercase, spaces, missing dash or underscore.
 export const normalizeRoomCode = (input) => {
   const clean = String(input ?? "").trim().toUpperCase().replaceAll(" ", "").replaceAll("_", "-");
   if (!clean.includes("-") && clean.length === ROOM_CODE_LENGTH) {

@@ -1,4 +1,4 @@
-/* Thèmes « Saisons » : Printemps, Été, Automne, Hiver. */
+/* Season themes: Spring, Summer, Autumn, Winter. */
 
 :root[data-skin="spring"]    { --bg: #f7eef0; --card: #fffdfb; --accent: #c4577a; --line: #ecd8de; --txt: #3a2e33; --mut: #8b7880; color-scheme: light; }
 
@@ -9,7 +9,7 @@
 :root[data-skin="winter"]    { --bg: #e7eff7; --card: #fbfdff; --accent: #4a7bb0; --line: #d2dfeb; --txt: #22303d; --mut: #6f8396; color-scheme: light; }
 
 :root[data-skin="spring"] body {
-  /* hanami : ciel blanc rosé qui descend vers un vert tendre */
+  /* hanami: pinkish-white sky fading to soft green */
   background-image:
     radial-gradient(circle at 10% 0%, rgba(255,255,255,.75), transparent 40%),
     linear-gradient(to bottom, #fbf1f3 0%, #f6eaec 55%, #e9f0de 100%);
@@ -19,13 +19,13 @@
 }
 
 :root[data-skin="spring"] body::before {
-  /* branche de cerisier en fleurs qui dépasse du coin */
+  /* blooming cherry branch peeking from the corner */
   content: ""; position: fixed; left: 0; top: 0; width: 400px; height: 230px; max-width: 70vw; pointer-events: none; z-index: 0;
   background: url("../../assets/spring-branch.svg") no-repeat left top / contain;
   opacity: .9;
 }
 
-/* le titre passe dans une capsule claire pour rester lisible par-dessus la branche */
+/* title in a light pill so it stays readable over the branch */
 :root[data-skin="spring"] .brand {
   background: color-mix(in srgb, var(--card) 88%, transparent);
   border: 1px solid var(--line); border-radius: 999px; padding: 3px 16px 5px;
@@ -33,7 +33,7 @@
 }
 
 :root[data-skin="spring"] body::after {
-  /* pétales qui tombent en dérivant, sur deux plans */
+  /* drifting falling petals, two layers */
   content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background-image: url("../../assets/spring-petals-a.svg"), url("../../assets/spring-petals-b.svg");
   background-size: 390px 390px, 560px 560px;
@@ -47,7 +47,7 @@
 @media (prefers-reduced-motion: reduce) { :root[data-skin="spring"] body::after { animation: none; } }
 
 :root[data-skin="summer"] body {
-  /* grand soleil chaud */
+  /* big warm sun */
   background-image:
     radial-gradient(circle at 85% 4%, rgba(255,250,215,1) 0 40px, rgba(255,230,160,.55) 41px, transparent 220px),
     linear-gradient(to bottom, #fff2d2 0%, #fde3b6 60%, #f9cf96 100%);
@@ -57,7 +57,7 @@
 }
 
 :root[data-skin="autumn"] body {
-  /* lumière rasante de fin d'après-midi */
+  /* low late-afternoon light */
   background-image:
     radial-gradient(ellipse 80% 50% at 0% 0%, rgba(227,155,74,.22), transparent 70%),
     radial-gradient(ellipse 60% 40% at 100% 100%, rgba(170,70,40,.18), transparent 70%),
@@ -68,7 +68,7 @@
 }
 
 :root[data-skin="winter"] body {
-  /* ciel blanc bleuté */
+  /* bluish-white sky */
   background-image: linear-gradient(to bottom, #f4f8fc 0%, #e3ecf5 60%, #d6e3ef 100%);
   background-attachment: fixed;
   background-size: auto;
@@ -76,7 +76,7 @@
 }
 
 :root[data-skin="winter"] body::after {
-  /* flocons qui tombent lentement, sur deux plans à vitesses différentes */
+  /* slow falling snowflakes, two layers at different speeds */
   content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background-image: url("../../assets/winter-flakes-a.svg"), url("../../assets/winter-flakes-b.svg");
   background-size: 430px 430px, 610px 610px;

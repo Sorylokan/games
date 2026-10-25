@@ -1,4 +1,4 @@
-/* Mise en page : barre du haut, plateau à gauche, colonne de cartes à droite (empilés en étroit). */
+/* Layout: top bar, board on the left, card column on the right (stacked when narrow). */
 
 .app {
   max-width: 1080px; margin: 0 auto;
@@ -7,21 +7,21 @@
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 
-/* Barre du haut */
+/* Top bar */
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 14px; border-bottom: 1px solid var(--line); margin-bottom: 18px; flex-wrap: wrap; }
 
 .brand { font: 700 21px var(--display); color: var(--accent); letter-spacing: .01em; }
 
-/* Retour au catalogue, à gauche du nom du jeu (style du lien-bouton : a.icon-btn dans base.css) */
+/* Back-to-catalog link, left of the game name (button style: a.icon-btn in base.css) */
 .brand-group { display: flex; align-items: center; gap: 10px; }
 
 .tools { display: flex; align-items: center; gap: 8px; }
 
-/* Table : plateau + colonne */
+/* Board + column */
 .table { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, 1fr); gap: 18px; align-items: start; }
 
-/* Mobile : une seule colonne. Les boîtes à cliquer passent juste sous la fresque (c'est là que le pouce
-   travaille), les infos de la fresque et les règles ensuite. Marges resserrées pour tout voir sans défiler. */
+/* Mobile: one column, box queues right under the mural (where the thumb is), info and rules after.
+   Tighter spacing so everything fits without scrolling. */
 @media (max-width: 780px) {
   .table { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .topbar { padding-block: 10px; margin-bottom: 10px; }

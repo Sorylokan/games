@@ -1,9 +1,9 @@
-// État partagé de l'application. Un seul objet, importé par les modules qui en ont besoin.
-//   st    : la partie en cours (créée par game/session.js)
-//   geo   : dimensions du plateau en pixels écran (render/canvas.js)
-//   pal   : couleurs du thème lues dans le CSS (ui/skin.js)
-//   speed : ×1 ou ×2
-//   skin  : nom du thème actif
+// Shared app state, one object imported where needed.
+//   st    current game (game/session.js)
+//   geo   board size in screen pixels (render/canvas.js)
+//   pal   theme colors read from CSS (ui/skin.js)
+//   speed ×1 or ×2
+//   skin  active theme
 
 export const app = {
   st: null,

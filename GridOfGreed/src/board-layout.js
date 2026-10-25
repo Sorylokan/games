@@ -1,8 +1,6 @@
-// Placement des joueurs autour de la table (logique pure, sans DOM).
-// Grille CSS 3x3. Cases du périmètre repérées par leurs initiales :
-// TL haut-gauche, TM haut-milieu, ML milieu-gauche, BR bas-droite...
-// Toi (mon siège) : toujours en bas au centre [3,2]. Le centre [2,2] = pioche/défausse.
-// Placements calqués sur la maquette Dev_Files/grid-of-greed-table.html (tableau du brief).
+// Seats around the table (pure logic, no DOM). 3×3 CSS grid; edge cells named by initials
+// (TL top-left, TM top-middle, ML middle-left, BR bottom-right…).
+// You are always bottom-center [3,2]; the center [2,2] holds the draw and discard piles.
 
 export const CELL_POSITIONS = Object.freeze({
   BL: [3, 1], ML: [2, 1], TL: [1, 1],
@@ -10,7 +8,7 @@ export const CELL_POSITIONS = Object.freeze({
   MR: [2, 3], BR: [3, 3],
 });
 
-// Sièges adverses par nombre total de joueurs, dans l'ordre de jeu (horaire).
+// Opponent seats per player count, in (clockwise) turn order.
 const SEATS = Object.freeze({
   2: ["TM"],
   3: ["TL", "TR"],
@@ -24,9 +22,8 @@ const SEATS = Object.freeze({
 export const centerCell = () => [2, 2];
 export const myCell = () => [3, 2];
 
-// myIndex = index de ce client dans l'ordre de jeu (turnOrder).
-// Renvoie [{ index, cell:[ligne, colonne] }] pour chaque joueur, dans l'ordre
-// de jeu : ce client en bas-centre, les autres décalés horairement.
+// [{ index, cell: [row, col] }] for every player: this client (myIndex) bottom-center,
+// the others clockwise from there.
 export function layoutFor(playerCount, myIndex = 0) {
   const seats = SEATS[playerCount];
   if (!seats) return [];

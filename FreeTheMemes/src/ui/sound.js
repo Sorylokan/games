@@ -1,25 +1,19 @@
-// sound.js - sons synthétisés avec WebAudio (aucun fichier audio).
-//
-//   Dés :       tick(die)  thunk(die, value)        -> onTick / onSettle du DiceTray
-//   Interface : click()  ping()  bonk()
-//   Événements: hit(amount)  heal()  death()  tada()
-//   Sourdine :  toggleMuted() / isMuted() / setMuted(v)   (mémorisé)
-//
-//   Thème sonore : setSoundTheme(id) change le "preset" actif (timbre, hauteur,
-//   enveloppes). Chaque preset adapte les paramètres des fonctions ci-dessus.
-//   Plus tard : on pourra ajouter des fichiers par thème (sounds/<id>/) en repli.
+// Synthesized sounds (Web Audio, no audio files).
+//   Dice:   tick(die)  thunk(die, value)   -> DiceTray onTick / onSettle
+//   UI:     click()  ping()  bonk()
+//   Events: hit(amount)  heal()  death()  tada()
+//   Mute:   toggleMuted() / isMuted() / setMuted(v)   (saved)
+//   setSoundTheme(id) switches the preset (timbre, pitch, envelopes).
 
 const KEY = "ftm-muted";
 
-/* ---------------------------------------------------------
-   PRESETS PAR THÈME
-   Chaque preset définit des modificateurs consommés par les fonctions de son.
-   - osc     : type d'oscillateur de base ("sine", "triangle", "square", "sawtooth")
-   - pitch   : multiplicateur de hauteur global (1 = normal, <1 = grave, >1 = aigu)
-   - dur     : multiplicateur de durée des notes
-   - gain    : multiplicateur de volume global
-   - wizz    : si true, click()/ping() jouent un glissant montant façon "nudge" MSN
-   --------------------------------------------------------- */
+/* --- Presets per theme ---
+- osc:   base oscillator ("sine", "triangle", "square", "sawtooth")
+- pitch: global pitch multiplier (1 = normal)
+- dur:   note duration multiplier
+- gain:  global volume multiplier
+- wizz:  if true, click()/ping() play a rising MSN-"nudge" glide
+*/
 
 const DEFAULT_PRESET = { osc: "sine", pitch: 1, dur: 1, gain: 1, wizz: false, dice: "classic" };
 
@@ -45,9 +39,7 @@ let muted = false;
 try { muted = localStorage.getItem(KEY) === "1"; } catch { /* stockage indisponible */ }
 
 
-/* ---------------------------------------------------------
-   Initialisation (débloquée par le premier clic / première touche)
-   --------------------------------------------------------- */
+/* --- Init (unlocked by the first click / key) --- */
 
 function ensure() {
     if (ctx) {
@@ -60,7 +52,7 @@ function ensure() {
 
     ctx = new AC();
 
-    const comp = ctx.createDynamicsCompressor();   // évite la saturation
+    const comp = ctx.createDynamicsCompressor();   // avoids clipping
     master = ctx.createGain();
     master.gain.value = 0.9;
     master.connect(comp);
@@ -82,12 +74,12 @@ const ready = () => ctx && !muted;
    Utilitaires
    --------------------------------------------------------- */
 
-// vary(0.1) -> nombre aléatoire entre 0.9 et 1.1
+// vary(0.1) -> random number between 0.9 and 1.1
 const vary = (amount) => 1 + (Math.random() * 2 - 1) * amount;
 
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
 
-// Sortie stéréo : le D6 à gauche, le D4 à droite
+// Stereo: D6 on the left, D4 on the right
 function dest(die) {
     if (!die || !ctx.createStereoPanner) return master;
     const p = ctx.createStereoPanner();
@@ -104,7 +96,7 @@ function envelope(gain, t, peak, duration) {
 function note(type, freq, t, peak, duration, freqEnd, out = master) {
     const o = ctx.createOscillator();
     const g = ctx.createGain();
-    // Le preset actif module le type d'oscillateur, la hauteur, la duree et le gain.
+    // The active preset adjusts oscillator type, pitch, duration and gain.
     o.type = type ?? activePreset.osc;
     o.frequency.setValueAtTime(freq * activePreset.pitch, t);
     const dur = duration * activePreset.dur;
@@ -116,7 +108,7 @@ function note(type, freq, t, peak, duration, freqEnd, out = master) {
     o.stop(t + dur + 0.02);
 }
 
-// Petite salve de bruit filtré : base des "tic" et des impacts
+// Short filtered noise burst: base of ticks and impacts
 function burst(t, freq, q, peak, duration, out = master) {
     const src = ctx.createBufferSource();
     src.buffer = noise;
@@ -133,15 +125,12 @@ function burst(t, freq, q, peak, duration, out = master) {
 }
 
 
-/* ---------------------------------------------------------
-   DÉS
-   --------------------------------------------------------- */
+/* --- Dice --- */
 
 const lastTickAt = new WeakMap();
 
-/* Un chiffre passe. Le son dépend de la vitesse, déduite du temps écoulé
-   depuis le tic précédent du même dé : rapide = sec et aigu ; en ralentissant,
-   le tic devient plus grave, plus fort, avec un petit "corps" de bois. */
+/* A number goes by. The sound follows the speed (time since this die's last tick):
+fast = dry and high; slowing down = lower, louder, with a small wooden body. */
 export function tick(die) {
     if (!ready()) return;
 
@@ -151,10 +140,10 @@ export function tick(die) {
     const dt = die ? now - (lastTickAt.get(die) ?? 0) : 40;
     if (die) lastTickAt.set(die, now);
 
-    // 0 = vitesse maximale (~40 ms entre deux tics), 1 = presque arrêté (~180 ms)
+    // 0 = top speed (~40 ms between ticks), 1 = almost stopped (~180 ms)
     const slow = dt > 400 ? 0.6 : clamp01((dt - 40) / 140);
 
-    // Variante du roll selon le thème : hauteur/timbre du tic.
+    // Theme variant of the tick: pitch/timbre.
     const dicePitch = { classic: 1, sharp: 1.35, deep: 0.55, soft: 0.85, toy: 1.6 }[activePreset.dice] ?? 1;
     const base  = (die && die.sides === 4 ? 2300 : 1700) * (1 - 0.35 * slow) * dicePitch;
     const out   = dest(die);
@@ -167,8 +156,7 @@ export function tick(die) {
     }
 }
 
-/* Le dé s'arrête : "clunk" + claque d'impact.
-   Plus la valeur est haute, plus le son est clair. */
+/* The die stops: "clunk" + impact. Higher values sound brighter. */
 export function thunk(die, value) {
     if (!ready()) return;
 
@@ -176,7 +164,7 @@ export function thunk(die, value) {
     const sides = die ? die.sides : 6;
     const bright = value && sides > 1 ? (value - 1) / (sides - 1) : 0.5;
 
-    // Variante de l'arrêt selon le thème : plus grave/aigu, plus sec/ronde.
+    // Theme variant of the stop: lower/higher, drier/rounder.
     const dicePitch = { classic: 1, sharp: 1.3, deep: 0.5, soft: 0.8, toy: 1.5 }[activePreset.dice] ?? 1;
     const start = (sides === 4 ? 190 : 150) * (0.92 + 0.16 * bright) * vary(0.06) * dicePitch;
     const out = dest(die);
@@ -193,7 +181,7 @@ export function thunk(die, value) {
 export function click() {
     if (!ready()) return;
     if (activePreset.wizz) {
-        // "Wizz" façon MSN nudge : glissant montant rapide
+        // MSN-nudge "wizz": fast rising glide
         const t = ctx.currentTime;
         note(activePreset.osc, 500, t, 0.09, 0.18, 1600);
         return;
@@ -201,7 +189,7 @@ export function click() {
     note(activePreset.osc, 520 * vary(0.1), ctx.currentTime, 0.07 * vary(0.3), 0.05, 260 * vary(0.1));
 }
 
-/* À toi de jouer */
+/* Your turn */
 export function ping() {
     if (!ready()) return;
     const t = ctx.currentTime;
@@ -215,7 +203,7 @@ export function ping() {
     note(activePreset.osc, 1175, t + 0.09, 0.10, 0.38);
 }
 
-/* Action refusée : deux "bonk" descendants, façon boîte d'erreur */
+/* Refused action: two falling "bonks", like an error box */
 export function bonk() {
     if (!ready()) return;
     const t = ctx.currentTime;
@@ -224,11 +212,9 @@ export function bonk() {
 }
 
 
-/* ---------------------------------------------------------
-   ÉVÉNEMENTS DE JEU
-   --------------------------------------------------------- */
+/* --- Game events --- */
 
-/* Dégâts : plus le montant est élevé, plus l'impact est lourd. */
+/* Damage: the bigger the amount, the heavier the impact. */
 export function hit(amount = 1) {
     if (!ready()) return;
 
@@ -238,19 +224,19 @@ export function hit(amount = 1) {
     note("sine", (150 - 40 * p) * vary(0.05), t, 0.12 + 0.08 * p, 0.14 + 0.08 * p, 45);
     burst(t, 700 * vary(0.2), 1, 0.10 + 0.08 * p, 0.05);
 
-    if (amount >= 4) {                      // gros coup : deuxième choc
+    if (amount >= 4) {                      // big hit: second impact
         note("sine", 110, t + 0.07, 0.12, 0.2, 40);
     }
 }
 
-/* Soin : petit arpège doux montant */
+/* Heal: small soft rising arpeggio */
 export function heal() {
     if (!ready()) return;
     const t = ctx.currentTime;
     [523, 659, 784].forEach((f, i) => note("sine", f, t + i * 0.06, 0.06, 0.28));
 }
 
-/* Mort d'un joueur : chute grave */
+/* Player death: low fall */
 export function death() {
     if (!ready()) return;
     const t = ctx.currentTime;
@@ -258,7 +244,7 @@ export function death() {
     note("sine", 130, t, 0.12, 0.8, 35);
 }
 
-/* Victoire : arpège + accord final */
+/* Victory: arpeggio + final chord */
 export function tada() {
     if (!ready()) return;
     const t = ctx.currentTime;
@@ -275,7 +261,7 @@ export function isMuted() { return muted; }
 
 export function setMuted(value) {
     muted = Boolean(value);
-    try { localStorage.setItem(KEY, muted ? "1" : "0"); } catch { /* ignoré */ }
+    try { localStorage.setItem(KEY, muted ? "1" : "0"); } catch { /* ignore */ }
 }
 
 export function toggleMuted() {

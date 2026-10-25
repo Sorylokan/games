@@ -1,9 +1,9 @@
-// Chemins des porteurs : ils marchent dans la zone libre jusqu'au pixel de leur couleur le plus proche.
+// Carrier paths: walk through free cells to the nearest pixel of their color.
 import { DIRS } from '../core/grid.js';
 import { app } from './state.js';
 import { slotPos, entryOf } from './geometry.js';
 
-// Plus court chemin (en largeur) depuis une case d'entrée. Mis en cache tant que la grille ne change pas.
+// Breadth-first shortest paths from an entry cell, cached until the grid changes.
 function bfsFrom(entry) {
   const st = app.st;
   const key = st.ver + ':' + entry[1];
@@ -31,8 +31,7 @@ function bfsFrom(entry) {
   return res;
 }
 
-// Pixel visé par le prochain porteur d'une boîte, et le trajet pour y aller.
-// Renvoie { r, c, pts } ou null si rien n'est atteignable.
+// Target pixel and path for a box's next carrier: { r, c, pts }, or null if nothing is reachable.
 export function findTarget(box) {
   const st = app.st, N = st.N, b = bfsFrom(entryOf(box.slot));
   let best = null;
@@ -54,9 +53,9 @@ export function findTarget(box) {
     j = b.prev[j];
   }
   const s = slotPos(box.slot);
-  pts.unshift({ x: s.x, y: s.y - 0.35 });               // sortie de la boîte
+  pts.unshift({ x: s.x, y: s.y - 0.35 });               // out of the box
   const last = pts[pts.length - 1];
-  pts.push({ x: last.x + (best.c + 0.5 - last.x) * 0.42, // s'avance contre le pixel
+  pts.push({ x: last.x + (best.c + 0.5 - last.x) * 0.42, // step up against the pixel
              y: last.y + (best.r + 0.5 - last.y) * 0.42 });
   return { r: best.r, c: best.c, pts };
 }
@@ -67,7 +66,7 @@ export function pathLen(pts) {
   return L;
 }
 
-// Position (et direction) à la distance d le long du trajet.
+// Position and heading at distance d along the path.
 export function along(pts, d) {
   for (let i = 1; i < pts.length; i++) {
     const a = pts[i - 1], b = pts[i], l = Math.hypot(b.x - a.x, b.y - a.y);

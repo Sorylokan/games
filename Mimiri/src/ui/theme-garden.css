@@ -1,8 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700&display=swap");
 
-/* THEME JARDIN : fond vert forêt, boutons fermés sur tuile sombre, fleurs écloses sur tuile sauge.
-   Activé par <link> après styles.css et class="theme-garden" sur <body>.
-   Verts volontairement doux (pas de vert fluo : ça fatigue les yeux). */
+/* Garden theme: forest green, closed buds on dark tiles, open flowers on sage tiles.
+   Greens kept soft on purpose (neon green tires the eyes). */
 body.theme-garden {
   --bg: #12332c; --card: #1d4a3f; --line: #307457; --txt: #eef6ee; --mut: #a9c7b3;
   --accent: #F29F58; --accent-ink: #12332c;
@@ -11,7 +10,7 @@ body.theme-garden {
   --display: Fredoka, Nunito, "Trebuchet MS", system-ui, sans-serif;
 }
 
-/* Décor : lumière dorée en haut, ombre de sous-bois en bas, feuilles et pétales en filigrane. */
+/* Decoration: golden light on top, undergrowth shade below, faint leaves and petals. */
 body.theme-garden {
   background-image:
     radial-gradient(50rem 32rem at 50% -6%, rgba(242, 159, 88, .16), transparent 64%),

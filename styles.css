@@ -1,16 +1,12 @@
-/* ==========================================================================
-   Styles génériques du catalogue de jeux.
-   AUCUN style propre à un jeu ici : l'apparence de chaque carte est définie
-   par son fichier card_*.json (champs "style" et "css"). Ajouter un jeu ne
-   doit jamais nécessiter de modifier ce fichier.
-   ========================================================================== */
+/* Generic catalog styles. No game-specific styles here: each card's look comes from its
+   card_*.json ("style" and "css"), so adding a game never touches this file. */
 :root {
   --bg: #0c0b10;
   --ink: #eeeeee;
   --txt: #c9c4d6;
   --mut: #8a8698;
   --line: #2c2938;
-  --pop: #f5e000;   /* jaune de la page : focus, accents */
+  --pop: #f5e000;   /* page yellow: focus, accents */
 }
 
 * { box-sizing: border-box; }
@@ -19,7 +15,7 @@ body {
   margin: 0; min-height: 100vh; color: var(--txt);
   font: 16px/1.45 "Archivo Narrow", system-ui, sans-serif;
   padding: clamp(1rem, 4vw, 3rem);
-  /* Lueur jaune en haut, trame de points discrète */
+  /* yellow glow on top, faint dot pattern */
   background:
     radial-gradient(60rem 30rem at 85% -10%, rgba(245, 224, 0, .07), transparent 60%),
     radial-gradient(circle, rgba(201, 196, 214, .07) 1px, transparent 1.5px) 0 0 / 22px 22px,
@@ -29,7 +25,7 @@ body {
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 a:focus-visible, button:focus-visible, select:focus-visible { outline: 3px solid var(--pop); outline-offset: 3px; }
 
-/* Barre du haut */
+/* Top bar */
 .top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: clamp(2rem, 6vw, 4rem); font-weight: 700; }
 .home { color: inherit; text-decoration: none; border-bottom: 2px solid var(--line); transition: border-color .15s, color .15s; }
 .home:hover { color: var(--ink); border-color: var(--txt); }
@@ -41,7 +37,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 3px solid
 }
 .lang select:hover { border-color: var(--txt); }
 
-/* En-tête */
+/* Header */
 .hero { margin-bottom: 2rem; }
 .eyebrow { display: inline-block; margin: 0 0 .9rem; padding: .2rem .7rem; color: #0a0a0a; background: var(--pop); font-weight: 700; font-size: .9rem; letter-spacing: .04em; text-transform: uppercase; transform: skewX(-8deg); }
 .eyebrow:empty { display: none; }
@@ -49,11 +45,11 @@ h1 { margin: 0 0 .75rem; font: 400 clamp(3rem, 10vw, 5.2rem)/.95 Anton, Impact, 
 h1 i { font-style: normal; color: var(--pop); text-shadow: 4px 4px 0 rgba(245, 224, 0, .18); }
 .sub { margin: 0; color: #bebbc9; max-width: 36rem; font-size: 1.1rem; }
 
-/* Titres de section : « Le jeu du moment », « Les autres jeux » */
+/* Section titles */
 .kicker { display: flex; align-items: center; gap: .8rem; margin: 0; color: var(--ink); font: 400 1.5rem/1 Anton, Impact, sans-serif; letter-spacing: .04em; text-transform: uppercase; }
 .kicker::after { content: ""; flex: 1; min-width: 2rem; height: 1px; background: var(--line); }
 
-/* Le jeu du moment : la fiche normale, mise en page large (texte à gauche, aperçu à droite) */
+/* Featured game: the same card, wide layout (text left, preview right) */
 .spotlight { margin: 3rem 0 4rem; animation: rise .5s ease-out both; }
 .spotlight .kicker { margin-bottom: 1.5rem; }
 .spotlight .kicker::before { content: "★"; color: var(--pop); }
@@ -68,11 +64,11 @@ h1 i { font-style: normal; color: var(--pop); text-shadow: 4px 4px 0 rgba(245, 2
   .tile.featured .preview { order: -1; max-width: 20rem; }
 }
 
-/* Liste : titre + filtres sur une ligne */
+/* List: title + filters on one line */
 .list-head { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; margin-bottom: 2rem; }
 .list-head .kicker { flex: 1 1 14rem; }
 
-/* Filtres */
+/* Filters */
 .filters { display: flex; flex-wrap: wrap; gap: .5rem; }
 .filters:empty { display: none; }
 .filters button {
@@ -84,17 +80,17 @@ h1 i { font-style: normal; color: var(--pop); text-shadow: 4px 4px 0 rgba(245, 2
 .filters button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
 .filters .n { margin-left: .2rem; opacity: .55; font-variant-numeric: tabular-nums; }
 
-/* Grille du catalogue */
+/* Catalog grid */
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 2.5rem 2rem; list-style: none; padding: 0; margin: 0; }
 .grid > li { display: flex; animation: rise .5s ease-out both; animation-delay: calc(var(--n, 0) * 80ms); }
 .grid > li.error { color: var(--mut); }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
 
-/* Structure commune des cartes (le thème vient des card_*.json) */
+/* Shared card structure (the look comes from card_*.json) */
 .tile { position: relative; display: flex; flex-direction: column; width: 100%; text-decoration: none; color: inherit; }
 .tile:focus-visible { outline: 3px solid var(--pop); outline-offset: 6px; }
 
-/* Ruban de chantier en travers du coin haut droit */
+/* "Work in progress" ribbon across the top-right corner */
 .badge {
   position: absolute; top: 1.7rem; right: -3.4rem; z-index: 2; width: 12rem; padding: 6px 0;
   background: repeating-linear-gradient(-45deg, var(--pop) 0 10px, #0a0a0a 10px 20px);
@@ -107,7 +103,7 @@ h1 i { font-style: normal; color: var(--pop); text-shadow: 4px 4px 0 rgba(245, 2
 }
 @keyframes badge-wobble { 50% { transform: rotate(48deg); } }
 
-/* Bande d'avertissement dans la carte */
+/* Warning strip inside the card */
 .warning { padding: 5px; background: repeating-linear-gradient(-45deg, var(--pop) 0 10px, #0a0a0a 10px 20px); }
 .warning > span { display: block; padding: .4rem .7rem; background: var(--pop); color: #0a0a0a; font-weight: 700; }
 .tile p { margin: 0; }
@@ -115,10 +111,10 @@ h1 i { font-style: normal; color: var(--pop); text-shadow: 4px 4px 0 rgba(245, 2
 .tags { display: flex; flex-wrap: wrap; gap: .4rem; }
 .go { margin-top: auto; align-self: flex-start; }
 
-/* Aperçu "dice" : structure seulement, les couleurs/tailles viennent du JSON */
+/* "dice" preview: structure only, colors/sizes come from the JSON */
 .preview-dice { display: flex; gap: .6rem; align-items: center; }
 
-/* Aperçu "grid" : mécanique de flip générique, décorations dans le JSON */
+/* "grid" preview: generic flip, decoration in the JSON */
 .preview-grid { display: grid; grid-auto-flow: column; gap: 8px; width: 100%; max-width: 18rem; align-self: center; margin: .5rem 0; }
 .cell { aspect-ratio: 1; perspective: 400px; }
 .cell-in { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .5s ease; transition-delay: calc(var(--i) * 40ms); }
@@ -126,7 +122,7 @@ h1 i { font-style: normal; color: var(--pop); text-shadow: 4px 4px 0 rgba(245, 2
 .cell-face, .cell-back { position: absolute; inset: 0; border-radius: 6px; backface-visibility: hidden; display: grid; place-items: center; }
 .cell-face { transform: rotateY(180deg); }
 
-/* Aperçu "mural" : fresque de pixels qui se démonte au survol (couleurs dans le JSON) */
+/* "mural" preview: pixel mural that falls apart on hover (colors in the JSON) */
 .preview-mural { width: 100%; max-width: 15rem; align-self: center; margin: .5rem 0; display: flex; flex-direction: column; gap: .7rem; }
 .mural-grid { display: grid; gap: 3px; padding: var(--mural-pad, 10px); background: var(--mural-board, transparent); border: 1px solid var(--mural-line, transparent); border-radius: 12px; }
 .mural-grid i { aspect-ratio: 1; }
@@ -134,21 +130,21 @@ h1 i { font-style: normal; color: var(--pop); text-shadow: 4px 4px 0 rgba(245, 2
 .tile:hover .px, .tile:focus-visible .px { transform: scale(.22); opacity: .35; transition-delay: var(--d); }
 .mural-label { text-align: center; }
 
-/* Aperçu "toggle" : démo d'une grille d'interrupteurs, couleurs et emojis dans le JSON (--tg-*) */
+/* "toggle" preview: switch-grid demo, colors and emojis in the JSON (--tg-*) */
 .preview-toggle { width: 100%; max-width: 20rem; align-self: center; margin: .5rem 0; display: flex; flex-direction: column; gap: .7rem; }
 .tg-grid { container-type: inline-size; display: grid; gap: 8px; padding: 10px; background: var(--tg-board, transparent); border-radius: 18px; transition: background .4s; }
-.tg { aspect-ratio: 1; display: grid; place-items: center; line-height: 1; font-size: 15cqi; /* l'emoji suit la taille de la grille */ border-radius: 14px; background: var(--tg-off); transition: background .3s; }
+.tg { aspect-ratio: 1; display: grid; place-items: center; line-height: 1; font-size: 15cqi; /* emoji scales with the grid */ border-radius: 14px; background: var(--tg-off); transition: background .3s; }
 .tg.on { background: var(--tg-on); }
 .tg-label { text-align: center; }
 
-/* Pied de page */
+/* Footer */
 footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem 2rem; margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--line); color: var(--mut); font-size: .95rem; }
 footer p { margin: 0; max-width: 38rem; }
 footer a { color: var(--txt); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--line); align-self: flex-start; }
 footer a:hover { color: var(--ink); border-color: var(--txt); }
 
 @media (prefers-reduced-motion: reduce) {
-  /* Neutralise les transformations/animations apportées par les card_*.json */
+  /* cancel transforms/animations added by card_*.json */
   .tile, .tile:hover { transform: none !important; }
   .badge, .grid > li, .spotlight { animation: none !important; }
   .tile, .cell-in, .tg, .px { transition: none !important; }

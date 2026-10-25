@@ -37,9 +37,7 @@ export const canTargetWithAttack = (state, attackerId, targetId) => {
   const attackerPosition = getAreaPosition(state.board, attacker.areaId);
   const targetPosition = getAreaPosition(state.board, target.areaId);
 
-  // Finger Bullet: portee etendue a toute zone SAUF celle de l'attaquant
-  // ("every Area except your own") - on ne peut donc pas frapper quelqu'un
-  // partageant sa propre zone.
+  // Finger Bullet: range is every Area except your own, so you can't hit someone sharing your Area.
   if (attacker.equipment.includes("finger-bullet")) {
     return attackerPosition !== null && targetPosition !== null && attackerPosition !== targetPosition;
   }

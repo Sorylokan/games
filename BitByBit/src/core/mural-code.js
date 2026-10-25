@@ -1,15 +1,15 @@
-// Fresques perso : codage en un code court à partager, et export pour data/maps.js.
-// Aucune dépendance au navigateur au-delà de btoa/atob/TextEncoder (présents aussi dans Node 18+).
+// Custom murals: short share codes, and export for data/maps.js.
+// Only needs btoa/atob/TextEncoder (also in Node 18+).
 import { COLORS } from '../data/colors.js';
 
 export const MIN_SIZE = 4;
-export const MAX_SIZE = 50; // au-delà, les boîtes et le calcul des niveaux deviennent lourds (voir packetFor)
-const PREFIX = 'BB1-'; // « Bit by Bit », version 1 du format
+export const MAX_SIZE = 50; // beyond this, boxes and level generation get heavy (see packetFor)
+const PREFIX = 'BB1-'; // "Bit by Bit", format version 1
 
 export const cleanName = (s) => String(s ?? '').replace(/[<>|]/g, '').trim().slice(0, 30);
 export const pixelCount = (map) => map.join('').replace(/\./g, '').length;
 
-// Compression par plages : « BBBBKK » → « 4B2K ».
+// Run-length encoding: "BBBBKK" → "4B2K".
 export function rle(str) {
   let out = '';
   for (let i = 0; i < str.length;) {
@@ -27,7 +27,7 @@ export function unrle(s, maxLen = MAX_SIZE * MAX_SIZE) {
   while (pos < s.length) {
     re.lastIndex = pos;
     const m = re.exec(s);
-    if (!m) return null; // morceau illisible
+    if (!m) return null; // unreadable chunk
     const n = Number(m[1]);
     if (!n || out.length + n > maxLen) return null;
     out += m[2].repeat(n);
@@ -47,12 +47,12 @@ const fromB64 = (s) => {
   return new TextDecoder().decode(Uint8Array.from(atob(b), (c) => c.charCodeAt(0)));
 };
 
-// { name, map } → « BB1-… »
+// { name, map } → "BB1-…"
 export function encodeMural({ name, map }) {
   return PREFIX + toB64(`${map.length}|${cleanName(name)}|${rle(map.join(''))}`);
 }
 
-// « BB1-… » → { name, map }, ou null si le code est abîmé ou invalide.
+// "BB1-…" → { name, map }, or null if the code is broken or invalid.
 export function decodeMural(code) {
   try {
     const c = String(code ?? '').trim();
@@ -72,14 +72,14 @@ export function decodeMural(code) {
   }
 }
 
-// Identifiant lisible pour data/maps.js : « Mon Chat ! » → « mon-chat ».
+// Readable id for data/maps.js: "Mon Chat !" → "mon-chat".
 export const slugify = (name) => cleanName(name).replace(/œ/gi, 'oe').replace(/æ/gi, 'ae').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-  .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'fresque';
+  .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'mural';
 
-// Entrée prête à coller dans data/maps.js, plus les lignes de traduction.
+// Entry to paste into data/maps.js, plus its translation line.
 export function toMapsSnippet({ name, map }) {
   const id = slugify(name);
   const rows = map.map((r) => `    '${r}',`).join('\n');
   const label = cleanName(name) || id;
-  return `  { id: '${id}', map: [\n${rows}\n  ] },\n\n// locales/fr.json et locales/en.json :\n// "map.${id}": "${label}",`;
+  return `  { id: '${id}', map: [\n${rows}\n  ] },\n\n// locales/fr.json and locales/en.json:\n// "map.${id}": "${label}",`;
 }

@@ -1,7 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700&display=swap");
 
-/* THEME CHATONS : nuit bleutée, chatons orange. Activé par <link> après styles.css
-   et class="theme-kittens" sur <body>. Cases endormies sombres, cases réveillées plus claires. */
+/* Kittens theme: bluish night, orange kittens. Sleeping cells dark, awake cells lighter. */
 body.theme-kittens {
   --bg: #1B1833; --card: #404258; --line: #50577A; --txt: #f1eefb; --mut: #b4b8d2;
   --accent: #F29F58; --accent-ink: #1B1833;
@@ -10,7 +9,7 @@ body.theme-kittens {
   --display: Fredoka, Nunito, "Trebuchet MS", system-ui, sans-serif;
 }
 
-/* Décor : lueur orange en haut à gauche, brume bleutée en bas à droite, empreintes de pattes en filigrane. */
+/* Decoration: orange glow top left, bluish haze bottom right, faint paw prints. */
 body.theme-chatons {
   background-image:
     radial-gradient(48rem 34rem at 12% 8%, rgba(242, 159, 88, .16), transparent 62%),

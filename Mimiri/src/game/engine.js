@@ -1,18 +1,14 @@
-// Moteur de Mimiri : règles pures, sans DOM (donc testables avec `node --test`).
-//
-// Chaque case vaut 1 (« à corriger ») ou 0 (« gagnée »). Un clic bascule la case
-// et ses voisines selon PATTERN ; la partie est gagnée quand tout vaut 0.
-// Le thème (kittens, chats grincheux, jardin...) ne change JAMAIS ces règles :
-// il décide seulement de ce que « 1 » et « 0 » ressemblent à l'écran.
+// Mimiri engine: pure rules, no DOM (testable with `node --test`).
+// Each cell is 1 (to fix) or 0 (solved). A click flips the cell and its neighbors (PATTERN);
+// the game is won when everything is 0. Themes never change the rules, only how 1 and 0 look.
 
 export const SIZES = [3, 4, 5, 6];
 export const DAILY_SIZE = 5;
 
-// Motif d'un clic : la croix. Variantes possibles plus tard (diagonales, 8 voisines,
-// ligne entière...) : il suffit de passer un autre motif aux fonctions ci-dessous.
+// Click pattern: a cross. Pass another pattern to the functions below for variants.
 export const PATTERN = [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]];
 
-// --- Aléatoire avec graine (pour le défi du jour) ---
+// --- Seeded random (daily challenge) ---
 export function hashStr(s) {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -28,15 +24,15 @@ export function mulberry32(a) {
   };
 }
 
-// Date locale au format AAAA-MM-JJ : sert de graine et de clé du défi du jour.
+// Local date as YYYY-MM-DD: seed and key of the daily challenge.
 export function dayKey(date = new Date()) {
   const p = (x) => String(x).padStart(2, "0");
   return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}`;
 }
 
-// --- Règles ---
+// --- Rules ---
 
-// Indices des cases touchées par un clic sur la case i (celles qui sont dans la grille).
+// Indices of the in-grid cells affected by a click on cell i.
 export function touchedBy(n, i, pattern = PATTERN) {
   const r = Math.floor(i / n), c = i % n;
   const out = [];
@@ -47,7 +43,7 @@ export function touchedBy(n, i, pattern = PATTERN) {
   return out;
 }
 
-// Applique un clic en place (bascule chaque case touchée).
+// Applies a click in place.
 export function applyPress(cells, n, i, pattern = PATTERN) {
   for (const j of touchedBy(n, i, pattern)) cells[j] ^= 1;
   return cells;
@@ -56,15 +52,15 @@ export function applyPress(cells, n, i, pattern = PATTERN) {
 export const isSolved = (cells) => cells.every((v) => v === 0);
 export const countOn = (cells) => cells.filter((v) => v === 1).length;
 
-// Génération toujours résoluble : on part de « tout est gagné » et on simule des clics.
-// Renvoie la grille ET une solution (la liste des clics simulés), utile pour les tests.
+// Always solvable: start from a solved grid and simulate clicks.
+// Returns the grid and a solution (the simulated clicks), handy for tests.
 export function scramble(n, rand = Math.random, pattern = PATTERN) {
   const total = n * n;
   const clicks = Math.max(3, Math.round(total * 0.45));
   for (let attempt = 0; attempt < 50; attempt++) {
     const cells = new Array(total).fill(0);
     const order = [...Array(total).keys()];
-    for (let i = order.length - 1; i > 0; i--) { // mélange (Fisher-Yates)
+    for (let i = order.length - 1; i > 0; i--) { // Fisher-Yates shuffle
       const j = Math.floor(rand() * (i + 1));
       [order[i], order[j]] = [order[j], order[i]];
     }
@@ -72,7 +68,7 @@ export function scramble(n, rand = Math.random, pattern = PATTERN) {
     for (const k of solution) applyPress(cells, n, k, pattern);
     if (!isSolved(cells)) return { cells, solution };
   }
-  // Repli (quasi impossible) : un seul clic suffit à obtenir une grille non résolue.
+  // Fallback (almost never reached): one click always gives an unsolved grid.
   const cells = new Array(total).fill(0);
   applyPress(cells, n, 0, pattern);
   return { cells, solution: [0] };
@@ -80,6 +76,6 @@ export function scramble(n, rand = Math.random, pattern = PATTERN) {
 
 export const generate = (n, rand, pattern) => scramble(n, rand, pattern).cells;
 
-// Grille du jour : même graine, donc même grille pour tout le monde ce jour-là.
+// Daily grid: same seed, so the same grid for everyone that day.
 export const dailyGrid = (day = dayKey(), n = DAILY_SIZE) =>
   generate(n, mulberry32(hashStr("mimiri-" + day)));

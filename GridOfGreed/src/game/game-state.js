@@ -1,5 +1,4 @@
-// Forme de l'état et helpers de lecture.
-// Une carte : { v, up }. Une grille : 4 colonnes ; une colonne = 3 cartes, ou null si retirée.
+// State shape and read helpers. A card: { v, up }. A grid: 4 columns of 3 cards (null once removed).
 
 export const COLS = 4;
 export const ROWS = 3;

@@ -1,4 +1,4 @@
-// Création de la partie, donne, révélation initiale, choix du premier joueur.
+// Game creation, deal, initial reveal, first player.
 import { fullDeck, shuffle } from '../data/deck.js';
 import { COLS, ROWS, MIN_PLAYERS, MAX_PLAYERS, fail, slotOf, visibleScore } from './game-state.js';
 
@@ -34,7 +34,7 @@ export function startNextRound(state, rng = Math.random) {
   return { ok: true, state: s, events: [{ type: 'roundDealt', round: s.round }] };
 }
 
-// Revanche : nouvelle partie à la même table (mêmes joueurs, même ordre, même score de fin), totaux remis à zéro.
+// Rematch: new game at the same table (same players, order and target score), totals reset.
 export function rematch(state, rng = Math.random) {
   if (state.phase !== 'gameOver') return { ok: false, error: 'La partie n\'est pas terminée' };
   const s = createGame({ players: state.players, targetScore: state.targetScore, rng });
@@ -57,7 +57,7 @@ export function initialReveal(s, pi, me, a, rng, ev) {
     const sums = s.players.map(visibleScore);
     const best = Math.max(...sums);
     const tied = sums.map((x, i) => (x === best ? i : -1)).filter((i) => i >= 0);
-    s.current = tied[Math.floor(rng() * tied.length)]; // égalité : tirage au sort
+    s.current = tied[Math.floor(rng() * tied.length)]; // tie: random pick
     s.phase = 'playing';
     s.turn = { step: 'draw' };
     ev.push({ type: 'roundStart', first: s.current, sums });

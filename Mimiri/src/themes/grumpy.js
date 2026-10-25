@@ -1,6 +1,5 @@
-// Thème « Chats grincheux » : on fait des câlins pour redonner le sourire à tout le monde.
-// render(on, idx) : on = 1 = chat grincheux (à corriger), on = 0 = chat joyeux (gagné).
-// Les couleurs vivent dans theme-grumpy.css ; ici, uniquement les textes et le dessin.
+// "Grumpy cats" theme: hug them all back to a smile. on = grumpy cat (to fix), off = happy cat.
+// Colors live in theme-grumpy.css; texts and drawing here.
 import { cat, EYE, NOSE, FURS } from "./cat.js";
 
 export default {
@@ -12,7 +11,7 @@ export default {
   ariaOn: "Chat grincheux",
   ariaOff: "Chat joyeux",
 
-  // Traductions (les champs ci-dessus = français, référence utilisée par les tests).
+  // Translations (the fields above are French, the reference checked by the tests).
   texts: {
     en: {
       title: "Grumpy Cats",

@@ -1,16 +1,16 @@
-// Conversion d'une image en fresque. Aucune dépendance au navigateur (testable avec node) :
-// on reçoit les pixels RGBA déjà lus. Les couleurs sont comparées en OKLab (perception de l'œil).
+// Image → mural conversion. No browser APIs: takes RGBA pixels already read.
+// Colors are compared in OKLab, which matches human perception.
 import { DIRS } from './grid.js';
 
 const EMPTY = '.';
 
-// sRGB 0..255 → linéaire, en table : évite un Math.pow par pixel.
+// sRGB 0..255 → linear, as a lookup table (avoids a Math.pow per pixel).
 const LIN = Float32Array.from({ length: 256 }, (_, i) => {
   const c = i / 255;
   return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 });
 
-// sRGB (entiers 0..255) → OKLab [L, a, b] (matrices de Björn Ottosson). L va de 0 (noir) à 1 (blanc).
+// sRGB (0..255 integers) → OKLab [L, a, b] (Björn Ottosson's matrices). L: 0 black → 1 white.
 export function toOklab(r, g, b) {
   const lr = LIN[Math.round(r)], lg = LIN[Math.round(g)], lb = LIN[Math.round(b)];
   const l = Math.cbrt(0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb);
@@ -23,7 +23,7 @@ export function toOklab(r, g, b) {
   ];
 }
 
-// Palette en OKLab, calculée une seule fois par palette ({ lettre: '#rrggbb' }).
+// Palette ({ letter: '#rrggbb' }) in OKLab, computed once per palette.
 const cache = new WeakMap();
 function paletteLab(palette) {
   let p = cache.get(palette);
@@ -38,7 +38,7 @@ function paletteLab(palette) {
   return p;
 }
 
-// Indice de la couleur la plus proche parmi `allowed` (indices dans la palette).
+// Index of the closest color among `allowed` (palette indices).
 function nearestIndex(L, A, B, lab, allowed) {
   let best = allowed[0], bestD = Infinity;
   for (const i of allowed) {
@@ -49,13 +49,13 @@ function nearestIndex(L, A, B, lab, allowed) {
   return best;
 }
 
-// Lettre de la couleur de palette la plus proche d'une couleur sRGB.
+// Letter of the palette color closest to an sRGB color.
 export function nearestColor(r, g, b, palette) {
   const p = paletteLab(palette);
   return p.letters[nearestIndex(...toOklab(r, g, b), p.lab, [...p.lab.keys()])];
 }
 
-// Une case dont au moins 3 des 4 voisines ont une même autre couleur prend cette couleur (un seul passage).
+// A cell takes the color shared by at least 3 of its 4 neighbors (single pass).
 export function cleanIsolated(grid) {
   const src = grid.map((row) => row.slice()), N = grid.length;
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
@@ -69,8 +69,8 @@ export function cleanIsolated(grid) {
   return grid;
 }
 
-// Fond transparent : la couleur majoritaire des 4 coins est vidée, mais seulement là où elle touche
-// le bord (remplissage depuis les bords) : la même couleur à l'intérieur du dessin est gardée.
+// Clears the most common corner color, flood-filling from the edges only:
+// the same color inside the drawing is kept.
 export function clearBackground(grid) {
   const N = grid.length;
   const corners = [grid[0][0], grid[0][N - 1], grid[N - 1][0], grid[N - 1][N - 1]].filter((v) => v !== EMPTY);
@@ -88,16 +88,16 @@ export function clearBackground(grid) {
   return grid;
 }
 
-// Pixels RGBA d'une image carrée de N×S pixels de côté → fresque (N chaînes, même format que data/maps.js).
-// Chaque case est votée par ses S×S pixels : chacun vote pour sa couleur de palette la plus proche
-// (ou pour '.' s'il est transparent, alpha < 128) et la couleur majoritaire l'emporte.
-// Réglages : saturation et contrast (1 = inchangé), maxColors (garder les K couleurs les plus utilisées),
-// cleanup (nettoyer les pixels isolés), transparentBg (vider le fond qui touche les bords).
+// RGBA pixels of a square (N×S)² image → mural (N strings, same format as data/maps.js).
+// Each cell is voted by its S×S pixels: each votes for its closest palette color ('.' if alpha < 128),
+// the majority wins.
+// Options: saturation and contrast (1 = unchanged), maxColors (keep the K most used colors),
+// cleanup (cleanIsolated), transparentBg (clearBackground).
 export function pixelsToMap(data, N, palette, { saturation = 1, contrast = 1, maxColors = Infinity, cleanup = false, transparentBg = false } = {}) {
   const W = Math.round(Math.sqrt(data.length / 4)), S = W / N;
   const { letters, lab } = paletteLab(palette), n = letters.length;
 
-  // 1) chaque pixel en OKLab, réglages appliqués une fois pour toutes (deux votes possibles ensuite)
+  // 1) every pixel to OKLab, with settings applied once (there may be two votes)
   const px = new Float32Array(W * W * 3), clear = new Uint8Array(W * W);
   for (let p = 0; p < W * W; p++) {
     if (data[p * 4 + 3] < 128) { clear[p] = 1; continue; }
@@ -107,10 +107,10 @@ export function pixelsToMap(data, N, palette, { saturation = 1, contrast = 1, ma
     px[p * 3 + 2] = B * saturation;
   }
 
-  // 2) vote case par case ; usage = nombre de voix de chaque couleur sur toute l'image
+  // 2) vote cell by cell; usage = votes per color over the whole image
   const vote = (allowed) => {
     const usage = new Float64Array(n), grid = [];
-    const tally = new Uint16Array(n + 1); // dernière place = case vide
+    const tally = new Uint16Array(n + 1); // last slot = empty cell
     for (let r = 0; r < N; r++) {
       const row = [];
       for (let c = 0; c < N; c++) {
@@ -120,7 +120,7 @@ export function pixelsToMap(data, N, palette, { saturation = 1, contrast = 1, ma
           tally[clear[p] ? n : nearestIndex(px[p * 3], px[p * 3 + 1], px[p * 3 + 2], lab, allowed)]++;
         }
         let best = 0;
-        for (let i = 1; i <= n; i++) if (tally[i] > tally[best]) best = i; // à égalité : la couleur gagne sur le vide
+        for (let i = 1; i <= n; i++) if (tally[i] > tally[best]) best = i; // ties: a color beats empty
         for (let i = 0; i < n; i++) usage[i] += tally[i];
         row.push(best === n ? EMPTY : letters[best]);
       }
@@ -131,7 +131,7 @@ export function pixelsToMap(data, N, palette, { saturation = 1, contrast = 1, ma
 
   let { grid, usage } = vote([...lab.keys()]);
 
-  // 3) trop de couleurs : on ne garde que les K plus utilisées et on revote
+  // 3) too many colors: keep the K most used and vote again
   const used = [...usage.keys()].filter((i) => usage[i] > 0).sort((a, b) => usage[b] - usage[a]);
   if (used.length > maxColors) grid = vote(used.slice(0, Math.max(1, maxColors))).grid;
 

@@ -1,6 +1,5 @@
-// Les fresques, dans l'ordre où on les joue. Une grille carrée de lettres (voir data/colors.js).
-// Un « . » laisse une case vide. Pour ajouter une fresque : ajoute une entrée ici, puis son nom
-// sous la clé « map.<id> » dans chaque fichier de locales/.
+// Official murals, in play order. Square grids of color letters (data/colors.js), '.' = empty.
+// To add one: an entry here, plus its name under "map.<id>" in every locales/ file.
 
 export const MAPS = [
   { id: 'heart', map: [

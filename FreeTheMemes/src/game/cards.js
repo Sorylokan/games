@@ -236,8 +236,7 @@ export const resolveCard = (state, playerId, card) => {
     return failure(state, "UNSUPPORTED_CARD_EFFECT", "This card effect is not registered.");
   }
 
-  // Carte de vol sans cible equipee : rien a voler, la carte ne fait rien au
-  // lieu de bloquer la partie sur un choix impossible (cf. Pickpocket Boulevard).
+  // Steal card with nothing to steal: no effect, instead of blocking on an impossible choice.
   if (card.effect === "steal-one-equipment") {
     const hasStealableEquipment = Object.values(state.players).some((target) => (
       target.alive && target.id !== playerId && target.equipment.length > 0
@@ -353,7 +352,7 @@ export const resolvePendingAction = (state, pendingAction, choice, { rollDie } =
         target.alive && target.id !== actor.id && target.equipment.length > 0
       ));
       if (!anyStealable && (choice.targetId == null || choice.cardId == null)) {
-        return ok(remainingState);   // plus rien a voler : la carte ne fait rien
+        return ok(remainingState);   // nothing left to steal: no effect
       }
       const transferred = transferEquipment(remainingState, choice.targetId, actor.id, choice.cardId);
       return transferred.ok ? transferred : failure(state, transferred.error, transferred.message);

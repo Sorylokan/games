@@ -1,11 +1,11 @@
-// Composition du paquet et plages de couleur (données pures).
+// Deck contents and color ranges.
 
 export function fullDeck() {
   const d = [];
   const add = (v, n) => { for (let i = 0; i < n; i++) d.push(v); };
   add(-2, 5); add(0, 15); add(-1, 10);
   for (let v = 1; v <= 12; v++) add(v, 10);
-  return d; // 150 cartes
+  return d; // 150 cards
 }
 
 export function shuffle(arr, rng = Math.random) {
@@ -17,7 +17,7 @@ export function shuffle(arr, rng = Math.random) {
   return a;
 }
 
-// Plage de couleur d'une valeur (pour l'UI : cadre et chiffre).
+// Color range of a value (UI frame and number).
 export function rangeOf(v) {
   if (v < 0) return 'neg';
   if (v === 0) return 'zero';

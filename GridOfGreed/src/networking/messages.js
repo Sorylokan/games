@@ -1,8 +1,8 @@
-// Types de messages échangés sur le réseau (rôle identique à messages.js de FTM).
+// Network message types (same role as in Free the Memes).
 export const MESSAGE_TYPES = Object.freeze({
   REQUEST_ACTION: "REQUEST_ACTION",
-  STATE_UPDATE: "STATE_UPDATE",     // vue masquée personnelle (viewFor)
-  LOBBY_UPDATE: "LOBBY_UPDATE",     // salon avant le départ (pas encore d'état de jeu)
+  STATE_UPDATE: "STATE_UPDATE",     // personal masked view (viewFor)
+  LOBBY_UPDATE: "LOBBY_UPDATE",     // lobby before the start (no game state yet)
   PLAYER_JOINED: "PLAYER_JOINED",
   PLAYER_LEFT: "PLAYER_LEFT",
   PLAYER_HELLO: "PLAYER_HELLO",
@@ -11,8 +11,7 @@ export const MESSAGE_TYPES = Object.freeze({
   ERROR: "ERROR",
 });
 
-// Contrairement à FTM, l'action est l'objet brut du moteur GoG
-// ({ type:'drawPile' }, { type:'swap', col, row }...) : dispatch valide tout.
+// The action is the raw engine object ({ type: 'drawPile' }, { type: 'swap', col, row }…); dispatch validates it.
 export const createActionRequest = (playerId, action) => ({
   type: MESSAGE_TYPES.REQUEST_ACTION,
   playerId,

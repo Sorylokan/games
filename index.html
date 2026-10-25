@@ -7,15 +7,13 @@
 <title>Jeux – Sorylokan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Polices de la structure de la page uniquement ; celles des cartes sont
-     chargées par scripts.js via le champ "fonts" de chaque card_*.json. -->
+<!-- Page fonts only; card fonts are loaded by scripts.js from each card's "fonts" field. -->
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Narrow:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="wrap">
-  <!-- Textes traduits par scripts.js : data-i18n (texte), data-i18n-html (texte avec balises),
-       data-i18n-aria (libellé d'accessibilité). Les traductions sont dans locales/. -->
+  <!-- Translated by scripts.js from locales/: data-i18n (text), data-i18n-html (with tags), data-i18n-aria. -->
   <nav class="top">
     <a class="home" href="../" data-i18n-aria="nav.homeLabel"><span aria-hidden="true">←</span> <span data-i18n="nav.home">Sorylokan</span></a>
     <label class="lang">
@@ -30,9 +28,7 @@
     <p class="sub" data-i18n="hero.sub"></p>
   </header>
 
-  <!-- Les cartes sont générées par scripts.js à partir des fiches card_*.json.
-       Ajouter un jeu = créer card_MONJEU.json + l'ajouter à cards.json.
-       Le « jeu du moment » se choisit dans cards.json (champ "featured"). -->
+  <!-- Cards are built by scripts.js from card_*.json (listed in cards.json; "featured" picks the spotlight). -->
   <section class="spotlight" id="featured" hidden>
     <h2 class="kicker" data-i18n="featured.label">Le jeu du moment</h2>
     <div id="featured-slot"></div>

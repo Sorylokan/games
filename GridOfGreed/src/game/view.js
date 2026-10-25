@@ -1,4 +1,4 @@
-// Vue à envoyer à un joueur : cartes cachées et pioche masquées.
+// View sent to a player: hidden cards and the draw pile are masked.
 
 export function viewFor(state, pid) {
   const v = structuredClone(state);

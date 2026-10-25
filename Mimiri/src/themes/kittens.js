@@ -1,6 +1,5 @@
-// Thème « Chatons câlins » : on joue avec les chatons pour les réveiller tous.
-// render(on, idx) : on = 1 = chaton endormi (à réveiller), on = 0 = chaton réveillé (gagné).
-// Les couleurs vivent dans theme-kittens.css ; ici, uniquement les textes et le dessin.
+// "Kittens" theme: play with the kittens to wake them all. on = sleeping (to fix), off = awake.
+// Colors live in theme-kittens.css; texts and drawing here.
 import { cat, BIG_EYES, EYE, NOSE } from "./cat.js";
 
 export default {
@@ -12,7 +11,7 @@ export default {
   ariaOn: "Chaton endormi",
   ariaOff: "Chaton réveillé",
 
-  // Traductions (les champs ci-dessus = français, référence utilisée par les tests).
+  // Translations (the fields above are French, the reference checked by the tests).
   texts: {
     en: {
       title: "Cuddly Kittens",

@@ -1,5 +1,4 @@
-// Registre des porteurs : nom d'espèce (utilisé dans data/skins.js) → fonction de dessin.
-// Pour ajouter une espèce : dessine-la dans un fichier de ce dossier, puis ajoute-la ici.
+// Carrier registry: species name (used in data/skins.js) → draw function.
 import { COLORS } from '../../data/colors.js';
 import { app } from '../../game/state.js';
 import { toScreen } from '../../game/geometry.js';
@@ -12,7 +11,7 @@ import { drawFox, drawHedgehog } from './autumn.js';
 import { drawGhost, drawBat } from './halloween.js';
 import { drawElf, drawSnowman } from './xmas.js';
 
-// Espèces dessinées debout (elles se retournent selon la direction, sans pivoter).
+// Species drawn standing (they flip with the direction instead of rotating).
 const UPRIGHT = {
   crab: drawCrab, hermit: drawHermit,
   fairy: drawFairy, wisp: drawWisp,
@@ -22,9 +21,9 @@ const UPRIGHT = {
   elf: drawElf, snowman: drawSnowman,
 };
 
-// Dessine un porteur a à la position (x, y) en cases, allant dans la direction ang.
+// Draws carrier a at (x, y) in cells, heading ang.
 export function drawCarrier(a, x, y, ang, phase) {
-  const carry = a.back ? COLORS[a.color] : null; // il ne porte son pixel qu'au retour
+  const carry = a.back ? COLORS[a.color] : null; // only carries its pixel on the way back
   if (a.kind === 'ant') return drawAnt(x, y, ang, carry, phase);
   const draw = UPRIGHT[a.kind];
   if (!draw) return;

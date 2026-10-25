@@ -1,12 +1,11 @@
-// Langue de l'interface : charge le fichier locales/<langue>.json, fournit t(), et traduit le HTML
-// (data-i18n pour le texte, data-i18n-title pour l'infobulle et le libellé d'accessibilité,
-// data-i18n-ph pour le texte d'exemple d'un champ).
+// UI language: loads locales/<lang>.json, provides t(), translates the HTML
+// (data-i18n: text, data-i18n-title: tooltip + aria-label, data-i18n-ph: placeholder).
 import { createTranslator, loadLocale, getLocale, DEFAULT_LOCALE } from '../i18n.js';
 import { STORAGE } from '../config.js';
 import { store } from '../storage.js';
 import { $ } from '../dom.js';
 
-// Langues proposées. Pour en ajouter une : un fichier locales/xx.json et une ligne ici.
+// Available languages: add locales/xx.json and a line here.
 export const LANGS = { fr: 'Français', en: 'English' };
 
 let translate = (key) => key;
@@ -19,7 +18,7 @@ async function messagesFor(lang) {
   return cache[lang];
 }
 
-// Langue de départ : celle choisie avant, sinon celle du navigateur si on l'a, sinon le français.
+// Saved choice, else the browser language if available, else French.
 export function initialLang() {
   const saved = store.get(STORAGE.lang, null);
   if (LANGS[saved]) return saved;
@@ -52,7 +51,7 @@ export function initLangSelect(onChange) {
   for (const [code, label] of Object.entries(LANGS)) {
     const opt = document.createElement('option');
     opt.value = code;
-    opt.textContent = label; // chaque langue écrite dans sa propre langue
+    opt.textContent = label; // each language named in itself
     select.append(opt);
   }
   select.addEventListener('change', (e) => onChange(e.target.value));

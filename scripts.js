@@ -1,23 +1,13 @@
-// Moteur générique du catalogue de jeux (chargé en type="module", DOM prêt).
-//
-// Ce script ne connaît AUCUN jeu individuellement :
-//   1. cards.json liste les fiches disponibles (GitHub Pages ne permet pas
-//      de lister un dossier, d'où ce fichier technique) ;
-//   2. chaque card_*.json fournit le contenu, le style et l'aperçu de sa carte ;
-//   3. les cartes sont générées puis injectées dans #catalog.
-//
-// Pour ajouter un jeu : créer card_MONJEU.json + l'ajouter à cards.json,
-// sans toucher à index.html, scripts.js ni styles.css.
-//
-// Langues : les textes de la page sont dans locales/<langue>.json. Dans les fiches,
-// tout texte peut être une simple chaîne (identique dans toutes les langues)
-// ou un objet par langue : { "fr": "Jouer →", "en": "Play →" }.
+// Generic game catalog. Knows no game in particular:
+//   - cards.json lists the cards (GitHub Pages can't list a folder);
+//   - each card_*.json gives its content, style and preview.
+// Adding a game = a card_MYGAME.json + a line in cards.json; nothing else changes.
+// Page text is in locales/<lang>.json. Card text is a string, or { "fr": "…", "en": "…" }.
 
 const $ = (id) => document.getElementById(id);
 const catalog = $("catalog");
 
-// Langues proposées. Pour en ajouter une : locales/xx.json + une ligne ici
-// (+ les traductions "xx" dans les fiches ; à défaut, le français s'affiche).
+// Available languages: locales/xx.json + a line here (cards fall back to French).
 const LANGS = { fr: "Français", en: "English" };
 const DEFAULT_LANG = "fr";
 const LANG_KEY = "games-lang";
@@ -25,22 +15,22 @@ const LANG_KEY = "games-lang";
 let lang = DEFAULT_LANG;
 let messages = {};
 let fallback = {};
-let entries = [];     // [[classe, fiche], ...]
-let filter = "all";   // "all" | "solo" | "multi" (champ "mode" des fiches)
-let featuredClass = null; // classe de la fiche du « jeu du moment » (choisie dans cards.json)
+let entries = [];     // [[class, card], ...]
+let filter = "all";   // "all" | "solo" | "multi" (card "mode" field)
+let featuredClass = null; // class of the featured card (set in cards.json)
 
-// localStorage sans jamais planter (navigation privée, stockage bloqué...).
+// localStorage that never throws (private browsing, blocked storage…).
 const store = {
   get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
-  set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* tant pis */ } },
+  set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* ignore */ } },
 };
 
-// --- Traduction ------------------------------------------------------------------
+// --- Translation ---
 
 const t = (key, vars = {}) =>
   (messages[key] ?? fallback[key] ?? key).replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
 
-// Texte d'une fiche dans la langue active : chaîne telle quelle, ou objet { fr, en }.
+// Card text in the active language: plain string, or { fr, en } object.
 const tr = (v) =>
   v && typeof v === "object" && !Array.isArray(v) ? v[lang] ?? v[DEFAULT_LANG] ?? Object.values(v)[0] : v;
 
@@ -74,22 +64,21 @@ async function setLang(code) {
 function initLangSelect() {
   const select = $("lang");
   select.innerHTML = Object.entries(LANGS)
-    .map(([code, label]) => `<option value="${code}">${label}</option>`) // chaque langue écrite dans sa propre langue
+    .map(([code, label]) => `<option value="${code}">${label}</option>`) // each language named in itself
     .join("");
   select.addEventListener("change", (e) => setLang(e.target.value));
 }
 
-// --- Injection des styles -----------------------------------------------------
+// --- Styles ---
 
-// Objet JS (camelCase) -> déclarations CSS. Les custom properties (--x) restent telles quelles.
+// JS object (camelCase) → CSS declarations. Custom properties (--x) are kept as-is.
 const toDeclarations = (style) =>
   Object.entries(style ?? {})
     .map(([k, v]) => `${k.startsWith("--") ? k : k.replace(/[A-Z]/g, (c) => "-" + c.toLowerCase())}: ${v};`)
     .join(" ");
 
-// Injecte une règle par carte : .tile.card-xxx { <style> <css> }
-// Le champ "css" des JSON utilise le nesting CSS natif (&, sélecteurs descendants),
-// ce qui permet :hover, ::before, etc. sans rien dédier dans styles.css.
+// One rule per card: .tile.card-xxx { <style> <css> }. The "css" field uses native CSS nesting
+// (&, descendant selectors), so :hover, ::before etc. need nothing in styles.css.
 const injectStyles = (list) => {
   const el = document.createElement("style");
   el.textContent = list
@@ -98,12 +87,10 @@ const injectStyles = (list) => {
   document.head.appendChild(el);
 };
 
-// card_FTM.json -> "card-ftm" : classe unique dérivée du nom de fichier.
+// card_FTM.json → "card-ftm": unique class from the file name.
 const cardClass = (file) => "card-" + file.replace(/^card_?|\.json$/gi, "").toLowerCase();
 
-// Polices Google Fonts propres à chaque fiche (champ "fonts", valeurs au format
-// family=... : ["Fredoka:wght@600", "Nunito:wght@400;700"]). Dédupliquées et
-// injectées en un seul <link> : un nouveau jeu n'a jamais à toucher index.html.
+// Google Fonts per card ("fonts" field, e.g. ["Fredoka:wght@600"]), deduplicated into one <link>.
 const injectFonts = (list) => {
   const families = [...new Set(list.flatMap(([, card]) => card.fonts ?? []))];
   if (!families.length) return;
@@ -113,18 +100,17 @@ const injectFonts = (list) => {
   document.head.appendChild(link);
 };
 
-// --- Aperçus (registre extensible, aucun n'est lié à un jeu précis) ------------
+// --- Previews (generic, not tied to a game) ---
 
 const PREVIEWS = {
-  // Dés affichés sur la carte (animation au survol : voir initDice).
+  // Dice (hover animation: initDice).
   dice: (p) =>
     `<div class="preview preview-dice" aria-hidden="true">` +
     p.dice.map((d) => `<div class="die" data-sides="${d.sides}">${d.value}</div>`).join("") +
     (p.label ? `<span class="dice-label">${tr(p.label)}</span>` : "") +
     `</div>`,
 
-  // Grille de cartes retournables. colors : la première entrée dont "max" >= valeur
-  // l'emporte ; la dernière peut omettre "max" pour servir de couleur par défaut.
+  // Flippable cards. colors: the first entry with "max" >= value wins; the last may omit "max" (default).
   grid: (p) => {
     const colour = (v) => (p.colors.find((c) => c.max === undefined || v <= c.max) ?? {}).color;
     const cells = p.values
@@ -141,9 +127,8 @@ const PREVIEWS = {
     );
   },
 
-  // Fresque en pixels : au survol, les pixels disparaissent du bord vers le centre
-  // (anneau par anneau, avec un peu de hasard). map : lignes de lettres,
-  // colors : lettre -> couleur, "." = case vide.
+  // Pixel mural: on hover, pixels vanish ring by ring from the edge (with some randomness).
+  // map: rows of letters, colors: letter → color, "." = empty.
   mural: (p) => {
     const n = p.map.length;
     const px = p.map
@@ -164,8 +149,7 @@ const PREVIEWS = {
     );
   },
 
-  // Démo d'une grille d'interrupteurs (voir initToggle) : la configuration complète est
-  // transmise à initToggle via data-config, le HTML ne contient que les cases vides.
+  // Switch-grid demo (initToggle). Full config passed via data-config; the HTML only has empty cells.
   toggle: (p) =>
     `<div class="preview preview-toggle" aria-hidden="true" data-config="${encodeURIComponent(JSON.stringify(p))}">` +
     `<div class="tg-grid" style="grid-template-columns: repeat(${p.columns}, 1fr)">` +
@@ -175,8 +159,7 @@ const PREVIEWS = {
 
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)");
 
-// Animation des aperçus "dice" : les dés se brouillent au survol/focus,
-// puis s'arrêtent sur un nouveau tirage. Désactivée si prefers-reduced-motion.
+// "dice" previews scramble on hover/focus, then land on a new roll. Off with reduced motion.
 const initDice = () => {
   if (REDUCED.matches) return;
   document.querySelectorAll(".preview-dice").forEach((preview) => {
@@ -194,11 +177,10 @@ const initDice = () => {
   });
 };
 
-// Démo des aperçus "toggle" : la grille rejoue en boucle une vraie partie (un clic bascule la case
-// et ses 4 voisines), se résout, puis passe au thème suivant. Config : columns, rows, presses (les
-// clics qui résolvent la grille), themes [{ on, off, onBg, offBg, boardBg, label }].
-// Sans animation (prefers-reduced-motion), on affiche juste la grille de départ.
-// La boucle s'arrête d'elle-même quand la carte est redessinée (changement de langue, filtre).
+// "toggle" previews loop a real game (a click flips a cell and its 4 neighbors), solve it, then
+// switch theme. Config: columns, rows, presses (clicks that solve the grid),
+// themes [{ on, off, onBg, offBg, boardBg, label }]. Reduced motion: static start grid.
+// The loop stops by itself when the card is redrawn.
 const initToggle = () => {
   const still = REDUCED.matches;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -248,27 +230,25 @@ const initToggle = () => {
           press(i); paint();
           await wait(700);
         }
-        await wait(1800);                    // grille résolue : tout le monde est content
-        ti = (ti + 1) % themes.length;       // thème suivant, nouvelle grille
+        await wait(1800);                    // solved: everyone is happy
+        ti = (ti + 1) % themes.length;       // next theme, new grid
         scramble(); paint();
       }
     })();
   });
 };
 
-// --- Génération des cartes -----------------------------------------------------
+// --- Cards ---
 
-// Une carte de jeu. Seuls les champs présents dans le JSON sont rendus (ribbon, tagline, tags...).
-// featured = vrai pour le « jeu du moment » : même fiche, mais mise en page large
-// (texte à gauche, aperçu à droite) et classe .featured sur la carte. Une fiche peut
-// donc adapter son style à ce cas avec "&.featured ..." dans son champ "css".
+// One game card; only fields present in the JSON are rendered. featured: same card, wide layout
+// and a .featured class (cards can style it with "&.featured …" in their "css").
 const renderTile = ([cls, card], featured = false) => {
   const text = [`<h2>${tr(card.title)}</h2>`];
   const tagline = tr(card.tagline);
   const tags = (tr(card.tags) ?? []).map(tr);
   const preview = card.preview && PREVIEWS[card.preview.type] ? PREVIEWS[card.preview.type](card.preview) : "";
   if (tagline) text.push(`<p class="tagline">${tagline}</p>`);
-  if (preview && !featured) text.push(preview); // carte normale : l'aperçu reste dans le texte
+  if (preview && !featured) text.push(preview); // regular card: preview stays in the text column
   if (card.description) text.push(`<p>${tr(card.description)}</p>`);
   if (tags.length) text.push(`<div class="tags">${tags.map((tag) => `<span>${tag}</span>`).join("")}</div>`);
   if (card.warning) text.push(`<p class="warning"><span>⚠ ${tr(card.warning)}</span></p>`);
@@ -285,10 +265,9 @@ const renderTile = ([cls, card], featured = false) => {
 
 const renderCard = (entry, index) => `<li style="--n:${index}">${renderTile(entry)}</li>`;
 
-// --- Filtres (Tous / Solo / Entre amis) -------------------------------------------
+// --- Filters (All / Solo / With friends) ---
 
-// Un bouton par mode présent dans la liste, avec le nombre de jeux concernés.
-// Un mode inconnu (sans traduction "filter.<mode>") est simplement ignoré.
+// One button per mode present, with its game count.
 function renderFilters(list) {
   const modes = ["all", "solo", "multi"].filter((m) => m === "all" || list.some(([, c]) => c.mode === m));
   const count = (m) => (m === "all" ? list.length : list.filter(([, c]) => c.mode === m).length);
@@ -297,10 +276,10 @@ function renderFilters(list) {
         .map((m) => `<button type="button" data-filter="${m}" aria-pressed="${m === filter}">` +
           `${t(`filter.${m}`)} <span class="n">${count(m)}</span></button>`)
         .join("")
-    : ""; // un seul type de jeu : pas besoin de filtre
+    : ""; // a single kind of game: no filter needed
 }
 
-// Le jeu du moment est mis en avant au-dessus de la liste ; la liste montre les autres.
+// The featured game sits above the list; the list shows the others.
 function render() {
   $("eyebrow").textContent = t("hero.eyebrow", { n: entries.length });
   const star = entries.find(([cls]) => cls === featuredClass);
@@ -322,12 +301,11 @@ $("filters").addEventListener("click", (e) => {
   render();
 });
 
-// --- Démarrage ---------------------------------------------------------------------
+// --- Startup ---
 
 async function main() {
   initLangSelect();
-  // cards.json : { "featured": "card_X.json", "cards": [...] }.
-  // L'ancien format (un simple tableau, sans jeu du moment) marche toujours.
+  // cards.json: { "featured": "card_X.json", "cards": [...] } (a plain array still works).
   const list = await fetch("cards.json").then((r) => r.json());
   const files = Array.isArray(list) ? list : list.cards ?? [];
   featuredClass = !Array.isArray(list) && list.featured ? cardClass(list.featured) : null;
@@ -344,7 +322,7 @@ async function main() {
   entries = results.filter(Boolean);
   injectFonts(entries);
   injectStyles(entries);
-  await setLang(initialLang()); // traduit la page et dessine les cartes
+  await setLang(initialLang()); // translates the page and draws the cards
 }
 
 main().catch(async (err) => {

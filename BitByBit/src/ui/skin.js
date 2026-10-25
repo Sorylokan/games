@@ -1,5 +1,4 @@
-// Changement de thème : attribut data-skin sur <html>, couleurs lues dans le CSS pour le canvas,
-// texte des règles accordé, et sélecteur rempli depuis data/skins.js (noms traduits).
+// Theme switching: data-skin on <html>, CSS colors read for the canvas, rules text, and the dropdown.
 import { SKINS, DEFAULT_SKIN } from '../data/skins.js';
 import { STORAGE } from '../config.js';
 import { store } from '../storage.js';
@@ -7,8 +6,7 @@ import { $ } from '../dom.js';
 import { app } from '../game/state.js';
 import { t } from './lang.js';
 
-// (Re)remplit la liste déroulante, groupée par catégorie, dans l'ordre de data/skins.js.
-// Rappelée à chaque changement de langue.
+// Fills the dropdown, grouped like data/skins.js. Called again on language change.
 export function fillSkinSelect() {
   const select = $('skin');
   select.innerHTML = '';
@@ -32,7 +30,7 @@ export function initSkinSelect(onChange) {
   $('skin').addEventListener('change', (e) => onChange(e.target.value));
 }
 
-// Couleurs du thème actif, pour ce que le canvas dessine (cadres, fourmis, encoches…).
+// Active theme colors, for what the canvas draws.
 function readPalette() {
   const cs = getComputedStyle(document.documentElement);
   const pal = {};
@@ -43,7 +41,7 @@ function readPalette() {
 }
 
 export function renderRules() {
-  if (!$('rules')) return; // l'atelier n'affiche pas de règles
+  if (!$('rules')) return; // the editor has no rules text
   $('rules').textContent = `${t('rules.intro')} ${t(`rules.${SKINS[app.skin].crew}`)}`;
 }
 

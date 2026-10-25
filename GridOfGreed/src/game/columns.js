@@ -1,4 +1,4 @@
-// Colonne de 3 cartes visibles identiques : elle part sur la défausse.
+// A column of 3 identical face-up cards goes to the discard pile.
 
 export function removeIfMatch(s, pi, col, ev) {
   const column = s.players[pi].grid[col];

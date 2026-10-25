@@ -1,10 +1,10 @@
-// Décompte de fin de manche.
+// End-of-round scoring.
 import { COLS } from './game-state.js';
 import { removeIfMatch } from './columns.js';
 
 export function scoreRound(s, ev) {
   s.current = null; s.turn = null;
-  // 1) tout le monde retourne ses cartes, 2) les colonnes identiques partent, 3) on compte.
+  // 1) flip every card, 2) remove matching columns, 3) count.
   const raw = s.players.map((p, i) => {
     p.grid.forEach((col) => col && col.forEach((c) => { c.up = true; }));
     for (let c = 0; c < COLS; c++) removeIfMatch(s, i, c, ev);
@@ -14,13 +14,13 @@ export function scoreRound(s, ev) {
   let doubled = false;
   if (s.finisher !== null) {
     const f = raw[s.finisher];
-    // Doublé si score positif ET pas strictement le plus bas (égalité = doublé).
+    // Doubled if positive and not strictly the lowest (a tie counts as not lowest).
     if (f > 0 && raw.some((x, i) => i !== s.finisher && x <= f)) {
       final[s.finisher] = f * 2;
       doubled = true;
     }
   }
-  s.players.forEach((p, i) => { p.total += final[i]; }); // un score négatif fait baisser le total
+  s.players.forEach((p, i) => { p.total += final[i]; }); // a negative score lowers the total
   s.roundScores = { raw, final, doubled, finisher: s.finisher };
   (s.history ??= []).push({ round: s.round, final: final.slice(), doubled, finisher: s.finisher });
   ev.push({ type: 'roundEnd', raw, final, doubled, finisher: s.finisher });

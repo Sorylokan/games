@@ -1,5 +1,5 @@
-// Règles de base sur une grille de pixels (aucune dépendance au navigateur : testable avec node).
-// Une grille g est un tableau N×N de lettres de couleur, ou null pour une case vide.
+// Pixel grid rules (no browser APIs, testable with node).
+// A grid g is an N×N array of color letters, null for an empty cell.
 
 export const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
@@ -8,11 +8,11 @@ export const pick = (arr, rnd = Math.random) => arr[Math.floor(rnd() * arr.lengt
 export const clone = (g) => g.map((r) => r.slice());
 export const remaining = (g) => g.reduce((s, r) => s + r.filter(Boolean).length, 0);
 
-// Transforme une fresque (lignes de lettres) en grille.
+// Mural (rows of letters) → grid.
 export const parseMap = (map) => map.map((row) => [...row].map((ch) => (ch === '.' ? null : ch)));
 
-// Zone libre reliée à l'extérieur. La grille est entourée d'une bordure de 1 case
-// (coordonnées -1 et N), d'où un tableau (N+2)×(N+2).
+// Free cells connected to the outside. The grid has a 1-cell border (coordinates -1 and N),
+// hence an (N+2)×(N+2) array.
 export function outsideMap(g, N) {
   const W = N + 2, seen = new Uint8Array(W * W), stack = [[-1, -1]];
   const free = (r, c) => r < 0 || c < 0 || r >= N || c >= N || !g[r][c];
@@ -31,8 +31,7 @@ export function outsideMap(g, N) {
   return seen;
 }
 
-// Pixels qu'un porteur peut toucher : pleins, avec au moins un voisin dans la zone extérieure.
-// color facultatif : ne garde que cette couleur.
+// Pixels a carrier can reach: filled, with a neighbor in the outside area. Optional color filter.
 export function reachable(g, N, color) {
   const W = N + 2, out = outsideMap(g, N), res = [];
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
@@ -43,8 +42,7 @@ export function reachable(g, N, color) {
   return res;
 }
 
-// Une boîte ouverte ramasse tout ce qu'elle peut atteindre de sa couleur, jusqu'à k pixels.
-// Modifie g et renvoie le nombre de pixels ramassés.
+// An open box picks up reachable pixels of its color, up to k. Mutates g, returns the count.
 export function collect(g, N, color, k) {
   let n = 0;
   while (n < k) {
@@ -59,8 +57,8 @@ export function collect(g, N, color, k) {
   return n;
 }
 
-// Laisse toutes les boîtes de la ligne ramasser jusqu'à ce que plus rien ne bouge.
-// line : [{ color, rem }]. Renvoie les boîtes qui ne sont pas encore pleines.
+// Lets every box on the line collect until nothing moves. line: [{ color, rem }].
+// Returns the boxes that aren't full yet.
 export function settle(g, N, line) {
   let changed = true;
   while (changed) {

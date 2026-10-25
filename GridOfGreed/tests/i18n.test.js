@@ -1,4 +1,4 @@
-// Tests du traducteur (miroir de i18n.test.js de FTM).
+// Translator tests (mirrors Free the Memes).
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createTranslator, getLocale, DEFAULT_LOCALE } from "../src/i18n.js";

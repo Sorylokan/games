@@ -1,5 +1,4 @@
-// Niveau n° i (0, 1, 2…) : quelle fresque, et à quel point c'est serré.
-// Après la dernière fresque, la série recommence avec une difficulté plus haute.
+// Level i (0, 1, 2…): which mural, and how tight. After the last mural, the series restarts harder.
 import { MAPS } from './maps.js';
 
 export function levelAt(i) {
@@ -9,23 +8,21 @@ export function levelAt(i) {
     id: m.id,
     map: m.map,
     round,
-    cap: i < 3 ? 4 : 3,                          // places sur la ligne
-    mix: Math.min(16, 3 + i * 1.5),              // désordre dans les files
-    tries: Math.min(24, 4 + i * 3 + round * 4),  // niveaux générés, on garde le plus dur
+    cap: i < 3 ? 4 : 3,                          // slots on the line
+    mix: Math.min(16, 3 + i * 1.5),              // queue shuffling
+    tries: Math.min(24, 4 + i * 3 + round * 4),  // candidates generated, the hardest is kept
   };
 }
 
-// Pixels par boîte : 4 à 12 jusqu'à 24 de côté. Au-delà, les boîtes grossissent avec la surface,
-// pour garder à peu près le même nombre de boîtes à poser qu'une fresque 24×24 (et un calcul rapide).
+// Pixels per box: 4–12 up to 24×24. Beyond, boxes grow with the area so a big mural needs about
+// as many boxes as a 24×24 one (and generates fast).
 export function packetFor(N) {
   const k = Math.max(1, (N / 24) ** 2);
   return [Math.round(4 * k), Math.round(12 * k)];
 }
 
-// Niveau pour une fresque perso (atelier) : difficulté moyenne. Plus la grille est grande, moins on
-// génère d'essais (tries) et moins on simule de parties au hasard pour les comparer (runs) : le calcul
-// se fait au lancement, il doit rester court même sur téléphone.
-// author : présent pour une fresque de la communauté (data/community.js).
+// Level for a custom or community mural (`author` set for community ones). Medium difficulty.
+// Bigger grids get fewer tries/runs: generation runs on launch and must stay fast on phones.
 export function customLevel({ name, map, author = null }) {
   const N = map.length;
   return {
@@ -36,5 +33,5 @@ export function customLevel({ name, map, author = null }) {
   };
 }
 
-// Vrai quand on vient de finir la dernière fresque de la série.
+// True after the last mural of the series.
 export const isEndOfSeries = (i) => (i + 1) % MAPS.length === 0;

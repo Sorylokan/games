@@ -1,4 +1,4 @@
-// Sessions hôte / client (rôle identique à game-session.js de FTM).
+// Host / client sessions (same role as in Free the Memes).
 import { HostAuthority } from "./host-authority.js";
 import { MESSAGE_TYPES } from "./messages.js";
 
@@ -21,7 +21,7 @@ export const createHostSession = (transport, options = {}) => {
   authority.releasePeer(peerId);
   });
 
-  // Annonce le salon aux pairs déjà connectés.
+  // Announce the lobby to peers already connected.
   authority.broadcast();
 
   return {

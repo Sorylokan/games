@@ -11,7 +11,7 @@ Ce fichier fixe les contraintes pour toute personne ou IA qui modifie le code. E
 - Même façon de travailler que Free the Memes : même arborescence, mêmes noms de fichiers quand le rôle est le même.
 - JavaScript natif en modules ES. **Aucun bundler, aucun framework.** Hébergement sur GitHub Pages.
 - Tests avec le lanceur intégré de Node : `npm test` (= `node --test`).
-- Commentaires et messages d'erreur en français.
+- Commentaires du code en anglais, courts et directs (le dépôt est public). Messages d'erreur du moteur : en français.
 - Une seule responsabilité par fichier, un fichier de test par module dans `tests/` (à plat).
 
 ## 2. Arborescence

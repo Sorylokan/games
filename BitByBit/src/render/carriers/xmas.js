@@ -1,6 +1,6 @@
-// Noël : lutins, et de temps en temps un bonhomme de neige.
-// Chaque fonction dessine l'espèce debout, centrée en (0, 0), à l'échelle « 30 unités = 1 case ».
-// Paramètres : ph (phase d'animation), flip (1 ou -1 selon la direction), carry (couleur du pixel porté ou null).
+// Christmas: elves, and now and then a snowman.
+// Each function draws the species standing, centered on (0, 0), 30 units = 1 cell.
+// ph: animation phase, flip: 1 or -1 (direction), carry: carried pixel color or null.
 import { ctx, tile, dot, rr } from '../canvas.js';
 
 export function drawElf(ph, flip, carry) {

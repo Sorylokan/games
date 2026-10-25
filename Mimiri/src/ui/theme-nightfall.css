@@ -1,8 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700&display=swap");
 
-/* THEME NIGHTFALL : nuit profonde, guirlande d'ampoules colorées à éteindre.
-   Activé par <link> après styles.css et class="theme-nightfall" sur <body>.
-   Case allumée = lueur chaude sombre, case éteinte = bleu nuit. */
+/* Nightfall theme: deep night, stars to switch off.
+   Lit cell = dark warm glow, off cell = night blue. */
 body.theme-nightfall {
   --bg: #0e1226; --card: #1a2038; --line: #2c3352; --txt: #eef0fa; --mut: #9aa0c4;
   --accent: #f4d47c; --accent-ink: #0e1226;
@@ -11,7 +10,7 @@ body.theme-nightfall {
   --display: Fredoka, Nunito, "Trebuchet MS", system-ui, sans-serif;
 }
 
-/* Décor : clair de lune en haut à droite, ciel profond en bas, étoiles en filigrane. */
+/* Decoration: moonlight top right, deep sky below, faint stars. */
 body.theme-nightfall {
   background-image:
     radial-gradient(44rem 30rem at 88% 4%, rgba(244, 212, 124, .14), transparent 60%),

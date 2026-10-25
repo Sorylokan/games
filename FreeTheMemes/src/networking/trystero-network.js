@@ -63,8 +63,7 @@ export class TrysteroNetwork extends NetworkAdapter {
     this.sendPublic(request);
   }
 
-  // seatToken : identifiant local stable par salle, pour reconnaitre un joueur
-  // qui revient avec un nouveau peerId apres une coupure ou un rechargement.
+  // seatToken: stable local id per room, to recognize a player coming back with a new peerId.
   sendHello(name, seatToken) {
     this.sendPublic({ type: MESSAGE_TYPES.PLAYER_HELLO, name, seatToken });
   }

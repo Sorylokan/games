@@ -1,9 +1,8 @@
-# Formulaire « Proposer une fresque » pour Bit by Bit.
-# L'atelier (BitByBit/editor/) ouvre ce formulaire pré-rempli : ?template=fresque.yml&title=…&code=…
-# Une proposition acceptée s'ajoute dans BitByBit/src/data/community.js (code + pseudo).
-name: "Bit by Bit : proposer une fresque / suggest a mural"
-description: "Propose ta fresque pour la série « Fresques de la communauté » / Suggest your mural for the community series."
-title: "[Fresque] "
+# "Suggest a mural" form for Bit by Bit. The editor (BitByBit/editor/) opens it prefilled:
+# ?template=fresque.yml&title=…&code=…  Accepted murals go to BitByBit/src/data/community.js.
+name: "Bit by Bit: suggest a mural / proposer une fresque"
+description: "Suggest your mural for the community series / Propose ta fresque pour les fresques de la communauté."
+title: "[Mural] "
 labels: ["mural"]
 body:
   - type: markdown

@@ -1,21 +1,17 @@
-// Dessin du chat partagé par les thèmes « chats » : tête ronde, grandes oreilles,
-// petites pattes, joues roses. Chaque thème fournit seulement le visage.
+// Cat drawing shared by the cat themes. Each theme only provides the face.
 
 export const FURS = ["#F29F58", "#9aa3c7", "#E8C9A0", "#d9788f"];
 export const EYE = "#2b2236";
 export const NOSE = `<ellipse cx="50" cy="65" rx="3.8" ry="2.8" fill="#e8708a"/>`;
 
-// Grands yeux brillants (chat réveillé)
+// Big shiny eyes (awake cat)
 export const BIG_EYES = `
   <ellipse cx="32" cy="56" rx="7.5" ry="9" fill="${EYE}"/><ellipse cx="68" cy="56" rx="7.5" ry="9" fill="${EYE}"/>
   <circle cx="34.8" cy="52.5" r="3.2" fill="#fff"/><circle cx="29.5" cy="60" r="1.6" fill="#fff"/>
   <circle cx="70.8" cy="52.5" r="3.2" fill="#fff"/><circle cx="65.5" cy="60" r="1.6" fill="#fff"/>`;
 
-// idx   : position de la case (varie le pelage)
-// face  : yeux, nez, bouche... (SVG) fournis par le thème
-// blush : opacité des joues roses
-// opts.ears : "up" (grandes oreilles dressées) ou "down" (oreilles plus discrètes)
-// opts.wig  : le chat se balance doucement
+// idx: cell index (varies the fur), face: SVG from the theme, blush: cheek opacity,
+// opts.ears: "up" or "down" (smaller ears), opts.wig: gentle sway
 export function cat(idx, face, blush, opts = {}) {
   const fur = FURS[idx % FURS.length];
   const ears = opts.ears === "up"

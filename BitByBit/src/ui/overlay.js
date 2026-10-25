@@ -1,8 +1,8 @@
-// Fenêtre posée sur le plateau en fin de fresque (gagné ou coincé).
+// Window over the board (end of mural, community list).
 import { $ } from '../dom.js';
 import { renderUI } from './panel.js';
 
-// actions : [{ label, fn, ghost? }] ; les valeurs false sont ignorées (boutons optionnels).
+// actions: [{ label, fn, ghost? }]; falsy entries are skipped (optional buttons).
 export function showOverlay(title, text, actions) {
   const ov = $('overlay');
   ov.innerHTML = '';
@@ -25,7 +25,7 @@ export function showOverlay(title, text, actions) {
   panel.append(h, p, row);
   ov.append(panel);
   ov.hidden = false;
-  renderUI(); // désactive les files pendant que la fenêtre est ouverte
+  renderUI(); // refresh queue buttons (disabled once the game is over)
 }
 
 export function hideOverlay() {

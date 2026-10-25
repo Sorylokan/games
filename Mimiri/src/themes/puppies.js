@@ -1,6 +1,5 @@
-// Thème « Chiots câlins » : on joue avec les chiots pour les réveiller tous.
-// render(on, idx) : on = 1 = chiot endormi (à réveiller), on = 0 = chiot réveillé (gagné).
-// Les couleurs vivent dans theme-puppies.css ; ici, uniquement les textes et le dessin.
+// "Puppies" theme: play with the puppies to wake them all. on = sleeping (to fix), off = awake.
+// Colors live in theme-puppies.css; texts and drawing here.
 import { dog, BIG_EYES, EYE, NOSE } from "./dog.js";
 
 export default {
@@ -12,7 +11,7 @@ export default {
   ariaOn: "Chiot endormi",
   ariaOff: "Chiot réveillé",
 
-  // Traductions (les champs ci-dessus = français, référence utilisée par les tests).
+  // Translations (the fields above are French, the reference checked by the tests).
   texts: {
     en: {
       title: "Cuddly Puppies",
@@ -27,7 +26,7 @@ export default {
 
   render(on, idx) {
     if (!on) {
-      // Réveillé : grands yeux, gueule ouverte, langue qui pend, oreilles soulevées.
+      // Awake: big eyes, open mouth, tongue out, ears up.
       return dog(idx, `${BIG_EYES}${NOSE}
         <path d="M50 67 L50 71" stroke="${EYE}" stroke-width="2.2" stroke-linecap="round"/>
         <path d="M41 71 Q50 80 59 71 Q50 87 41 71 Z" fill="#7a2f3d"/>
@@ -35,7 +34,7 @@ export default {
         <path d="M50 76 L50 83" stroke="#e0607f" stroke-width="1.4" stroke-linecap="round"/>`,
         0.6, { ears: "up", wig: true });
     }
-    // Endormi : yeux fermés, petite bouche, oreilles qui tombent, « z » qui flottent.
+    // Asleep: closed eyes, small mouth, droopy ears, floating "z"s.
     return dog(idx, `
       <path d="M25 50 Q33 58 41 50" fill="none" stroke="${EYE}" stroke-width="3.2" stroke-linecap="round"/>
       <path d="M59 50 Q67 58 75 50" fill="none" stroke="${EYE}" stroke-width="3.2" stroke-linecap="round"/>

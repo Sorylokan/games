@@ -1,9 +1,7 @@
-// Autorité de l'hôte (rôle identique à host-authority.js de FTM, adapté au moteur GoG).
-// Différences clés avec FTM :
-// - pas d'état de jeu pré-créé : avant startMatch(), on gère un salon (roster) ;
-// - dispatch() du moteur valide déjà tour/phase/actions, inutile de re-filtrer ici ;
-// - pas de couple public/privé : chaque joueur reçoit sa vue masquée viewFor()
-//   (c'est game/view.js qui fait office de serialization.js chez FTM).
+// Host authority (same role as in Free the Memes). Differences:
+// - no game state before startMatch(): only a lobby roster;
+// - dispatch() already validates turn, phase and action;
+// - no public/private split: each player gets their own masked view (game/view.js).
 import { createGame, startNextRound, rematch } from "../game/setup.js";
 import { dispatch } from "../game/rules-engine.js";
 import { viewFor } from "../game/view.js";
@@ -16,16 +14,16 @@ const rejected = (error, message) => ({
 });
 
 export class HostAuthority {
-  #state = null; // null tant que la partie n'a pas démarré (mode salon)
+  #state = null; // null until the game starts (lobby)
   #transport;
   #random;
-  #roster; // [{ id, name }], l'hôte est toujours roster[0]
+  #roster; // [{ id, name }], the host is always roster[0]
   #peerPlayers = new Map(); // peerId -> playerId
-  #seatTokens = new Map(); // seatToken -> playerId : survit aux coupures de connexion
+  #seatTokens = new Map(); // seatToken -> playerId, survives disconnections
   #onStateChange;
   #onLobby;
   #nextSeat = 2;
-  #settings = { maxPlayers: 4, targetScore: 100 }; // réglages du salon, modifiables par l'hôte
+  #settings = { maxPlayers: 4, targetScore: 100 }; // lobby settings (host only)
 
   constructor({ transport, random = Math.random, hostName = "Hôte", onStateChange = () => {}, onLobby = () => {} }) {
   this.#transport = transport;
@@ -53,8 +51,8 @@ export class HostAuthority {
   };
   }
 
-  // Diffuse le salon (avant départ) ou une vue masquée par joueur (en partie).
-  // events : derniers événements du moteur, pour le journal et les animations.
+  // Broadcasts the lobby (before the start) or one masked view per player (in game).
+  // events: latest engine events, for sounds and animations.
   #broadcast(events = []) {
   if (!this.#state) {
     const lobby = this.#lobbyInfo();
@@ -69,8 +67,7 @@ export class HostAuthority {
     events,
     });
   }
-  // L'hôte reçoit aussi sa vue masquée : un seul format pour l'UI, et les
-  // cartes cachées des adversaires ne traînent pas dans la console.
+  // The host gets a masked view too: one format for the UI, no hidden cards in the console.
   this.#onStateChange(viewFor(this.#state, this.hostId), events);
   }
 
@@ -88,8 +85,7 @@ export class HostAuthority {
   const existing = this.#peerPlayers.get(peerId);
   if (existing) return existing;
 
-  // Reconnexion : un jeton de siège connu reprend sa place, peu importe le
-  // nouveau peerId attribué par la couche WebRTC (même pleine manche).
+  // Reconnection: a known seat token takes its seat back, whatever the new peerId.
   const returningId = seatToken ? this.#seatTokens.get(seatToken) : null;
   if (returningId && ![...this.#peerPlayers.values()].includes(returningId)) {
     const returning = this.#roster.find((p) => p.id === returningId);
@@ -114,8 +110,7 @@ export class HostAuthority {
   return player.id;
   }
 
-  // Le pair part (coupure, onglet fermé). Avant le départ on le retire du salon
-  // et on oublie son jeton ; en partie on garde les deux pour qu'il revienne.
+  // A peer left. In the lobby: remove it and forget its token. In game: keep both so it can come back.
   releasePeer(peerId) {
   const playerId = this.#peerPlayers.get(peerId);
   this.#peerPlayers.delete(peerId);
@@ -128,8 +123,7 @@ export class HostAuthority {
   }
   }
 
-  // Réglages du salon (avant le départ seulement). Le nombre de places ne peut pas
-  // descendre sous le nombre de joueurs déjà présents.
+  // Lobby settings (before the start only). Seats can't go below the players already there.
   setSettings({ maxPlayers, targetScore } = {}) {
   if (this.#state) return;
   if (Number.isInteger(maxPlayers) && maxPlayers <= MAX_PLAYERS &&
@@ -163,7 +157,7 @@ export class HostAuthority {
   }
 
   const action = request.action ?? {};
-  // Seul l'hôte décide de lancer la manche suivante ou la revanche (évite les doublons).
+  // Only the host starts the next round or a rematch.
   if (action.type === "startNextRound" || action.type === "rematch") {
     if (request.playerId !== this.hostId) return rejected("RESERVE_A_L_HOTE", "Seul l'hôte relance la partie.");
     const next = action.type === "rematch"
@@ -175,8 +169,7 @@ export class HostAuthority {
     return { ok: true, state: this.#state };
   }
 
-  // dispatch valide tout : phase, tour, action inconnue. Une action refusée
-  // renvoie { ok:false } sans exception et sans diffusion.
+  // dispatch validates everything; a refused action returns { ok: false } and isn't broadcast.
   const result = dispatch(this.#state, request.playerId, action, this.#random);
   if (!result.ok) return rejected("ACTION_REFUSEE", result.error);
 

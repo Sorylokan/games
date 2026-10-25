@@ -44,7 +44,7 @@ export class HostAuthority {
   #transport;
   #random;
   #peerPlayers = new Map();
-  #seatTokens = new Map();   // seatToken -> playerId : survit aux coupures de connexion
+  #seatTokens = new Map();   // seatToken -> playerId, survives disconnections
   #seatLimit = MIN_SEATS;
   #onStateChange;
 
@@ -74,14 +74,14 @@ export class HostAuthority {
     return this.#seatLimit;
   }
 
-  // Sièges occupés : l'hôte (premier siège) + les pairs connectés, dans l'ordre des sièges.
+  // Occupied seats: the host (first seat) + connected peers, in seat order.
   #occupiedIds() {
     const taken = new Set(this.#peerPlayers.values());
     taken.add(this.#state.turnOrder[0]);
     return Object.keys(this.#state.players).filter((id) => taken.has(id));
   }
 
-  // Place dans l'état public l'info du salon (places max + sièges occupés).
+  // Puts lobby info (seat limit, occupied seats) in the public state.
   #syncLobby() {
     if (this.#state.phase !== GAME_PHASES.SETUP) return;
     this.#state = {
@@ -102,7 +102,7 @@ export class HostAuthority {
     return null;
   }
 
-  // Distribue les personnages avec les joueurs réellement présents, puis démarre.
+  // Deals characters to the players actually present, then starts.
   startMatch() {
     if (this.#state.phase !== GAME_PHASES.SETUP) {
       return { ok: false, state: this.#state, error: "GAME_ALREADY_STARTED", message: "The game has already started." };
@@ -123,8 +123,7 @@ export class HostAuthority {
     const existingPlayerId = this.#peerPlayers.get(peerId);
     if (existingPlayerId) return existingPlayerId;
 
-    // Reconnexion : un jeton de siege connu reprend son ancienne place, peu
-    // importe le nouveau peerId attribue par la couche WebRTC.
+    // Reconnection: a known seat token takes its seat back, whatever the new peerId.
     const returningPlayerId = seatToken ? this.#seatTokens.get(seatToken) : null;
     const returningPlayer = returningPlayerId ? this.#state.players[returningPlayerId] : null;
     const returningAssigned = returningPlayerId && [...this.#peerPlayers.values()].includes(returningPlayerId);
@@ -174,8 +173,7 @@ export class HostAuthority {
     return player.id;
   }
 
-  // Le pair part (coupure, onglet ferme) : on oublie le lien peerId -> joueur
-  // pour qu'il puisse le reprendre avec son jeton, mais on garde #seatTokens.
+  // A peer left: forget peerId -> player so the seat token can reclaim it (#seatTokens is kept).
   releasePeer(peerId) {
     this.#peerPlayers.delete(peerId);
     if (this.#state.phase === GAME_PHASES.SETUP) {
@@ -227,7 +225,7 @@ export class HostAuthority {
 
   #finishAttack(result, playerId) {
     if (!result.ok || result.pendingAction || result.state.pendingActions.length > 0) return result;
-    // Si l'attaque a terminé la partie (ou changé de phase), il n'y a plus rien à clore.
+    // Nothing to close if the attack ended the game or changed the phase.
     if (result.state.gameOver || result.state.phase !== GAME_PHASES.ATTACK) return result;
     return completeAttack(result.state, playerId);
   }
@@ -247,8 +245,7 @@ export class HostAuthority {
     return completeAttack(result.state, result.state.currentPlayerId);
   }
 
-  // Le joueur actif est mort en cours de tour : ses phases suivantes sont impossibles
-  // (completeAreaAction refuse un joueur mort). On passe directement au tour suivant.
+  // The active player died mid-turn: their next phases can't run, skip to the next turn.
   #skipDeadTurn(result) {
     if (!result.ok || result.state.gameOver || result.state.pendingActions.length > 0) return result;
     const s = result.state;

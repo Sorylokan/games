@@ -9,10 +9,8 @@ const publicPlayer = (player) => ({
   ...(player.revealed ? { characterId: player.characterId, faction: player.faction, hp: player.hp, maxHp: player.maxHp } : {})
 });
 
-// Actions en attente dont le simple TYPE trahit le personnage (ou la faction) de leur
-// propriétaire : seul un Doge peut esquiver, seul un Memer se voit proposer la lance...
-// Tant que le propriétaire n'est pas révélé, les autres joueurs voient seulement
-// « SECRET_REACTION » : ils savent qu'il réfléchit, pas à quoi.
+// Pending actions whose TYPE alone gives away the owner's character or faction (only Doge can
+// dodge, only a Memer gets the lance…). Until the owner is revealed, others only see SECRET_REACTION.
 const SECRET_PENDING_TYPES = new Set([
   "DOGE_ATTACK_REACTION",
   "LIFE_STONKS_REACTION",
@@ -50,13 +48,12 @@ const publicPendingAction = (state, action) => {
     return { type: SECRET_REACTION, playerId: action.playerId };
   }
   const serialized = serializePendingAction(action);
-  // Une Notification se lit en secret : seul celui qui la donne connaît la carte.
+  // Notifications are read in secret: only the giver knows the card.
   if (action.type === "GIVE_NOTIFICATION") delete serialized.card;
   return serialized;
 };
 
-// Même logique pour le journal : on sait qu'une Notification a été piochée, pas laquelle.
-// HP_SET contient la valeur absolue de PV : on ne la diffuse pas.
+// Same for the log: a Notification was drawn, not which one. HP_SET holds an absolute HP value: not shared.
 const publicEvent = (event) => {
   if (event.type === "HP_SET") return { type: event.type, playerId: event.playerId };
   if ((event.type === "CARD_DRAWN" || event.type === "CARD_DISCARDED") && event.deckId === "notifications") {
@@ -97,8 +94,8 @@ export const serializePrivateState = (state, playerId) => {
     maxHp: player.maxHp,
     abilityState: { ...player.abilityState },
     revealedCharacters: [...(state.privateRevelations[playerId] ?? [])],
-    // Version complète de SES actions en attente (masquées dans l'état public),
-    // alignée sur pendingActions : null pour celles des autres joueurs.
+    // Full version of this player's own pending actions (masked in the public state),
+    // aligned with pendingActions: null for other players'.
     pendingActions: state.pendingActions.map((action) => (
       action.playerId === playerId ? serializePendingAction(action) : null
     ))

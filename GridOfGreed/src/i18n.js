@@ -1,4 +1,4 @@
-// Traduction (copie de src/i18n.js de FTM : module générique, rien à adapter).
+// Translator (same generic module as Free the Memes).
 const DEFAULT_LOCALE = "fr";
 
 const replaceVariables = (text, variables) => text.replace(

@@ -1,5 +1,5 @@
-// Point d'entrée des règles : valide et applique chaque action.
-// Actions : initialReveal | drawPile | drawDiscard | swap | discardFlip
+// Rules entry point: validates and applies each action.
+// Actions: initialReveal | drawPile | drawDiscard | swap | discardFlip
 import { shuffle } from '../data/deck.js';
 import { RuleError, fail, slotOf, hiddenSlots, existingSlots } from './game-state.js';
 import { initialReveal } from './setup.js';
@@ -47,14 +47,14 @@ function apply(s, pid, a, rng, ev) {
     }
     case 'swap': {
       if (t.step !== 'place') fail('Pioche d\'abord');
-      // Vérifie d'abord si la colonne actuelle est identique : elle doit partir.
+      // An already-matching column must go first.
       removeIfMatch(s, pi, a.col, ev);
       const old = slotOf(me, a);
-      s.discard.push(old.v); // la carte remplacée d'abord...
+      s.discard.push(old.v); // the replaced card first…
       me.grid[a.col][a.row] = { v: t.drawn, up: true };
       ev.push({ type: 'swap', player: pi, col: a.col, row: a.row,
         placed: t.drawn, replaced: old.v, wasHidden: !old.up });
-      removeIfMatch(s, pi, a.col, ev); // ...puis les 3 cartes identiques
+      removeIfMatch(s, pi, a.col, ev); // …then the 3 matching cards
       return endTurn(s, pi, ev);
     }
     case 'discardFlip': {
@@ -74,7 +74,7 @@ function apply(s, pid, a, rng, ev) {
   }
 }
 
-// Pioche vide : on remélange la défausse, sauf sa carte du dessus.
+// Empty draw pile: reshuffle the discard pile, except its top card.
 function recycle(s, rng, ev) {
   const top = s.discard.pop();
   s.draw = shuffle(s.discard, rng);
@@ -82,7 +82,7 @@ function recycle(s, rng, ev) {
   ev.push({ type: 'recycle', count: s.draw.length });
 }
 
-// Actions possibles pour le joueur dont c'est le tour.
+// Legal actions for the current player.
 export function legalActions(s, pid) {
   if (s.phase !== 'playing') return [];
   const pi = s.players.findIndex((p) => p.id === pid);

@@ -12,5 +12,5 @@ test("room links carry the room ID", () => {
 
   assert.equal(link, "https://example.test/games/FreeTheMemes/?room=ABCD-EF23");
   assert.equal(getRoomIdFromLocation("?room=ABCD-EF23"), "ABCD-EF23");
-  assert.equal(getRoomIdFromLocation("?room=ftm-demo"), null); // code mal formé : ignoré
+  assert.equal(getRoomIdFromLocation("?room=ftm-demo"), null); // malformed code: ignored
 });

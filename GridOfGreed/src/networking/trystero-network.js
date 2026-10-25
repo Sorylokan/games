@@ -1,5 +1,4 @@
-// Transport Trystero/WebRTC (copie de trystero-network.js de FTM, appId propre).
-// Chargé depuis le CDN esm.sh : site statique GitHub Pages, aucun bundler.
+// Trystero/WebRTC transport (same as Free the Memes, own appId), loaded from the esm.sh CDN.
 import { joinRoom } from "https://esm.sh/trystero@0.25.4/nostr";
 import { NetworkAdapter } from "./network-adapter.js";
 import { MESSAGE_TYPES } from "./messages.js";
@@ -65,8 +64,7 @@ export class TrysteroNetwork extends NetworkAdapter {
   this.sendPublic(request);
   }
 
-  // seatToken : identifiant local stable par salle, pour reconnaître un joueur
-  // qui revient avec un nouveau peerId après une coupure ou un rechargement.
+  // seatToken: stable local id per room, to recognize a player coming back with a new peerId.
   sendHello(name, seatToken) {
   this.sendPublic({ type: MESSAGE_TYPES.PLAYER_HELLO, name, seatToken });
   }

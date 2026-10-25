@@ -21,18 +21,16 @@ import { tick, thunk, click, ping, bonk, hit, heal, death, tada, isMuted, toggle
 const diceHost = document.createElement("div");
 const dice = new DiceTray(diceHost, [6, 4], { cell: 38, onTick: tick, onSettle: thunk });
 let seenEvents = null;
-// Evenements de des recus mais pas encore montres : l'odometre tourne, le
-// journal et le plateau n'affichent la consequence qu'a l'arret des des.
+// Dice events received but not shown yet: the log and board wait until the dice stop.
 const pendingDice = new Set();
 const diceRolling = () => pendingDice.size > 0;
  
-// Animation "impact" : ajoute la classe anim-shake au body, la retire apres.
-// Defaut : les zones vibrent ; theme MSN : wizz global de l'ecran (cf CSS).
+// "Impact" animation: toggles anim-shake on body (areas shake; the MSN theme shakes the whole screen).
 const ANIM_MS = 550;
 let animTimer = null;
 const playShake = () => {
   document.body.classList.remove("anim-shake");
-  void document.body.offsetWidth;              // relance l'animation meme si deja active
+  void document.body.offsetWidth;              // restart even if already running
   document.body.classList.add("anim-shake");
   clearTimeout(animTimer);
   animTimer = setTimeout(() => document.body.classList.remove("anim-shake"), ANIM_MS);
@@ -44,8 +42,7 @@ const syncDice = () => {
   const fresh = real.slice(seenEvents);
   seenEvents = real.length;
 
-  // Sons d'evenements (degats, soin, mort, victoire) : joues pour chaque
-  // evenement frais. try/catch : un AudioContext non pret ne doit pas casser le render.
+  // Sounds for fresh events (damage, heal, death, victory). An unready AudioContext must not break rendering.
   for (const e of fresh) {
     try {
       if (e.type === "DAMAGE_DEALT") { hit(e.amount); playShake(); }
@@ -55,13 +52,11 @@ const syncDice = () => {
     } catch (err) { warnLog("sound error", err); }
   }
 
-  // Ne pas nommer cette variable "hit" : elle masquerait le son hit() importé,
-  // et la boucle ci-dessus planterait (variable pas encore initialisée).
+  // Don't name this "hit": it would shadow the imported hit() sound and crash the loop above.
   const diceEvent = fresh.findLast((e) => e.type === "ATTACK_RESOLVED" || e.type === "AREA_ATTACK_RESOLVED" || e.type === "MOVEMENT_ROLLED" || e.type === "ABILITY_ROLLED");
   if (!diceEvent) return;
   const diceIndex = real.indexOf(diceEvent);
-  // Retenir le jet ET ses consequences (deplacement, degats...) jusqu'a
-  // l'arret de l'odometre, sinon le journal devoile le resultat trop tot.
+  // Hold the roll AND its consequences until the dice stop, so the log doesn't spoil the result.
   const held = real.slice(diceIndex);
   held.forEach((e) => pendingDice.add(e));
   let rolling;
@@ -73,14 +68,11 @@ const syncDice = () => {
   rolling.then(() => { held.forEach((e) => pendingDice.delete(e)); fillLog(); revealMovement(held); });
 };
 
-// Journal de DEBUG : console de l'inspecteur uniquement, jamais injecte dans
-// state.events (sinon il polluerait l'historique de partie ET serait diffuse
-// aux autres joueurs via serializePublicState).
+// Debug log: browser console only, never in state.events (it would be broadcast to everyone).
 const debugLog = (...args) => console.debug("[FTM]", ...args);
 const warnLog = (...args) => console.warn("[FTM]", ...args);
 
-// Animation FLIP : quand les des s'arretent, on fait glisser les pions de
-// leur ancienne zone vers la nouvelle au lieu de les teleporter.
+// FLIP animation: when the dice stop, pieces slide to their new Area instead of jumping.
 const revealMovement = (held) => {
   const movedIds = new Set(held.filter((e) => e.type === "PLAYER_MOVED").map((e) => e.playerId));
   const before = new Map();
@@ -120,7 +112,7 @@ let roomPlayers = [];
 let isHost = false;
 let hostSession;
 let clientSession;
-// Pseudo par defaut au premier lancement, localStorage des qu'il est choisi ou edite (handleNameChange).
+// Random default nickname on first launch, then saved in localStorage.
 const DEFAULT_NAMES = [
   "Pepe", "Nyan Cat", "Trollface", "Distracted BF", "Shrek",
   "Gigachad", "Keyboard Cat", "Grumpy Cat", "Bad Luck Brian", "Hide the Pain",
@@ -133,11 +125,10 @@ localStorage.setItem("ftm-player-name", localPlayerName);
 let assignedPlayerId = "player-1";
 let roomRole = roomId ? "client" : "local";
 let privateState = null;
-let publicPendingActions = []; // actions en attente telles que diffusées à tous (réactions secrètes masquées)
+let publicPendingActions = []; // pending actions as broadcast to everyone (secret reactions masked)
 let wasMyTurn = false;
 
-// Jeton de siege local : stable par salle et par navigateur, jamais secret.
-// L'hote s'en sert pour rendre son siege a un joueur qui se reconnecte.
+// Local seat token, stable per room and browser (not secret): lets the host give a seat back on reconnect.
 const loadSeatToken = (code) => {
   const key = `ftm-seat:${code}`;
   let token = null;
@@ -149,9 +140,8 @@ const loadSeatToken = (code) => {
   return token;
 };
 
-// Fusionne ce que seul CE joueur a le droit de savoir dans sa copie locale de l'état.
-// Les actions en attente repartent toujours de la version publique, puis on y remet la
-// version complète des NÔTRES : une vue privée en retard est corrigée au message suivant.
+// Merges what only THIS player may know into the local state. Pending actions always start from
+// the public version, then ours are restored; a stale private view is fixed by the next message.
 const withPrivate = (s) => {
   const me = privateState && s?.players?.[privateState.playerId];
   if (!me) return s;
@@ -204,7 +194,7 @@ termBar.addEventListener("pointerdown", (e) => {
   termBar.addEventListener("pointerup", up);
 });
 const fillLog = () => {
-  // Historique de partie : uniquement les evenements de jeu (le debug vit dans la console).
+  // Game log: game events only (debug output goes to the console).
   termBody.innerHTML = state.events.slice(-80)
     .filter((e) => !pendingDice.has(e))
     .map((e) => `<div>${describeEvent(e)}</div>`).join("");
@@ -224,18 +214,16 @@ const getEquipmentLabel = (cardId) => {
 };
 const T = (key, vars) => translate(key, vars);
 
-// Messages d'état du salon : stockés comme clé + variables, donc retraduits au changement de langue.
+// Lobby notices are stored as key + vars so they retranslate on language change.
 let roomNotice = null;
 const setNotice = (key, vars = {}) => { roomNotice = { key, vars }; };
-let joinCodeDraft = "";   // code tapé dans l'accueil, conservé entre deux rendus
-// Code/lien masqués par défaut dans le salon (stream, capture d'écran) : le bouton œil
-// les révèle, les boutons Copier copient toujours les vraies valeurs (comme GridOfGreed).
+let joinCodeDraft = "";   // code typed on the home screen, kept across renders
+// Room code/link masked by default (streams, screenshots); the eye button reveals them, Copy always copies the real value.
 const ROOM_CODE_MASK = "••••-••••";
 let roomCodeShown = false;
 
-// ---- Thème ----
-// Pour ajouter un thème plus tard : une ligne ici + son fichier CSS (theme-<id>.css).
-// Le socle styles.css est neutre ; chaque thème fournit l'apparence complète.
+// ---- Theme ----
+// A theme = a line here + its theme-<id>.css (styles.css is neutral, the theme provides the whole look).
 const THEMES = [
   { id: "persona5", label: "Persona 5", css: "./src/ui/theme-persona5.css" },
   { id: "synthwave", label: "Synthwave", css: "./src/ui/theme-synthwave.css" },
@@ -252,11 +240,11 @@ const applyTheme = (id) => {
   const def = THEMES.find((t) => t.id === id) ?? THEMES[0];
   theme = def.id;
   localStorage.setItem("ftm-theme", theme);
-  // la classe va sur <body> (pas sur #app) : le fond et la police du body doivent voir les variables du thème
+  // the class goes on <body> so its background and font see the theme variables
   document.body.classList.remove(...[...document.body.classList].filter((c) => c.startsWith("theme-")));
   document.body.classList.add(`theme-${theme}`);
   if (def.css) themeLink.href = def.css; else themeLink.removeAttribute("href");
-  setSoundTheme(theme);   // adapte les sons synthétisés au thème actif
+  setSoundTheme(theme);   // match synth sounds to the theme
 };
 applyTheme(theme);
 
@@ -271,7 +259,7 @@ const loadMessages = async (code) => {
   englishMessages ??= await loadLocale("en");
   const messages = { en: englishMessages };
   if (code !== "en") {
-    try { messages[code] = await loadLocale(code); } catch { /* fichier absent : repli sur l'anglais */ }
+    try { messages[code] = await loadLocale(code); } catch { /* missing file: English fallback */ }
   }
   translate = createTranslator({ locale: code, messages });
 };
@@ -287,8 +275,7 @@ const renderLocaleSelect = () => `<select class="locale-select" data-locale aria
   SUPPORTED_LOCALES.map((l) => `<option value="${l.code}" ${l.code === locale ? "selected" : ""}>${l.label}</option>`).join("")
 }</select>`;
 
-// Retour au catalogue de tous les jeux (dossier parent), en tête de chaque barre du haut.
-// Classe wordmark en plus : la flèche prend la couleur du logo, que chaque thème redéfinit.
+// Back-to-catalog link at the start of every top bar. Also a .wordmark so it takes the logo color of each theme.
 const renderBackLink = () => `<a class="wordmark back-link" href="../" title="${escHtml(T("ui.allGames"))}" aria-label="${escHtml(T("ui.allGames"))}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>`;
 
 const renderThemeSelect = () => `<select class="locale-select" data-theme-select aria-label="${escHtml(T("ui.theme"))}">${
@@ -299,7 +286,7 @@ app.addEventListener("change", (e) => {
   const select = e.target.closest?.("[data-locale]");
   if (select) setLocale(select.value);
   const themeSelect = e.target.closest?.("[data-theme-select]");
-  if (themeSelect) applyTheme(themeSelect.value);   // pas besoin de render() : seul le CSS change
+  if (themeSelect) applyTheme(themeSelect.value);   // no render() needed: only CSS changes
 });
 const esc = (s) => String(s).replaceAll('"', "&quot;");
 const AREA_BY_ID = Object.fromEntries(Object.values(AREAS).map((area) => [area.id, area]));
@@ -330,7 +317,7 @@ const pieceIndexFor = (playerId) => {
   return index < 0 ? 0 : index % 8;
 };
 
-// attackableIds: set des cibles valides en phase d'attaque -> le pion devient cliquable.
+// attackableIds: valid targets in the attack phase -> the piece becomes clickable.
 const renderPieceToken = (player, active, attackableIds = null) => {
   const attackable = attackableIds?.has(player.id);
   return `
@@ -403,8 +390,7 @@ const describeEvent = (event) => {
   return `${event.type.replaceAll("_", " ")}${event.playerId ? ` - ${playerLabel(event.playerId)}` : ""}.`;
 };
 
-// Toast d'erreur en jeu : affiche dans le dock quand une action est refusee,
-// sinon un refus silencieux laisse croire que le bouton est casse.
+// Error toast in the dock when an action is refused (a silent refusal looks like a broken button).
 let gameNotice = null;
 let gameNoticeTimer = null;
 const setGameNotice = (text) => {
@@ -534,7 +520,7 @@ const handleCreateRoom = () => {
   isHost = true;
   roomRole = "host";
   roomId = createRoomId();
-  roomCodeShown = false;   // chaque nouveau salon repart masqué
+  roomCodeShown = false;   // every new room starts masked
   roomPlayers = [];
   roomStatus = "connecting"; setNotice("lobby.roomCreated", { code: roomId });
   render();
@@ -553,7 +539,7 @@ const handleJoinRoom = () => {
   }
 
   roomId = requestedRoomId;
-  roomCodeShown = false;   // chaque nouveau salon repart masqué
+  roomCodeShown = false;   // every new room starts masked
   roomStatus = "connecting"; setNotice("lobby.joining", { code: requestedRoomId });
   render();
   connectToRoom(requestedRoomId);
@@ -567,13 +553,12 @@ const lobbyStatusLabel = () => {
 
 const copyText = async (text, okKey, inputSelector) => {
   let copied = true;
-  // Si le presse-papier échoue, on révèle le code : le repli sélectionne le texte de
-  // l'input, qui doit donc contenir la vraie valeur et non le masque.
+  // If the clipboard fails, reveal the code: the fallback selects the input, which must hold the real value.
   try { await navigator.clipboard.writeText(text); setNotice(okKey); }
   catch { copied = false; roomCodeShown = true; setNotice("lobby.copyManual"); }
   render();
   if (!copied) {
-    const el = app.querySelector(inputSelector);   // sélectionné APRÈS le rendu, sinon la sélection disparaît
+    const el = app.querySelector(inputSelector);   // selected AFTER rendering, or the selection is lost
     el?.focus(); el?.select();
     return;
   }
@@ -616,7 +601,7 @@ const handlePrimaryAction = () => {
     return;
   }
   if (state.phase === GAME_PHASES.START_TURN) {
-    // Pas de bouton "commencer" : le premier geste lance directement les dés.
+    // No "start" button: the first action rolls the dice.
     if (run(beginTurn(state, playerId), "begin turn")) {
       const movement = resolveMovementAction(state, playerId, { rollDie: randomRoll });
       if (run(movement, "roll and move") && !movement.reroll && !movement.pendingAction) {
@@ -811,7 +796,7 @@ const renderPendingReactionPanel = (pendingReaction, pendingMovementDestinations
   const canResolve = roomRole === "local" || pendingReaction.playerId === assignedPlayerId;
 
   if (!canResolve) {
-    // Réaction propre à un personnage : nommer l'action trahirait qui il est.
+    // Character-specific reaction: naming it would give the character away.
     const waiting = isSecretPendingType(pendingReaction.type)
       ? escT("ui.waitingForChoice", { name: ownerLabel })
       : escT("ui.waitingForResolve", { name: ownerLabel, action: pendingReaction.type.replaceAll("_", " ").toLowerCase() });
@@ -941,8 +926,7 @@ const renderDock = ({ active, canAct, pendingReaction, isGameOver, otherPlayers 
   if (isGameOver) return `<div class="dock-row"><span class="dock-title">${escT("ui.gameOver")}</span></div>`;
   if (pendingReaction) return renderPendingReactionPanel(pendingReaction, pendingMovementDestinationsFor(pendingReaction));
   if (!canAct) return `<div class="dock-row"><span class="dock-title">${escT("ui.thinking", { name: active.name })}</span></div>`;
-  // Tant que les des tournent, on ne propose aucune action : la phase a deja
-  // avance cote moteur (ex. AREA_ACTION) mais le joueur n'est pas encore "arrive".
+  // No actions while the dice roll: the engine has moved on, but the player hasn't "arrived" yet.
   if (diceRolling()) return `<div class="dock-row"><span class="dock-title">${escT("ui.rollingDice")}</span></div>`;
  
   const P = (label, cls = "") => `<button class="action ${cls}" data-action="primary">${label}</button>`;
@@ -969,7 +953,7 @@ const renderDock = ({ active, canAct, pendingReaction, isGameOver, otherPlayers 
 const pendingMovementDestinationsFor = (pa) => pa?.type === "CHOOSE_MOVEMENT_DESTINATION"
   ? Object.values(state.board.areaAtPosition).filter((id) => id !== pa.excludedAreaId) : [];
 
-// ---- Pastilles : notes privées, stockées dans CE navigateur, jamais envoyées au réseau ----
+// ---- Tags: private notes, stored in THIS browser, never sent over the network ----
 const DEFAULT_TAGS = [
   { id: "suspect", key: "ui.tag.suspect", color: 0 },
   { id: "trusted", key: "ui.tag.trusted", color: 1 },
@@ -1055,7 +1039,7 @@ const endDrag = () => {
   render();
 };
 
-// Écouteurs délégués sur #app : posés UNE fois, ils survivent aux re-rendus.
+// Delegated listeners on #app: set ONCE, they survive re-renders.
 app.addEventListener("dragstart", (e) => {
   const chip = e.target.closest?.("[data-tag]");
   if (!chip) return;
@@ -1077,7 +1061,7 @@ app.addEventListener("drop", (e) => {
   endDrag();
 });
 document.addEventListener("dragend", endDrag);
-// Un nouveau clic/toucher prouve qu'aucun glissé n'est en cours.
+// A new click/touch means no drag is in progress.
 document.addEventListener("pointerdown", () => { dragging = false; });
 app.addEventListener("input", (e) => {
   if (e.target.matches?.("[data-tag-input]")) tagError = "";
@@ -1178,8 +1162,7 @@ const render = () => {
   const pendingReaction = state.pendingActions[0];
   const canAct = canControlCurrentPlayer();
   const isGameOver = state.gameOver || state.phase === GAME_PHASES.GAME_OVER;
-  // Cibles cliquables sur le plateau : phase d'attaque, a nous de jouer, rien en
-  // attente, des arretes. otherPlayers est deja filtre par canTargetWithAttack.
+  // Clickable targets: attack phase, our turn, nothing pending, dice stopped (otherPlayers is pre-filtered).
   const attackableIds = (canAct && !isGameOver && !pendingReaction && !diceRolling() && state.phase === GAME_PHASES.ATTACK)
     ? new Set(otherPlayers.map((p) => p.id))
     : null;
@@ -1193,24 +1176,21 @@ const render = () => {
   ensureMarks();
   const tagInput = app.querySelector("[data-tag-input]");
   const tagDraft = tagInput ? { value: tagInput.value, focused: document.activeElement === tagInput, pos: tagInput.selectionStart } : null;
-  // Position visible : tant que le de du joueur tourne, son pion reste sur la
-  // derniere zone revelee ; a l'arret, pendingDice se vide et le rendu saute.
+  // While a player's dice roll, their piece stays on the last revealed Area.
   const shownAreaOf = (p) => {
     if (!diceRolling()) return p.areaId;
     const revealedMoves = state.events.filter((e) => e.type === "PLAYER_MOVED" && e.playerId === p.id && !pendingDice.has(e));
     const pendingMove = state.events.some((e) => pendingDice.has(e) && ((e.type === "MOVEMENT_ROLLED" && e.playerId === p.id) || (e.type === "PLAYER_MOVED" && e.playerId === p.id)));
     return pendingMove ? (revealedMoves.at(-1)?.areaId ?? null) : p.areaId;
   };
-  // Meme idee pour les PV : tant que les des tournent, on "rembobine" les
-  // evenements de PV encore retenus (pendingDice) pour ne pas devoiler le
-  // resultat d'un jet avant l'arret de l'odometre.
+  // Same for HP: rewind held HP events while the dice roll, so the result isn't spoiled.
   const shownHpOf = (p) => {
     if (!diceRolling() || !Number.isFinite(p.hp)) return p.hp;
     let hp = p.hp;
     const pending = state.events.filter((e) => pendingDice.has(e) && e.playerId === p.id);
     for (const e of pending) {
-      if (e.type === "DAMAGE_DEALT") hp += e.amount;                 // inverse de la perte
-      else if (e.type === "HEAL_APPLIED") hp -= e.amount;            // inverse du soin
+      if (e.type === "DAMAGE_DEALT") hp += e.amount;                 // undo the loss
+      else if (e.type === "HEAL_APPLIED") hp -= e.amount;            // undo the heal
       else if (e.type === "HP_SET") hp = p.maxHp;                    // valeur absolue inconnue -> prudence
     }
     return Math.max(0, Math.min(hp, p.maxHp));
@@ -1335,7 +1315,7 @@ const render = () => {
   app.querySelector("[data-reward-none]")?.addEventListener("click", () => resolveReward(null));
   app.querySelectorAll("[data-target]").forEach((button) => button.addEventListener("click", () => handleAttack(button.dataset.target)));
   app.querySelector("[data-area-attack]")?.addEventListener("click", () => handleAttack(otherPlayers[0]?.id));
-  // Clic direct sur un pion du plateau pour l'attaquer (equivaut aux boutons "Attaquer X").
+  // Click a piece on the board to attack it (same as the "Attack X" buttons).
   app.querySelectorAll("[data-attack-target]").forEach((piece) => {
     piece.addEventListener("click", () => handleAttack(piece.dataset.attackTarget));
     piece.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleAttack(piece.dataset.attackTarget); } });

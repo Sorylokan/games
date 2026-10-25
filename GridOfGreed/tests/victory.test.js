@@ -10,7 +10,7 @@ test('fin de partie à 100 : le plus petit total gagne', () => {
 });
 
 test('égalité à la fin de partie : victoire partagée', () => {
-  const r = finishScenario(A, A, [11], [80, 92]); // 80+24 = 104 et 92+12 = 104
+  const r = finishScenario(A, A, [11], [80, 92]); // 80+24 = 104 and 92+12 = 104
   assert.deepEqual(r.winners.sort(), ['p0', 'p1']);
 });
 

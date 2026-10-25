@@ -1,8 +1,8 @@
-/* Atelier : création de fresques perso. Reprend la mise en page du jeu (plateau à gauche, cartes à droite). */
+/* Mural editor. Reuses the game layout (board left, cards right). */
 
 a.brand { text-decoration: none; }
 
-/* Liens présentés comme des boutons (Retour au jeu, Créer) */
+/* Links styled as buttons */
 .btn-link {
   display: inline-flex; align-items: center; text-decoration: none; font-size: 14px;
   color: var(--txt); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px;
@@ -20,7 +20,7 @@ a.brand { text-decoration: none; }
 .row-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 .row-btns > * { flex: 1; min-width: 0; }
 
-/* Palette : la couleur choisie a un anneau */
+/* Palette: the selected color gets a ring */
 .palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); gap: 6px; margin-bottom: 10px; }
 .swatch {
   aspect-ratio: 1 / 1; padding: 0; border: 0; border-radius: 7px; background: var(--c);
@@ -34,12 +34,12 @@ a.brand { text-decoration: none; }
 }
 .swatch.eraser:hover { background: repeating-linear-gradient(45deg, var(--bg) 0 4px, var(--card) 4px 8px); }
 
-/* Outils : boutons groupés, l'actif est souligné */
+/* Tools: grouped buttons, active one highlighted */
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .seg button { border-color: var(--line); color: var(--txt); padding: 7px 6px; font-size: 13px; }
 .seg button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
 
-/* Image de fond */
+/* Background image */
 .file-btn {
   position: relative; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
   border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-size: 14px;
@@ -66,7 +66,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .dev summary { cursor: pointer; font-size: 13px; color: var(--mut); margin-top: 4px; }
 .dev textarea { width: 100%; resize: vertical; margin: 6px 0; font: 11px/1.4 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
 
-/* Mes fresques */
+/* My murals */
 .lib { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .lib li { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; }
 .lib li.current { border-color: var(--accent); }

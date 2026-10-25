@@ -51,7 +51,7 @@ test('manche suivante : totaux conservés, nouvelle donne', () => {
 });
 
 test('revanche : seulement en fin de partie, mêmes joueurs, totaux remis à zéro', () => {
-  assert.equal(rematch(finishScenario(A, A)).ok, false); // manche finie, pas la partie
+  assert.equal(rematch(finishScenario(A, A)).ok, false); // round over, not the game
   const over = finishScenario(A, A, [11], [95, 95]);
   assert.equal(over.phase, 'gameOver');
   const n = ok(rematch(over, mulberry32(3)));

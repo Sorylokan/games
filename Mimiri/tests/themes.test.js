@@ -1,4 +1,4 @@
-// Tests du registre de thèmes : chaque thème doit être complet et son CSS présent.
+// Theme registry: every theme must be complete and have its CSS.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";

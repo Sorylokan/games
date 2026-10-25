@@ -1,5 +1,4 @@
-// Atelier : création de fresques perso. Branche le canevas, la palette, les réglages,
-// la bibliothèque et le partage par code.
+// Mural editor: wires the canvas, palette, settings, library and code sharing.
 import { COLORS } from '../data/colors.js';
 import { DEFAULT_SKIN } from '../data/skins.js';
 import { STORAGE } from '../config.js';
@@ -13,7 +12,7 @@ import * as library from './library.js';
 import { initView, resizeView, draw, setBackground, setBackgroundOpacity, setBackgroundVisible, imagePixels } from './view.js';
 import { pixelsToMap } from '../core/image-to-map.js';
 
-// ---------- petits utilitaires d'interface ----------
+// ---------- UI helpers ----------
 let statusTimer;
 function status(key, vars, isError = false) {
   const el = $('status');
@@ -23,8 +22,8 @@ function status(key, vars, isError = false) {
   if (key) statusTimer = setTimeout(() => { el.textContent = ''; }, 3500);
 }
 
-// Bouton à double clic de confirmation (pas de fenêtre « êtes-vous sûr ? ») :
-// le 1er clic change le texte, le 2e dans les 3 secondes exécute l'action.
+// Click-twice confirmation (no "are you sure?" dialog): the 1st click changes the label,
+// a 2nd click within 3 s runs the action.
 function confirmable(btn, needConfirm, action) {
   let armed = null;
   btn.addEventListener('click', () => {
@@ -44,19 +43,19 @@ async function copy(text, field) {
   catch { field?.select(); status('ed.copyManual'); }
 }
 
-// L'atelier vit dans editor/ : le jeu est un dossier au-dessus.
+// The editor lives in editor/, the game is one folder up.
 const playUrl = (mural) => '../#play=' + encodeMural(mural);
 
-// Proposer une fresque : formulaire GitHub (.github/ISSUE_TEMPLATE/fresque.yml) pré-rempli par l'adresse.
+// "Suggest this mural": GitHub issue form (.github/ISSUE_TEMPLATE/fresque.yml) prefilled through the URL.
 const ISSUES_URL = 'https://github.com/Sorylokan/games/issues/new';
-const MAX_URL = 7000; // au-delà, GitHub peut refuser l'adresse : le code passe alors par le presse-papier
+const MAX_URL = 7000; // GitHub may reject longer URLs; the code then goes through the clipboard
 function suggestUrl(mural, withCode) {
-  const p = new URLSearchParams({ template: 'fresque.yml', title: `[Fresque] ${mural.name || t('custom.untitled')}` });
+  const p = new URLSearchParams({ template: 'fresque.yml', title: `[Mural] ${mural.name || t('custom.untitled')}` });
   if (withCode) p.set('code', encodeMural(mural));
   return `${ISSUES_URL}?${p}`;
 }
 
-// ---------- rendu des panneaux ----------
+// ---------- panels ----------
 function buildPalette() {
   const box = $('palette');
   box.innerHTML = '';
@@ -165,7 +164,7 @@ function renderAll() {
   draw();
 }
 
-// À chaque modification du dessin : brouillon sauvé, infos et image à jour.
+// After every drawing change: save the draft, refresh info and canvas.
 function changed() {
   library.saveDraft(toMural(), ed.editingId);
   renderInfo();
@@ -177,9 +176,9 @@ function afterLoad() {
   renderAll();
 }
 
-// ---------- conversion image → pixels ----------
-const SAMPLES = 8; // pixels d'échantillon par côté de case : ils votent pour la couleur de la case
-let lastConverted = null; // grille produite par la dernière conversion, sous forme de texte
+// ---------- image → pixels ----------
+const SAMPLES = 8; // sample pixels per cell side; they vote for the cell color
+let lastConverted = null; // grid from the last conversion, as text
 
 const convOptions = () => ({
   saturation: Number($('convSaturation').value) / 100,
@@ -189,8 +188,8 @@ const convOptions = () => ({
   transparentBg: $('convTransparent').checked,
 });
 
-// Une « série » de conversion dure tant que la grille n'a pas été retouchée : un seul snapshot()
-// au début, donc un Ctrl+Z revient à l'état d'avant la conversion, quels que soient les réglages essayés.
+// A conversion "series" lasts until the grid is edited by hand: a single snapshot() at the start,
+// so one Ctrl+Z goes back to before the conversion, whatever settings were tried.
 const inSeries = () => lastConverted !== null && toMap().join('|') === lastConverted;
 
 function convert() {
@@ -204,7 +203,7 @@ function convert() {
   return true;
 }
 
-// Aperçu en direct : un réglage modifié relance la conversion en cours (au plus une fois par image affichée).
+// Live preview: a setting change reruns the current conversion (at most once per frame).
 let convFrame = 0;
 function reconvert() {
   if (!inSeries() || convFrame) return;
@@ -221,7 +220,7 @@ const showBgTools = (on) => {
   for (const id of ['bgControls', 'bgRemove', 'bgConvert', 'convControls']) $(id).hidden = !on;
 };
 
-// ---------- branchements ----------
+// ---------- wiring ----------
 function bindControls() {
   $('name').addEventListener('input', (e) => { ed.name = cleanName(e.target.value); ed.dirty = true; library.saveDraft(toMural(), ed.editingId); renderInfo(); });
 
@@ -236,7 +235,7 @@ function bindControls() {
   document.querySelectorAll('#toolBar button').forEach((b) =>
     b.addEventListener('click', () => { ed.tool = b.dataset.tool; renderTools(); }));
 
-  // Image de fond (gardée en mémoire seulement)
+  // Background image (kept in memory only)
   $('bgFile').addEventListener('change', (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -245,7 +244,7 @@ function bindControls() {
       const img = new Image();
       img.onload = () => {
         setBackground(img);
-        lastConverted = null; // nouvelle image : la prochaine conversion ouvre une nouvelle série
+        lastConverted = null; // new image: the next conversion starts a new series
         showBgTools(true);
         status('ed.bgLoaded');
       };
@@ -259,7 +258,7 @@ function bindControls() {
   $('bgVisible').addEventListener('change', (e) => setBackgroundVisible(e.target.checked));
   $('bgRemove').addEventListener('click', () => { setBackground(null); lastConverted = null; showBgTools(false); });
 
-  // Remplit toute la grille d'après l'image de fond (annulable avec Ctrl+Z), puis les réglages s'appliquent en direct.
+  // Fills the grid from the background image (Ctrl+Z undoes it); settings then apply live.
   $('bgConvert').addEventListener('click', () => { if (convert()) status('ed.bgConverted'); });
   $('convColors').max = Object.keys(COLORS).length;
   renderConvValues();
@@ -281,7 +280,7 @@ function bindControls() {
   $('copyCode').addEventListener('click', () => copy($('code').value, $('code')));
   $('suggest').addEventListener('click', () => {
     const mural = toMural();
-    // Le code est toujours copié AVANT d'ouvrir l'onglet (après, la page n'a plus le focus et la copie échoue).
+    // Copy BEFORE opening the tab: afterwards the page loses focus and the copy fails.
     navigator.clipboard?.writeText(encodeMural(mural)).catch(() => {});
     const full = suggestUrl(mural, true);
     const fits = full.length <= MAX_URL;
@@ -299,7 +298,7 @@ function bindControls() {
   $('import').addEventListener('click', doImport);
   $('importCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') doImport(); });
 
-  // Raccourcis : Ctrl/Cmd+Z annuler ; B pinceau, F remplir, I pipette, E gomme
+  // Shortcuts: Ctrl/Cmd+Z undo; B brush, F fill, I picker, E eraser
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (undo()) changed(); return; }
     if (e.target.closest('input, textarea, select') || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -311,7 +310,7 @@ function bindControls() {
   });
 }
 
-// ---------- démarrage ----------
+// ---------- startup ----------
 initLangSelect(async (lang) => { await setLang(lang); fillSkinSelect(); renderAll(); });
 initSkinSelect((s) => { setSkin(s); draw(); });
 await setLang(initialLang());
@@ -322,7 +321,7 @@ buildPalette();
 initView({ changed, picked: (v) => selectColor(v) });
 bindControls();
 
-// editor/#edit=BB1-… (depuis le jeu) > brouillon en cours > fresque vide
+// editor/#edit=BB1-… (from the game) > current draft > empty mural
 const editCode = location.hash.match(/^#edit=(.+)$/)?.[1];
 const fromLink = editCode && decodeMural(decodeURIComponent(editCode));
 const draft = library.loadDraft();

@@ -1,20 +1,18 @@
-// Le canvas du plateau, sa taille, et les petites primitives de dessin réutilisées partout.
+// Board canvas: sizing and shared drawing primitives.
 import { $ } from '../dom.js';
 import { app } from '../game/state.js';
 
 export const cv = $('cv');
 export const ctx = cv.getContext('2d');
 
-// Recalcule la taille du canvas d'après la largeur du plateau.
-// La hauteur suit (fresque + ligne de boîtes) : c'est pour ça qu'on n'observe que la largeur.
+// Sizes the canvas from the board width; height follows (mural + box line).
 export function resize() {
   const st = app.st;
   if (!st) return;
   const w = cv.parentElement.clientWidth - 20;
   if (w <= 0) return;
-  const u = w / (st.N + 2);                       // taille d'une case
-  // Hauteur de la ligne de boîtes : en pixels d'écran, au moins 72 px, pour que les boîtes restent
-  // lisibles même quand une grande fresque rend les cases minuscules. lh = la même hauteur, en cases.
+  const u = w / (st.N + 2);                       // cell size
+  // Box line height: at least 72 screen px so boxes stay readable on big murals. lh = same, in cells.
   const linePx = Math.max(u * 1.9, Math.min(96, u * 3.4), 72);
   const lh = linePx / u;
   const h = u * (st.N + 2 + lh);
@@ -26,7 +24,7 @@ export function resize() {
   app.geo = { w, h, u, lh };
 }
 
-// Rectangle arrondi (chemin seulement : à remplir ou tracer ensuite).
+// Rounded rectangle path (fill or stroke it afterwards).
 export function rr(x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -37,7 +35,7 @@ export function rr(x, y, w, h, r) {
   ctx.closePath();
 }
 
-// Un pixel de fresque (carré arrondi, léger reflet ; fin contour sur les thèmes clairs).
+// One mural pixel: rounded square, slight highlight, thin outline on light themes.
 export function tile(px, py, size, color, alpha = 1) {
   const h = size / 2;
   ctx.globalAlpha = alpha;
@@ -50,7 +48,7 @@ export function tile(px, py, size, color, alpha = 1) {
   ctx.globalAlpha = 1;
 }
 
-// Disque plein.
+// Filled circle.
 export function dot(x, y, r, c) {
   ctx.fillStyle = c;
   ctx.beginPath();

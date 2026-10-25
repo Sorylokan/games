@@ -1,5 +1,5 @@
-// Atelier : la fresque en cours d'édition, ses outils et son historique (annuler).
-// Pas de DOM ici. La grille est un tableau N×N de lettres de couleur, ou '.' pour une case vide.
+// Editor model: the mural being edited, tools and undo history. No DOM.
+// The grid is N×N color letters, '.' for empty.
 import { MIN_SIZE, MAX_SIZE, cleanName } from '../core/mural-code.js';
 import { DIRS } from '../core/grid.js';
 
@@ -10,11 +10,11 @@ export const ed = {
   N: 12,
   cells: [],          // cells[r][c]
   name: '',
-  editingId: null,    // id dans la bibliothèque si on modifie une fresque enregistrée
-  color: 'R',         // couleur du pinceau (ERASER = gomme)
+  editingId: null,    // library id when editing a saved mural
+  color: 'R',         // brush color (ERASER = eraser)
   tool: 'brush',      // 'brush' | 'fill' | 'pick'
   history: [],
-  dirty: false,       // modifié depuis le dernier enregistrement
+  dirty: false,       // changed since last save
 };
 
 const blank = (N) => Array.from({ length: N }, () => Array(N).fill(ERASER));
@@ -36,7 +36,7 @@ export const toMap = () => ed.cells.map((r) => r.join(''));
 export const toMural = () => ({ name: ed.name, map: toMap() });
 export const isEmpty = () => ed.cells.every((r) => r.every((v) => v === ERASER));
 
-// Photo de l'état avant une modification, pour pouvoir l'annuler.
+// Call before a change so it can be undone.
 export function snapshot() {
   ed.history.push({ N: ed.N, cells: ed.cells.map((r) => r.slice()) });
   if (ed.history.length > HISTORY_MAX) ed.history.shift();
@@ -55,7 +55,7 @@ export function paint(r, c, color = ed.color) {
   return true;
 }
 
-// Trace une ligne de cases entre deux points (pour un trait continu quand on glisse vite).
+// Paints the cells between two points (continuous stroke on fast moves).
 export function paintLine(r0, c0, r1, c1, color) {
   const steps = Math.max(Math.abs(r1 - r0), Math.abs(c1 - c0), 1);
   let changed = false;
@@ -65,7 +65,7 @@ export function paintLine(r0, c0, r1, c1, color) {
   return changed;
 }
 
-// Pot de peinture : remplit la zone de même couleur touchant la case.
+// Bucket fill of the same-color area touching the cell.
 export function fill(r, c, color = ed.color) {
   const from = ed.cells[r]?.[c];
   if (from === undefined || from === color) return false;
@@ -80,7 +80,7 @@ export function fill(r, c, color = ed.color) {
   return true;
 }
 
-// Change le nombre de pixels de côté en gardant le dessin centré.
+// Changes the grid size, keeping the drawing centered.
 export function resize(N) {
   N = Math.max(MIN_SIZE, Math.min(MAX_SIZE, Math.round(N)));
   if (N === ed.N) return false;

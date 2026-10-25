@@ -1,9 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Tahoma:wght@400;700&display=swap");
 
-/* THEME INTERNET 2000-2010 (MSN / Web 1.0) : surcouche du socle neutre.
-   Activation : <link> après styles.css + class="theme-msn" sur <body>.
-   Bleu MSN, blanc brillant, coins arrondis, dégradés gloss, bordures 3D,
-   Tahoma/MS Sans. Les variables du socle sont redéfinies. */
+/* Internet 2000s theme (MSN / Web 1.0): MSN blue, glossy gradients, rounded corners, 3D borders, Tahoma. */
 
 body.theme-msn {
   --desk: #3a6ea5; --ink: #0a246a; --paper: #fff; --chrome: #ece9d8; --muted: #5a5a78;
@@ -19,7 +16,7 @@ body.theme-msn {
     linear-gradient(180deg, #a3c2e8 0%, #6b9bd2 40%, #3a6ea5 100%);
 }
 body.theme-msn #app { position: relative; z-index: 1; }
-/* Damier subtil façon vieux fond d'écran */
+/* Subtle checkerboard, old-wallpaper style */
 body.theme-msn::before {
   content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .06;
   background:
@@ -31,7 +28,7 @@ body.theme-msn::before {
   background-position: 0 0, 0 10px, 10px -10px, -10px 0;
 }
 
-/* ---- Fenêtres : style MSN Messenger ---- */
+/* ---- Windows: MSN Messenger style ---- */
 body.theme-msn .win { background: var(--paper); border: 2px solid var(--msn-blue); border-radius: 8px 8px 4px 4px; box-shadow: 0 2px 8px rgba(10, 36, 106, .35); overflow: hidden; }
 body.theme-msn .win-title {
   margin: 0; padding: 4px 10px;
@@ -48,7 +45,7 @@ body.theme-msn .win-title::after {
 }
 body.theme-msn .win-body { background: var(--paper); }
 
-/* Statut "En ligne" façon Messenger : point vert pulse + texte */
+/* Messenger-style "Online" status: pulsing green dot + text */
 body.theme-msn .connection-state {
   background: linear-gradient(180deg, #fff, #e0ecf8); color: var(--msn-blue);
   border: 1px solid var(--msn-blue); border-radius: 12px; padding: 3px 12px 3px 8px;
@@ -64,7 +61,7 @@ body.theme-msn .eyebrow { background: var(--msn-accent); color: #fff; border-rad
 body.theme-msn .online-actions, body.theme-msn .invite-block, body.theme-msn .room-roster { background: var(--paper); border: 2px solid var(--msn-blue); border-radius: 8px; box-shadow: var(--shadow); color: #000; }
 body.theme-msn .online-actions::before, body.theme-msn .invite-block::before, body.theme-msn .room-roster::before { background: linear-gradient(180deg, #fff, var(--msn-light) 45%, var(--msn-blue)); color: #fff; font: 700 12px var(--display); border-bottom: 1px solid #0a246a; text-shadow: 0 1px 0 rgba(0,0,0,.4); }
 
-/* ---- Boutons : gloss 3D façon XP/MSN ---- */
+/* ---- Buttons: XP/MSN 3D gloss ---- */
 body.theme-msn .action {
   background: linear-gradient(180deg, #fff 0%, #e8f0fa 40%, #b8cfe8 100%);
   color: var(--msn-blue); border: 1px solid var(--msn-blue); border-radius: 10px;
@@ -96,7 +93,7 @@ body.theme-msn .dice-slot .dice-tray { --gold: 255, 255, 255; --die-bg: #0a246a;
 body.theme-msn .piece { background: #fff; border: 1px solid #7f7f7f; border-radius: 99px; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
 body.theme-msn .piece-avatar, body.theme-msn .pl-avatar { border: 1px solid #7f7f7f; border-radius: 50%; }
 body.theme-msn .piece.current { background: var(--msn-accent); color: #fff; }
-/* Avatars ronds façon liste de contacts Messenger, avec liseré blanc brillant */
+/* Round avatars like the Messenger contact list, with a shiny white rim */
 body.theme-msn .piece-avatar, body.theme-msn .pl-avatar {
   border: 2px solid #fff; border-radius: 50%;
   box-shadow: 0 0 0 1px var(--msn-blue), 0 1px 3px rgba(0,0,0,.3), inset 0 1px 1px rgba(255,255,255,.6);
@@ -113,7 +110,7 @@ body.theme-msn .pending-label { color: #000; }
 body.theme-msn .victory { background: linear-gradient(180deg, #fff, #a5d8a5); border: 2px solid var(--msn-green); border-radius: 8px; }
 body.theme-msn .victory h2 { font: 700 24px var(--display); color: var(--msn-blue); }
 
-/* ---- Panneaux latéraux ---- */
+/* ---- Side panels ---- */
 body.theme-msn .hp-bar { border: 1px solid #7f7f7f; background: #fff; border-radius: 3px; box-shadow: inset 1px 1px 2px rgba(0,0,0,.1); }
 body.theme-msn .hp-fill { background: linear-gradient(180deg, #a5d8a5, var(--msn-green)); }
 body.theme-msn .me-name b { font: 700 14px var(--display); color: var(--msn-blue); }
@@ -121,7 +118,7 @@ body.theme-msn .badge { border: 1px solid #7f7f7f; background: #f0f0f0; color: #
 body.theme-msn .f-user { background: #d4e5f7; } body.theme-msn .f-memer { background: #d8f0c8; } body.theme-msn .f-troller { background: #ffd8a8; }
 body.theme-msn .sheet dt { color: var(--msn-blue); font-family: var(--display); font-weight: 700; letter-spacing: .05em; }
 body.theme-msn .sheet dd { color: #000; }
-/* ---- Liste des joueurs : façon liste de contacts MSN ---- */
+/* ---- Player list: MSN contact list style ---- */
 body.theme-msn .pl { border-bottom: 1px solid #d0d8e8; padding: 6px 4px; }
 body.theme-msn .pl:hover { background: #e8f0fa; }
 body.theme-msn .pl.active b::after { content: " \25B6"; color: var(--msn-green); }
@@ -135,7 +132,7 @@ body.theme-msn .note { border: 1px solid #7f7f7f; border-radius: 3px; font-famil
 body.theme-msn .n0 { background: #ffd8a8; } body.theme-msn .n1 { background: #d8f0c8; } body.theme-msn .n2 { background: #ffffcc; }
 body.theme-msn .n3 { background: #d4e5f7; } body.theme-msn .n4 { background: #e0e0e0; } body.theme-msn .n5 { background: #fff; }
 
-/* ---- Journal : fenêtre de conversation MSN ---- */
+/* ---- Log: MSN chat window ---- */
 body.theme-msn .term { background: #fff; border: 2px solid var(--msn-blue); border-radius: 8px 8px 4px 4px; box-shadow: 0 2px 8px rgba(10,36,106,.35); color: #000; }
 body.theme-msn .term-bar { background: linear-gradient(180deg, #fff 0%, #d6e4f5 8%, var(--msn-light) 45%, var(--msn-blue) 100%); color: #fff; border-bottom: 1px solid #0a246a; }
 body.theme-msn .term-body { font: 12px/1.5 "Lucida Console", Monaco, monospace; }
@@ -150,8 +147,7 @@ body.theme-msn .term-body div { border-bottom: 1px dotted #d0d8e8; padding: 2px 
   body.theme-msn .action, body.theme-msn .piece { transition: none; }
 }
 
-/* ---- Wizz MSN : au lieu de faire vibrer les zones, on secoue TOUT l'ecran
-   violemment et rapidement, comme un nudge Windows Live Messenger. ---- */
+/* ---- MSN "wizz": shake the WHOLE screen like a Messenger nudge, instead of the Areas ---- */
 @keyframes ftm-wizz {
   0%, 100% { transform: translate(0, 0); }
   10% { transform: translate(-8px, 4px); }
@@ -165,5 +161,5 @@ body.theme-msn .term-body div { border-bottom: 1px dotted #d0d8e8; padding: 2px 
   90% { transform: translate(-1px, 0); }
 }
 body.theme-msn.anim-shake .game-screen { animation: ftm-wizz .5s ease-in-out; }
-body.theme-msn.anim-shake .zone { animation: none; }   /* on remplace la vibration des zones par le wizz global */
+body.theme-msn.anim-shake .zone { animation: none; }   /* the global wizz replaces the Area shake */
 @media (prefers-reduced-motion: reduce) { body.theme-msn.anim-shake .game-screen { animation: none; } }

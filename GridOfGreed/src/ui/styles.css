@@ -1,7 +1,6 @@
-/* Feuille de style unique (base neutre). Le look sombre/or du brief vit ici ;
-   la table jouable héritera de ces variables (voir maquette Dev_Files/). */
+/* Single stylesheet. Themes only redefine the color variables. */
 :root {
-  /* Thème par défaut = night (bleu nuit) */
+  /* Default theme: night (dark blue) */
   --bg: #0a0e18;
   --card: #101827;
   --gold: #7fa8d9;
@@ -13,18 +12,18 @@
   --low: #5fcf80;
   --mid: #e9d24c;
   --high: #ef5b5b;
-  /* Repli avant le premier calcul JS de fitBoard() : sans eux tout vaut 0. */
+  /* Fallbacks until fitBoard() runs */
   --u: 48px;
   --k: 0.7;
 }
 
-/* Classique : palace reprend l'ancienne palette « casino », ruby est inchangé. */
+/* Classic: palace (formerly "casino"), ruby */
 :root[data-theme="palace"] { --bg: #07140e; --card: #0f2318; --gold: #d4af37; --line: #2f5a43; --txt: #d6e6dc; --mut: #7fa08d; }
 :root[data-theme="ruby"] { --bg: #140a0e; --card: #231319; --gold: #d99a5b; --line: #5a2f3c; --txt: #e6d3d8; --mut: #a0808a; }
-/* Casino : poker = feutrine verte, jackpot = or/rouge machine à sous. */
+/* Casino: poker = green felt, jackpot = slot-machine gold/red */
 :root[data-theme="poker"] { --bg: #0b1f14; --card: #12291c; --gold: #d9b44a; --line: #2a4f38; --txt: #d2e4d6; --mut: #7ba184; }
 :root[data-theme="jackpot"] { --bg: #170a08; --card: #241110; --gold: #efb63f; --line: #55282a; --txt: #eed9c8; --mut: #a07a6e; }
-/* Mystic : wizard reprend l'ancienne palette « night » (violet/or). */
+/* Mystic: wizard (the former "night" purple/gold) */
 :root[data-theme="wizard"] { --bg: #0c0b10; --card: #15131c; --gold: #b8923a; --line: #3a3648; --txt: #c9c4d6; --mut: #8a8698; }
 
 * { box-sizing: border-box; }
@@ -40,7 +39,7 @@ body {
   flex-direction: column;
 }
 
-/* Décor de fond subtil par thème (dégradés uniquement, aucune image externe) */
+/* Subtle background per theme (gradients only) */
 [data-theme="night"] body {
   background-image:
     radial-gradient(circle at 85% 8%, rgba(127,168,217,.12), transparent 30%),
@@ -59,11 +58,11 @@ body {
 [data-theme="poker"] body { background-image: radial-gradient(ellipse at 50% 38%, rgba(214,230,220,.06), transparent 62%); }
 [data-theme="jackpot"] body { background-image: radial-gradient(ellipse at 50% -10%, rgba(239,182,63,.14), transparent 55%); }
 
-/* Top-bar : 7,37 % de la hauteur, contenu aligné sur la zone utile (marges de 10 %) */
+/* Top bar: 7.37% of the height, aligned with the 10% side margins */
 .topbar { flex: 0 0 7.37%; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 10%; border-bottom: 1px solid var(--line); }
 .brand { font: 700 20px Fraunces, Georgia, serif; color: var(--gold); }
 .bar-tools { display: flex; align-items: center; gap: 8px; }
-/* Retour au catalogue, à gauche du nom du jeu */
+/* Back-to-catalog link, left of the game name */
 .brand-group { display: flex; align-items: center; gap: 10px; }
 a.icon-btn { display: inline-block; border: 1px solid var(--line); border-radius: 8px; color: var(--txt); }
 a.icon-btn:hover { background: color-mix(in srgb, var(--gold) 14%, transparent); }
@@ -71,7 +70,7 @@ a.icon-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; 
 .topbar select { padding: 4px 8px; font-size: 13px; }
 #toggle-sound[aria-pressed="true"] .i-off, #toggle-sound[aria-pressed="false"] .i-on { display: none; }
 
-/* Zone sous la top-bar : accueil, salon et table s'y affichent */
+/* Area below the top bar: home, lobby and table */
 .stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: auto; }
 
 main { padding: 24px; }
@@ -136,7 +135,7 @@ button.ghost { border-color: var(--line); color: var(--txt); }
 .error { margin: 0; color: var(--high); font-size: 13px; }
 .muted { color: var(--mut); font-size: 13px; }
 
-/* --- Salon --- */
+/* --- Lobby --- */
 .lobby { display: flex; flex-direction: row; align-items: stretch; justify-content: center; gap: 20px; flex-wrap: wrap; }
 .lobby .panel { width: min(380px, 92vw); }
 .lobby h2 { text-align: left; font-size: 34px; }
@@ -144,15 +143,15 @@ button.ghost { border-color: var(--line); color: var(--txt); }
 .room-code { font: 700 28px Fraunces, Georgia, serif; letter-spacing: .05em; }
 .room-link {
   flex: 1;
-  min-width: 0;              /* indispensable pour que le texte puisse être coupé dans une ligne flex */
+  min-width: 0;              /* lets the text be cut inside a flex row */
   padding: 8px 10px;
-  background: var(--bg);     /* rectangle plus sombre que le panneau, sans bordure */
+  background: var(--bg);     /* darker box, no border */
   border-radius: 8px;
   font-size: 13px;
   color: var(--mut);
-  white-space: nowrap;       /* une seule ligne */
-  overflow: hidden;          /* pas de barre de défilement */
-  text-overflow: ellipsis;   /* on voit le début, la fin est coupée avec « … » */
+  white-space: nowrap;       /* single line */
+  overflow: hidden;          /* no scrollbar */
+  text-overflow: ellipsis;   /* the end is cut with "…" */
 }
 .row-btns { display: flex; gap: 6px; }
 #toggle-code[aria-pressed="false"] .i-eye-off,
@@ -179,12 +178,11 @@ select:disabled { opacity: .6; }
 .stepper output { min-width: 2ch; text-align: center; font: 700 22px Fraunces, Georgia, serif; }
 .stepper .icon-btn { width: 34px; height: 34px; padding: 0; font-size: 20px; line-height: 1; }
 
-/* --- Table (repris de la maquette Dev_Files/grid-of-greed-table.html) --- */
-/* Table : 80 % de la largeur ; zone de jeu 65,10 %, gap 0,65 %, colonne droite 34,24 % */
+/* --- Table: 80% of the width; play area 65.10%, gap 0.65%, side column 34.24% --- */
 main.table { display: grid; grid-template-columns: 65.1% 34.24%; grid-template-rows: minmax(0, 1fr); column-gap: .65%; width: 80%; height: 100%; padding: 0; }
 .table-zone { position: relative; min-width: 0; min-height: 0; }
 
-/* Colonne de droite */
+/* Side column */
 .side { display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow-y: auto; margin: 5px 0px; }
 .side-card { padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
 .side-card.grow { flex: 1 1 auto; min-height: 90px; overflow: auto; }
@@ -194,12 +192,12 @@ main.table { display: grid; grid-template-columns: 65.1% 34.24%; grid-template-r
 .stbl th, .stbl td { padding: 3px 6px; text-align: center; border-bottom: 1px solid var(--line); }
 .stbl th:first-child, .stbl td:first-child { text-align: left; }
 .stbl th { color: var(--mut); font-weight: 400; font-size: 12px; }
-/* Scores : leader (moins de points) en gras/or, dernier en rouge */
+/* Scores: leader (fewest points) bold gold, last in red */
 .stbl tr.best td { color: var(--gold); font-weight: 700; }
 .stbl tr.worst td { color: var(--high); }
-/* Marqueurs couronne/crâne du tableau des scores (SVG inline, currentColor) */
+/* Crown/skull markers (inline SVG, currentColor) */
 svg.rank { width: 1em; height: 1em; margin-left: 4px; vertical-align: -0.15em; }
-/* Historique : badge ×2 sur le finisher puni (score affiché = score de base) */
+/* History: ×2 badge on the punished finisher (base score shown) */
 .dbl { color: var(--high); font-weight: 700; font-size: 11px; }
 .plist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .plist li { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border: 1px solid transparent; border-radius: 6px; }
@@ -211,8 +209,7 @@ svg.rank { width: 1em; height: 1em; margin-left: 4px; vertical-align: -0.15em; }
 .pdot { display: inline-block; flex: none; width: .7em; height: .7em; border-radius: 50%; background: var(--pc); }
 .pdot.host { width: auto; height: auto; border-radius: 0; background: none; color: var(--pc); line-height: 1; cursor: help; }
 .meta .pdot { align-self: center; }
-/* Zone de jeu découpée en 3x3 zones égales : le plateau remplit sa zone sans
-   dépendre d'une hauteur en pourcentage (positionné en absolu dans .table-zone) */
+/* Play area split into 3×3 equal cells (absolutely positioned in .table-zone) */
 .board { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
 .seat { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 10px; --su: calc(var(--u) * var(--k)); padding: calc(var(--su) * .12); margin: 5px; }
 .seat.me { --su: var(--u); border-color: var(--gold); }
@@ -228,10 +225,9 @@ svg.rank { width: 1em; height: 1em; margin-left: 4px; vertical-align: -0.15em; }
   grid-template-rows: repeat(3, var(--su));
   grid-auto-columns: var(--su);
   gap: calc(var(--su) * .18);
-  /* Pas de width:100% : la grille garde sa largeur naturelle et le siège
-     (flex, align-items:center) la centre — colonnes retirées = recentrage auto. */
+  /* No width: 100%: the grid keeps its natural width so removed columns recenter it */
 }
-/* Centre : pioche/défausse au milieu de la zone, consigne juste en dessous (les cartes ne bougent jamais) */
+/* Center: draw/discard piles, hint just below (the cards never move) */
 .mid { grid-area: 2 / 2; display: grid; grid-template-rows: 1fr auto 1fr; justify-items: center; min-height: 0; --su: var(--u); }
 .mid .cards { grid-row: 2; }
 .mid .tpanel { grid-row: 3; align-self: start; max-width: 100%; min-height: 0; padding-top: calc(var(--u) * .25); text-align: center; font-size: max(12px, calc(var(--u) * .26)); }
@@ -251,23 +247,21 @@ svg.rank { width: 1em; height: 1em; margin-left: 4px; vertical-align: -0.15em; }
 .b { border: 1.5px solid var(--gold); }
 .b::before { content: ""; position: absolute; inset: 12%; border: 1px solid var(--gold); opacity: .4; border-radius: calc(var(--su) * .06); }
 .b::after { content: ""; width: 26%; height: 26%; border: 1.5px solid var(--gold); transform: rotate(45deg); }
-/* Dos distincts par thème : symbole centré unique en SVG inline (ni emoji ni police).
-   palace et ruby gardent le losange or par défaut ci-dessus. */
+/* Card backs per theme: one centered inline SVG symbol. palace and ruby keep the default gold diamond. */
 [data-theme="night"] .b::after, [data-theme="poker"] .b::after,
 [data-theme="jackpot"] .b::after, [data-theme="wizard"] .b::after {
-  content: ""; /* requis : content explicit, sinon boîte 0x0 après border: 0 */
+  content: ""; /* needed, otherwise a 0×0 box after border: 0 */
   width: 46%; height: 46%; border: 0; transform: none;
   background: center / contain no-repeat;
 }
-/* night : croissant de lune (contour fin, fill retiré du style inline qui masquait la couleur) */
+/* night: crescent moon outline */
 [data-theme="night"] .b::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%237fa8d9' stroke-width='1.2' stroke-linejoin='round' d='M12,2h-.46a1,1,0,0,0-.44,1.86A5.94,5.94,0,0,1,14,9,6,6,0,0,1,3.93,13.4a1,1,0,0,0-1.65,1A10,10,0,1,0,12,2Z'/%3E%3C/svg%3E"); }
-/* poker : les quatre enseignes en grand — le cadre intérieur ::before est retiré
-   pour laisser la place (pique/trèfle or, cœur/carreau rouges) */
+/* poker: the four suits, large (no inner ::before frame) */
 [data-theme="poker"] .b::before { content: none; }
 [data-theme="poker"] .b::after { width: 62%; height: 62%; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cg fill='%23d9b44a'%3E%3Ccircle cx='8.3' cy='13.6' r='3.3'/%3E%3Ccircle cx='13.7' cy='13.6' r='3.3'/%3E%3Cpolygon points='5.5,12.6 16.5,12.6 11,5'/%3E%3Cpolygon points='10.1,15.8 11.9,15.8 12.9,19.4 9.1,19.4'/%3E%3C/g%3E%3Cg fill='%23d64545'%3E%3Ccircle cx='33.3' cy='9.4' r='3.3'/%3E%3Ccircle cx='38.7' cy='9.4' r='3.3'/%3E%3Cpolygon points='30.5,10.4 41.5,10.4 36,18'/%3E%3C/g%3E%3Cpolygon fill='%23d64545' points='12,28.6 16.2,35 12,41.4 7.8,35'/%3E%3Cg fill='%23d9b44a'%3E%3Ccircle cx='36' cy='31.3' r='3.2'/%3E%3Ccircle cx='33.1' cy='34.6' r='3.2'/%3E%3Ccircle cx='38.9' cy='34.6' r='3.2'/%3E%3Cpolygon points='35.2,36 36.8,36 37.8,40.4 34.2,40.4'/%3E%3C/g%3E%3C/svg%3E"); }
-/* jackpot : le 7 de la machine à sous */
+/* jackpot: slot-machine 7 */
 [data-theme="jackpot"] .b::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath fill='%23efb63f' d='M5 5H35V12L20 35H11L26 12H5Z'/%3E%3C/svg%3E"); }
-/* wizard : étoile à quatre branches */
+/* wizard: four-pointed star */
 [data-theme="wizard"] .b::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpolygon fill='%23b8923a' points='20,3 24.5,15.5 37,20 24.5,24.5 20,37 15.5,24.5 3,20 15.5,15.5'/%3E%3C/svg%3E"); }
 .f { transform: rotateY(180deg); border: 1.5px solid var(--c); color: var(--c); font: 500 calc(var(--su) * .52)/1 Fraunces, Georgia, serif; }
 [data-r=n] { --c: var(--neg); } [data-r=z] { --c: var(--zero); } [data-r=l] { --c: var(--low); }
@@ -275,9 +269,9 @@ svg.rank { width: 1em; height: 1em; margin-left: 4px; vertical-align: -0.15em; }
 .drawn { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: calc(var(--su) * .1); }
 .drawn.can:hover { filter: brightness(1.5); }
 
-/* Cases vides d'une colonne retirée */
+/* Empty slots of a removed column */
 .hole { width: var(--su); height: var(--su); border: 1px dashed var(--line); border-radius: calc(var(--su) * .1); opacity: .4; }
-/* Animation de disparition d'une colonne (3 cases vides qui "respirent") */
+/* Removed column: 3 pulsing empty slots */
 @keyframes holePulse { 0%, 100% { opacity: .4; } 50% { opacity: .15; } }
 .hole { animation: holePulse 2s ease-in-out infinite; }
 
@@ -288,7 +282,7 @@ table.scores { border-collapse: collapse; }
 table.scores th, table.scores td { padding: 3px 14px; text-align: center; border-bottom: 1px solid var(--line); }
 table.scores th { color: var(--mut); font-weight: 400; font-size: 12px; }
 
-/* Écran de fin de partie, par-dessus la table (voir endScreenEl dans table.js) */
+/* Game-over screen over the table (endScreenEl in table.js) */
 .endscreen { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; padding: 16px; background: color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter: blur(2px); animation: endIn .35s ease both; }
 .endscreen.late { animation-delay: 1.6s; }
 @keyframes endIn { from { opacity: 0; } }
@@ -305,7 +299,7 @@ table.scores th { color: var(--mut); font-weight: 400; font-size: 12px; }
 .end-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; }
 .end-actions .muted { flex-basis: 100%; margin: 0; }
 
-/* Carte fantôme qui vole d'une position à l'autre (voir fly() dans table.js) */
+/* Ghost card flying between positions (table.js) */
 .flying { position: fixed; margin: 0; z-index: 50; pointer-events: none; transform-origin: top left; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -316,8 +310,7 @@ table.scores th { color: var(--mut); font-weight: 400; font-size: 12px; }
   .endscreen { animation: none; }
 }
 
-/* Fenêtre étroite ou portrait (ratio largeur/hauteur ≤ 1,3) :
-   plateau carré, colonne d'infos en dessous sous forme de mosaïque. */
+/* Narrow or portrait window (ratio ≤ 1.3): square board, info cards below. */
 @media (max-aspect-ratio: 13/10) {
   .topbar { padding: 0 3%; }
   .stage { align-items: flex-start; }

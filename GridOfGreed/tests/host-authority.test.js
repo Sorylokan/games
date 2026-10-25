@@ -1,10 +1,10 @@
-// Tests de l'autorité hôte : salon, assignation, refus, reconnexion, diffusion des vues.
+// Host authority tests: lobby, seats, refusals, reconnection, view broadcast.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { HostAuthority } from "../src/networking/host-authority.js";
 import { MESSAGE_TYPES, createActionRequest } from "../src/networking/messages.js";
 
-// Transport factice qui enregistre tout.
+// Fake transport that records everything.
 const makeHost = () => {
   const publicMessages = [];
   const privateMessages = [];
@@ -58,7 +58,7 @@ test("startMatch lance la partie et chaque pair reçoit sa vue masquée", () => 
   assert.equal(result.ok, true);
   const update = privateMessages.at(-1);
   assert.equal(update.message.type, MESSAGE_TYPES.STATE_UPDATE);
-  // La vue masque la pioche (compteur seulement) et les cartes cachées.
+  // The view masks the draw pile (count only) and hidden cards.
   assert.equal(update.message.view.draw, undefined);
   assert.equal(typeof update.message.view.drawCount, "number");
   assert.equal(update.message.view.players[1].grid[0][0].v, null);
@@ -71,7 +71,7 @@ test("une action illégale est refusée sans diffusion", () => {
   authority.startMatch();
   const before = privateMessages.length;
 
-  // Ce n'est pas le moment de piocher (phase de révélation) + mauvais siège.
+  // Not the time to draw (reveal phase), and wrong seat.
   const wrongPeer = authority.handleRequest(createActionRequest("p2", { type: "drawPile" }), "peerB");
   assert.equal(wrongPeer.ok, false);
   assert.equal(wrongPeer.message.error, "JOUEUR_NON_ASSIGNE");
@@ -96,7 +96,7 @@ test("initialReveal passe par l'hôte même hors tour, et diffuse les vues", () 
   const view = privateMessages.at(-1).message.view;
   assert.equal(view.players[1].grid[0][0].up, true);
   assert.notEqual(view.players[1].grid[0][0].v, null);
-  assert.equal(view.players[1].grid[2][0].v, null); // toujours cachée
+  assert.equal(view.players[1].grid[2][0].v, null); // still hidden
 });
 
 test("revanche : réservée à l'hôte, et seulement une fois la partie terminée", () => {
@@ -107,7 +107,7 @@ test("revanche : réservée à l'hôte, et seulement une fois la partie terminé
   const tooEarly = authority.handleRequest(createActionRequest("p1", { type: "rematch" }));
   assert.equal(tooEarly.ok, false);
 
-  // On force une fin de partie pour tester la relance.
+  // Force a game over to test the rematch.
   authority.state.phase = "gameOver";
   authority.state.players.forEach((p) => { p.total = 120; });
   const notHost = authority.handleRequest(createActionRequest("p2", { type: "rematch" }), "peerA");
@@ -125,11 +125,11 @@ test("reconnexion : un jeton connu reprend son siège en pleine partie", () => {
   authority.startMatch();
   authority.releasePeer("peerA");
 
-  // Inconnu sans jeton : refusé. Puis Bob revient avec un nouveau peerId.
+  // Unknown peer without a token: refused. Then Bob comes back with a new peerId.
   assert.equal(authority.assignPeer("peerB", "Intrus", null), null);
   assert.equal(privateMessages.at(-1).message.reason, "started");
   assert.equal(authority.assignPeer("peerB", "Bob", "tokA"), "p2");
-  // PLAYER_ASSIGNED, puis aussitôt une vue d'état à jour sur le nouveau pair.
+  // PLAYER_ASSIGNED, then right away an up-to-date view for the new peer.
   assert.equal(privateMessages.at(-2).message.playerId, "p2");
   assert.equal(privateMessages.at(-1).message.type, MESSAGE_TYPES.STATE_UPDATE);
 });

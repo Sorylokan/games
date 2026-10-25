@@ -1,4 +1,4 @@
-/* Thèmes « Classique » : mêmes couleurs que Grid of Greed (Nuit est dans base.css). */
+/* Classic themes: same colors as Grid of Greed (Night is in base.css). */
 
 :root[data-skin="palace"] { --bg: #07140e; --card: #0f2318; --accent: #d4af37; --line: #2f5a43; --txt: #d6e6dc; --mut: #7fa08d; }
 

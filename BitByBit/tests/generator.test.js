@@ -10,7 +10,7 @@ const nextId = () => ++id;
 
 test('chaque niveau généré est faisable et compte exactement les pixels de la fresque', () => {
   for (let i = 0; i < MAPS.length; i++) {
-    const lvl = { ...levelAt(i), tries: 2 }; // moins d'essais : le test reste rapide
+    const lvl = { ...levelAt(i), tries: 2 }; // fewer tries keeps the test fast
     const { N, target, queues } = generate(lvl, nextId);
     const boxes = queues.flat();
     assert.equal(boxes.reduce((s, b) => s + b.count, 0), remaining(target), lvl.name);

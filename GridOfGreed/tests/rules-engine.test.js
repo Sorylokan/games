@@ -8,7 +8,7 @@ test('prendre la défausse puis échanger : la carte remplacée la remplace, la 
   const s = play(mk(2)); s.discard = [3, 5]; setGrid(s, 0, A, [4]);
   let r = ok(dispatch(s, 'p0', { type: 'drawDiscard' }));
   assert.equal(r.turn.drawn, 5);
-  r = ok(dispatch(r, 'p0', { type: 'swap', col: 1, row: 1 })); // carte cachée de valeur 1
+  r = ok(dispatch(r, 'p0', { type: 'swap', col: 1, row: 1 })); // hidden card worth 1
   assert.equal(r.discard.at(-1), 1);
   assert.deepEqual(r.players[0].grid[1][1], { v: 5, up: true });
   assert.equal(r.current, 1);
@@ -17,7 +17,7 @@ test('prendre la défausse puis échanger : la carte remplacée la remplace, la 
 test('pioche : on peut la défausser mais il faut retourner une carte cachée', () => {
   const s = play(mk(2)); s.draw = [9]; setGrid(s, 0, A, [0, 5]);
   let r = ok(dispatch(s, 'p0', { type: 'drawPile' }));
-  assert.equal(dispatch(r, 'p0', { type: 'discardFlip', col: 0, row: 1 }).ok, false); // déjà visible
+  assert.equal(dispatch(r, 'p0', { type: 'discardFlip', col: 0, row: 1 }).ok, false); // already face up
   r = ok(dispatch(r, 'p0', { type: 'discardFlip', col: 0, row: 0 }));
   assert.equal(r.discard.at(-1), 9);
   assert.equal(r.players[0].grid[0][0].up, true);

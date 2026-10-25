@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { parseMap, reachable, collect, settle, remaining } from '../src/core/grid.js';
 
-// Un carré rouge entouré de bleu : le rouge est caché tant que le bleu n'est pas parti.
+// A red square surrounded by blue: red is unreachable until the blue is gone.
 const MAP = [
   'BBBB',
   'BRRB',
@@ -18,7 +18,7 @@ test('seul le bord est atteignable au départ', () => {
 
 test('un pixel caché devient atteignable quand on ouvre un passage', () => {
   const g = parseMap(MAP);
-  g[0][1] = null; // on retire un bleu du haut
+  g[0][1] = null; // remove one blue on top
   assert.ok(reachable(g, 4, 'R').some(([r, c]) => r === 1 && c === 1));
 });
 

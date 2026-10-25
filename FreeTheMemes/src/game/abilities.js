@@ -127,8 +127,7 @@ export const resolveAbility = (state, pendingAction, choice = {}, { rollDie } = 
 
     const sides = ABILITY_DICE[pendingAction.abilityId];
     const amount = (rollDie ?? ((dieSides) => Math.floor(Math.random() * dieSides) + 1))(sides);
-    // Evenement de jet dedie : permet a l'UI d'animer l'odometre (d6 Death Note /
-    // d4 Hadouken) avant de reveler les degats, comme pour les attaques normales.
+    // Dedicated roll event so the UI animates the dice (d6 Death Note / d4 Hadouken) before showing damage.
     nextState = {
       ...nextState,
       events: [...nextState.events, {

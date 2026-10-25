@@ -1,4 +1,4 @@
-// Fin de tour, dernier tour après qu'un joueur a tout révélé.
+// End of turn, and the last round once someone has revealed everything.
 import { allUp } from './game-state.js';
 import { scoreRound } from './scoring.js';
 import { resolveRoundEnd } from './victory.js';

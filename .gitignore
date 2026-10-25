@@ -1,1 +1,50 @@
-/#Dev_Files/*
+
+# Development / temporary files
+# ─────────────────────────────────────────
+*.old
+*.disabled
+*-test.*
+
+
+# Development documentation
+# ─────────────────────────────────────────
+/#Dev_Files/
+**/Dev_Files/
+
+
+# Tests / Coverage reports
+# ─────────────────────────────────────────
+
+coverage/
+.nyc_output/
+
+
+# Dependencies
+# ─────────────────────────────────────────
+node_modules/
+
+
+# Build / generated files
+# ─────────────────────────────────────────
+dist/
+build/
+
+
+# Environment / local configuration
+# ─────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+
+# IDE / editor files
+# ─────────────────────────────────────────
+.vscode/
+.idea/
+
+
+# OS files
+# ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini

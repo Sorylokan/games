@@ -1,9 +1,9 @@
-// Bibliothèque des fresques perso, gardée dans le navigateur, plus le brouillon en cours.
+// Saved custom murals (in the browser) and the current draft.
 import { STORAGE } from '../config.js';
 import { store } from '../storage.js';
 import { decodeMural, encodeMural } from '../core/mural-code.js';
 
-// On stocke les fresques sous forme de code : compact, et déjà validé au relecture.
+// Stored as share codes: compact, and validated when read back.
 export function list() {
   const raw = store.get(STORAGE.murals, []);
   if (!Array.isArray(raw)) return [];
@@ -17,7 +17,7 @@ function write(entries) {
   store.set(STORAGE.murals, entries.map(({ id, updated, name, map }) => ({ id, updated, code: encodeMural({ name, map }) })));
 }
 
-// Enregistre (ou met à jour si id est connu). Renvoie l'id.
+// Saves (or updates a known id). Returns the id.
 export function save(mural, id = null) {
   const entries = list();
   const now = Date.now();
@@ -34,7 +34,7 @@ export function remove(id) {
 
 export const get = (id) => list().find((e) => e.id === id) ?? null;
 
-// Brouillon : sauvé à chaque modification, pour ne rien perdre en rechargeant la page.
+// Draft: saved on every change, survives a reload.
 export const saveDraft = (mural, editingId) => store.set(STORAGE.draft, { code: encodeMural(mural), editingId });
 export function loadDraft() {
   const d = store.get(STORAGE.draft, null);

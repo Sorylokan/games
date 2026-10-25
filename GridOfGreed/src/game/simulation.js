@@ -1,4 +1,4 @@
-// Parties jouées au hasard : tests d'invariants, et base pour de futurs bots.
+// Random games: invariant tests, and a base for future bots.
 import { createGame, startNextRound } from './setup.js';
 import { dispatch, legalActions } from './rules-engine.js';
 import { hiddenSlots } from './game-state.js';
@@ -14,7 +14,7 @@ export function mulberry32(seed) {
   };
 }
 
-// Joue une partie complète ; onStep(state) est appelé après chaque coup.
+// Plays a full game; onStep(state) runs after each move.
 export function randomGame(n, seed, onStep = () => {}) {
   const rng = mulberry32(seed);
   const pick = (a) => a[Math.floor(rng() * a.length)];

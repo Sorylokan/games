@@ -1,10 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600&display=swap");
 
-/* THEME SYNTHWAVE / VAPORWAVE : surcouche du Bureau 2004.
-   Activation : <link> après styles.css + class="theme-synthwave" sur <body>.
-   Néon cyan #01cdfe / magenta #ff71ce sur fond nuit, grille rétro + sunset,
-   scanlines. Les variables du Bureau (--ink, --paper, --pink...) sont
-   redéfinies : la plupart des règles existantes se recolorent seules. */
+/* Synthwave theme: neon cyan #01cdfe / magenta #ff71ce on night, retro grid + sunset, scanlines.
+Redefines the base variables (--ink, --paper, --pink…), so most rules recolor themselves. */
 
 body.theme-synthwave {
   --desk: #12041f; --ink: #05010f; --paper: #fdfaff; --chrome: #241136; --muted: #8a6fb0;
@@ -19,7 +16,7 @@ body.theme-synthwave {
   background: linear-gradient(180deg, #0b0121 0%, #2a0a4a 45%, #12041f 100%);
 }
 body.theme-synthwave #app { position: relative; z-index: 1; }
-/* Grille rétro en perspective dans le bas + sunset flou au centre */
+/* Retro perspective grid at the bottom + blurred sunset */
 body.theme-synthwave::before {
   content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background:
@@ -39,13 +36,13 @@ body.theme-synthwave::after {
   -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 14px, transparent 14px 18px);
   mask-image: repeating-linear-gradient(180deg, #000 0 14px, transparent 14px 18px);
 }
-/* Scanlines très légères par-dessus tout */
+/* Very light scanlines on top */
 body.theme-synthwave #app::after {
   content: ""; position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: .12;
   background: repeating-linear-gradient(0deg, transparent 0 3px, #000 3px 4px);
 }
 
-/* ---- Fenêtres : cadre sombre, liseré néon ---- */
+/* ---- Windows: dark frame, neon rim ---- */
 body.theme-synthwave .win { background: #1a0b30; border: 2px solid var(--cyan); box-shadow: var(--shadow); color: #eaf6ff; }
 body.theme-synthwave .win-title {
   margin: -2px 0 0 -2px; padding: 4px 12px; background: linear-gradient(90deg, var(--magenta), var(--purple));
@@ -66,7 +63,7 @@ body.theme-synthwave .online-actions, body.theme-synthwave .invite-block, body.t
 body.theme-synthwave .online-actions::before, body.theme-synthwave .invite-block::before, body.theme-synthwave .room-roster::before { background: linear-gradient(90deg, var(--magenta), var(--purple)); color: #fff; font: 800 13px var(--display); letter-spacing: .12em; text-transform: uppercase; }
 body.theme-synthwave .home-intro, body.theme-synthwave .room-intro { color: #cfe9ff; }
 
-/* ---- Boutons : néon creux ---- */
+/* ---- Buttons: hollow neon ---- */
 body.theme-synthwave .action {
   background: transparent; color: var(--cyan); border: 2px solid var(--cyan); border-radius: 3px;
   box-shadow: 0 0 10px rgba(1, 205, 254, .4), inset 0 0 8px rgba(1, 205, 254, .2);
@@ -92,7 +89,7 @@ body.theme-synthwave .zone .empty { color: var(--muted); }
 body.theme-synthwave .dice-body { background: #12041f; }
 body.theme-synthwave .dice-slot .dice-tray { --gold: 1, 205, 254; --die-bg: #12041f; }
 
-/* ---- Pions : pastilles néon ---- */
+/* ---- Pieces: neon dots ---- */
 body.theme-synthwave .piece { background: #12041f; border: 2px solid var(--pc, var(--cyan)); color: #fff; border-radius: 99px; box-shadow: 0 0 8px var(--pc, rgba(1, 205, 254, .7)); }
 body.theme-synthwave .piece-avatar, body.theme-synthwave .pl-avatar { border: 2px solid var(--ink); border-radius: 50%; box-shadow: 0 0 8px var(--pc, rgba(1, 205, 254, .7)); }
 body.theme-synthwave .piece.current { background: var(--cyan); color: var(--ink); }
@@ -108,7 +105,7 @@ body.theme-synthwave .pending-label { color: #cfe9ff; }
 body.theme-synthwave .victory { background: linear-gradient(90deg, var(--magenta), var(--purple)); color: #fff; border: 2px solid var(--cyan); box-shadow: 0 0 18px rgba(255, 113, 206, .7); }
 body.theme-synthwave .victory h2 { font: 800 34px var(--display); text-shadow: 0 0 12px rgba(255, 255, 255, .8); }
 
-/* ---- Panneaux latéraux ---- */
+/* ---- Side panels ---- */
 body.theme-synthwave .hp-bar { border: 2px solid var(--cyan); background: #12041f; }
 body.theme-synthwave .hp-fill { background: linear-gradient(90deg, var(--green), var(--cyan)); }
 body.theme-synthwave .me-name b { font: 800 18px var(--display); letter-spacing: .06em; color: var(--cyan); }

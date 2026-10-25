@@ -1,4 +1,4 @@
-// Déroulement d'une partie : lancer un niveau, poser une boîte, faire avancer les porteurs, gagner ou perdre.
+// Game flow: start a level, place boxes, move carriers, win or get stuck.
 import { BASE_SPEED, SPAWN_MS, MAX_OUT, BOX_OPEN_MS, BOX_CLOSE_MS, STORAGE } from '../config.js';
 import { clone, remaining } from '../core/grid.js';
 import { generate } from '../core/generator.js';
@@ -13,14 +13,14 @@ import { renderUI, shake } from '../ui/panel.js';
 import { showOverlay, hideOverlay } from '../ui/overlay.js';
 import { t } from '../ui/lang.js';
 
-// Aventure : la fresque n° li, avec sa difficulté.
+// Adventure: mural number li.
 export function start(li) {
   launch(levelAt(li), li);
   store.set(STORAGE.level, li);
 }
 
-// Fresque perso venue de l'atelier, ou de la communauté si mural.author est donné
-// (ne touche pas à la progression de l'aventure).
+// Custom mural (editor or shared link), or community mural if mural.author is set.
+// Doesn't touch adventure progress.
 export function startCustom(mural) {
   launch(customLevel(mural), null);
 }
@@ -33,11 +33,11 @@ function launch(lvl, li) {
     total: remaining(target),
     picked: 0,
     cap: lvl.cap,
-    line: Array(lvl.cap).fill(null), // places de la ligne : null ou une boîte
-    ants: [],                        // porteurs en route
-    claimed: new Set(),              // pixels déjà visés par un porteur
-    pickedAt: new Map(),             // moment où chaque pixel a été emporté (petite animation)
-    ver: 0, bfsCache: new Map(),     // cache des chemins, invalidé à chaque pixel emporté
+    line: Array(lvl.cap).fill(null), // line slots: null or a box
+    ants: [],                        // carriers on the move
+    claimed: new Set(),              // pixels already targeted
+    pickedAt: new Map(),             // pickup time per pixel (small animation)
+    ver: 0, bfsCache: new Map(),     // path cache, cleared on every pickup
     status: 'play',
     rescueUsed: false,
   };
@@ -48,7 +48,7 @@ function launch(lvl, li) {
 
 export const restart = () => (app.st.lvl.custom ? launch(app.st.lvl, null) : start(app.st.li));
 
-// Liens de fin de partie pour une fresque perso.
+// End-of-game actions for custom murals.
 const editLink = () => { location.href = './editor/#edit=' + encodeMural(app.st.lvl); };
 export function backToAdventure() {
   history.replaceState(null, '', location.pathname);
@@ -56,7 +56,7 @@ export function backToAdventure() {
   start(Number.isInteger(saved) && saved >= 0 ? saved : 0);
 }
 
-// Pose la boîte de tête de la file qi sur la première place libre.
+// Puts the first box of queue qi on the first free slot.
 export function place(qi, el) {
   const st = app.st;
   if (st.status !== 'play') return;
@@ -69,7 +69,7 @@ export function place(qi, el) {
   renderUI();
 }
 
-// Avance la partie de dt secondes.
+// Advances the game by dt seconds.
 export function update(now, dt) {
   const st = app.st;
   if (st.status !== 'play') return;
@@ -103,7 +103,7 @@ function moveCarriers(st, now, dt) {
   st.ants = st.ants.filter((a) => {
     a.d += v * a.spd * dt;
     if (a.d < a.len) return true;
-    if (!a.back) { // arrivé au pixel : il l'emporte et fait demi-tour
+    if (!a.back) { // reached the pixel: take it and turn back
       const id = a.r * st.N + a.c;
       st.grid[a.r][a.c] = null;
       st.claimed.delete(id);
@@ -112,7 +112,7 @@ function moveCarriers(st, now, dt) {
       a.back = true; a.d = 0; a.pts = a.pts.slice().reverse();
       return true;
     }
-    a.box.got++; a.box.out--; // rentré à la boîte
+    a.box.got++; a.box.out--; // back in the box
     if (a.box.got === a.box.count) a.box.doneAt = now;
     return false;
   });
@@ -128,7 +128,7 @@ function closeEmptyBoxes(st, now) {
 
 function checkEnd(st, now) {
   if (st.picked === st.total && !st.ants.length && st.line.every((b) => !b)) return win();
-  // Coincé : personne dehors, aucune boîte ne trouve de pixel, et plus de place (ou plus de boîtes).
+  // Stuck: nobody out, no box can find a pixel, and no free slot (or no boxes left).
   const idle = !st.ants.length && st.line.every((b) => !b || (b.blocked && !b.doneAt));
   const noMove = st.line.every((b) => b) || st.queues.every((q) => !q.length);
   const settled = st.line.some((b) => b) && now - Math.max(...st.line.filter(Boolean).map((b) => b.placedAt)) > 500;
@@ -153,7 +153,7 @@ function win() {
   st.status = 'win';
   if (st.lvl.custom) {
     const name = st.lvl.name || t('custom.untitled');
-    // Pas de « Modifier » pour la communauté : il mènerait à l'atelier, qui reste caché.
+    // No "Edit" for community murals: it would reveal the hidden editor.
     showOverlay(t('end.winTitle'), t(st.rescueUsed ? 'end.winHelped' : 'end.winClean', { name }), [
       { label: t('end.replay'), fn: restart },
       !st.lvl.community && { label: t('custom.edit'), ghost: true, fn: editLink },

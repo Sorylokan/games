@@ -1,10 +1,4 @@
-/*
- * CARD SOUND ENGINE
- * Vanilla JavaScript + Web Audio API
- *
- * Direction : Soft Tactile / Digital Mystery
- * Aucun asset audio ni dépendance externe.
- */
+// Card sound engine (Web Audio API, no audio files). Direction: soft tactile / digital mystery.
 
 const CardSound = (() => {
   let ctx = null;
@@ -19,16 +13,16 @@ const CardSound = (() => {
     volume: 0.75,
     muted: false,
 
-    // Intensité des composantes
+    // Component levels
     texture: 0.28,
     resonance: 0.24,
     mystery: 0.60,
     depth: 0.40,
 
-    // Réverbération discrète
+    // Subtle reverb
     reverb: 0.13,
 
-    // Évite que les actions répétées soient identiques
+    // Slight variation so repeated actions don't sound identical
     variation: 0.12,
   };
 
@@ -84,7 +78,7 @@ const CardSound = (() => {
     const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
     const data = buffer.getChannelData(0);
 
-    // Bruit adouci : chaque échantillon est corrélé au précédent.
+    // Softened noise: each sample follows the previous one.
     let previous = 0;
 
     for (let i = 0; i < length; i++) {
@@ -108,7 +102,7 @@ const CardSound = (() => {
         const envelope = Math.pow(1 - t, decay);
         const diffuse = Math.random() * 2 - 1;
 
-        // Réverbération sombre, sans queue métallique prononcée.
+        // Dark reverb, no metallic tail.
         data[i] = diffuse * envelope * 0.20;
       }
     }
@@ -127,7 +121,7 @@ const CardSound = (() => {
     }
   }
 
-  // Enveloppe sans discontinuité brutale.
+  // Click-free envelope.
   function envelope(gain, start, peak, attack, decay, end) {
     gain.gain.cancelScheduledValues(start);
     gain.gain.setValueAtTime(0.0001, start);
@@ -143,11 +137,7 @@ const CardSound = (() => {
     gain.gain.setValueAtTime(0.0001, end);
   }
 
-  /*
-   * Résonateur :
-   * une fréquence, une attaque et une décroissance.
-   * Plusieurs résonateurs simultanés créent le timbre.
-   */
+  // Resonator: one frequency, attack and decay. Several at once make the timbre.
   function resonator({
     frequency,
     volume,
@@ -181,11 +171,7 @@ const CardSound = (() => {
     osc.stop(start + attack + decay + 0.025);
   }
 
-  /*
-   * Microtexture :
-   * petit souffle modelé par un filtre qui bouge
-   * pendant le son. Ce n'est pas un bruit constant.
-   */
+  // Microtexture: a small breath shaped by a moving filter (not constant noise).
   function texture({
     duration = 0.08,
     volume = 0.025,
@@ -225,10 +211,7 @@ const CardSound = (() => {
     source.stop(start + duration + 0.015);
   }
 
-  /*
-   * Transitoire de contact :
-   * une petite impulsion texturée, sans clic brutal.
-   */
+  // Contact transient: a small textured impulse, no harsh click.
   function transient({
     volume = 0.035,
     duration = 0.025,
@@ -266,11 +249,7 @@ const CardSound = (() => {
     source.stop(start + duration + 0.01);
   }
 
-  /*
-   * Couche mystérieuse :
-   * des partiels inharmoniques et légèrement désaccordés.
-   * Le niveau reste proportionnel au réglage mystery.
-   */
+  // Mystery layer: slightly detuned inharmonic partials, scaled by the mystery setting.
   function shimmer(base, start, intensity = 1) {
     const amount = settings.mystery * intensity;
 
@@ -304,12 +283,7 @@ const CardSound = (() => {
     );
   }
 
-  /*
-   * PRENDRE UNE CARTE
-   *
-   * Sensation : la carte quitte doucement sa surface.
-   * Un mouvement léger, une matière douce, une résonance.
-   */
+  // Pick up a card: it gently leaves the surface.
   function pickup() {
     if (!initialized || settings.muted) return;
 
@@ -343,12 +317,7 @@ const CardSound = (() => {
     shimmer(310, now + 0.018, 0.55);
   }
 
-  /*
-   * DÉPLACER UNE CARTE
-   *
-   * Sensation : un glissement directionnel,
-   * avec une évolution de timbre au lieu d'un son statique.
-   */
+  // Move a card: a directional slide with an evolving timbre.
   function slide() {
     if (!initialized || settings.muted) return;
 
@@ -364,7 +333,7 @@ const CardSound = (() => {
       start: now,
     });
 
-    // Deux petites composantes décalées donnent du mouvement.
+    // Two slightly offset partials add movement.
     resonator({
       frequency: variation(390),
       volume: 0.012 * settings.resonance,
@@ -386,12 +355,7 @@ const CardSound = (() => {
     });
   }
 
-  /*
-   * JOUER UNE CARTE
-   *
-   * Sensation : un contact doux, mais mémorable.
-   * Pas de gros impact grave ni de note musicale explicite.
-   */
+  // Play a card: a soft but memorable contact, no heavy thud or obvious note.
   function play() {
     if (!initialized || settings.muted) return;
 
@@ -406,7 +370,7 @@ const CardSound = (() => {
       start: now,
     });
 
-    // Corps de la carte : deux résonances, pas un simple bip.
+    // Card body: two resonances, not a plain beep.
     resonator({
       frequency: variation(185),
       volume: 0.040 * (0.7 + depth * 0.5),
@@ -427,7 +391,7 @@ const CardSound = (() => {
       start: now + 0.003,
     });
 
-    // Texture de contact, très courte.
+    // Very short contact texture.
     texture({
       duration: 0.050,
       volume: 0.025 * settings.texture,
@@ -437,7 +401,7 @@ const CardSound = (() => {
       start: now,
     });
 
-    // Signature numérique : elle arrive après le contact.
+    // Digital signature, after the contact.
     shimmer(185, now + 0.012, 0.8);
   }
 
@@ -490,21 +454,19 @@ const CardSound = (() => {
 
 export default CardSound;
 
-/* ---------------- Adaptation GoG (surface attendue par app.js) ----------------
-   CardSound.pickup/slide/play pour les cartes ; les événements de partie
-   (colonne, ×2, manche, victoire) restent synthétisés en petites notes. */
+// --- Grid of Greed API (used by app.js): CardSound for cards, small synth notes for game events ---
 
 export function setMuted(v) { CardSound.set({ muted: v }); }
 export function isMuted() { return CardSound.getSettings().muted; }
 
-// Débloque l'audio au premier geste (politique autoplay des navigateurs).
+// Unlock audio on the first gesture (browser autoplay policy).
 ["pointerdown", "keydown"].forEach((type) =>
   window.addEventListener(type, () => { CardSound.resume().catch(() => {}); }, { passive: true })
 );
 
 const ready = () => !isMuted();
 
-// Petite note auxiliaire via un contexte dédié léger (évite de toucher au moteur carte).
+// Small extra note through its own light context (keeps the card engine untouched).
 let auxCtx = null;
 function auxAudio() {
   if (!auxCtx) {
@@ -532,52 +494,51 @@ function note(type, freq, peak, duration, freqEnd, delay = 0) {
   o.stop(t + duration + 0.02);
 }
 
-// Clic d'interface discret.
+// Soft UI click.
 export function click() {
   if (!ready()) return;
   note("sine", 540, 0.07, 0.05);
 }
 
-// Carte générique : glissement feutré.
+// Generic card: soft slide.
 export function flip() {
   if (!ready()) return;
   CardSound.slide();
 }
 
-// Colonne retirée : glissement grave.
+// Column removed: low slide.
 export function column() {
   if (!ready()) return;
   note("sine", 200, 0.16, 0.3, 95);
 }
 
-// Greedy puni : deux notes descendantes.
+// Punished finisher: two falling notes.
 export function greedy() {
   if (!ready()) return;
   note("triangle", 294, 0.1, 0.14);
   note("triangle", 175, 0.11, 0.24, null, 0.15);
 }
 
-// Fin de manche : petit accord.
+// End of round: small chord.
 export function round() {
   if (!ready()) return;
   note("sine", 392, 0.1, 0.28);
   note("sine", 523, 0.1, 0.34, null, 0.07);
 }
 
-// Victoire finale : arpège montant feutré.
+// Final victory: soft rising arpeggio.
 export function win() {
   if (!ready()) return;
   [392, 494, 587, 784].forEach((f, i) => note("sine", f, 0.11, 0.4, null, i * 0.1));
 }
 
-// Coup refusé : petit buzz grave assoupli.
+// Refused move: soft low buzz.
 export function bad() {
   if (!ready()) return;
   note("triangle", 110, 0.07, 0.16, 80);
 }
 
-// Joue les sons des événements moteur frais (appelé à chaque nouvelle vue).
-// try/catch : un AudioContext pas prêt ne doit jamais casser le rendu.
+// Plays sounds for fresh engine events (on every new view). Never breaks rendering if audio isn't ready.
 export function playEvents(events) {
   if (!ready() || !events?.length) return;
   try {
@@ -588,5 +549,5 @@ export function playEvents(events) {
       else if (e.type === "roundEnd") { if (e.doubled) greedy(); else round(); }
       else if (e.type === "gameOver") win();
     }
-  } catch { /* contexte audio indisponible */ }
+  } catch { /* audio unavailable */ }
 }

@@ -11,7 +11,7 @@ test('viewFor masque les cartes cachées, la pioche et la carte piochée des aut
   assert.equal(other.draw, undefined);
   assert.equal(other.drawCount, r.draw.length);
   assert.ok(other.players.every((p) => p.grid.flat().every((c) => c.up || c.v === null)));
-  // Correction voulue : la carte piochée est visible par tous (masquage retiré du test).
+  // By design: the drawn card is visible to everyone.
   assert.equal(other.turn.drawn, 8);
   assert.equal(self.turn.drawn, 8);
 });

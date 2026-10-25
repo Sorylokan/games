@@ -1,9 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Anton&family=Comic+Neue:wght@700&display=swap");
 
-/* THEME MEMES / WEB CULTURE : surcouche du socle neutre.
-   Activation : <link> après styles.css + class="theme-memes" sur <body>.
-   Impact font, couleurs flashy, effet glitch, texture points, bordures epaisses.
-   Aucune image copiee : juste du CSS qui evoque la culture memes. */
+/* Memes theme: Impact font, loud colors, glitch effect, halftone dots, thick borders. CSS only, no copied images. */
 
 body.theme-memes {
   --desk: #1a1a2e; --ink: #000; --paper: #fff; --chrome: #eee; --muted: #888;
@@ -19,13 +16,13 @@ body.theme-memes {
     linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
 }
 body.theme-memes #app { position: relative; z-index: 1; }
-/* Texture de points façon meme imprime / halftone */
+/* Halftone dot texture */
 body.theme-memes::before {
   content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .15;
   background: radial-gradient(circle, #fff 1px, transparent 1.5px) 0 0 / 18px 18px;
 }
 
-/* ---- Fenêtres : carte postale epaisse ---- */
+/* ---- Windows: thick postcard ---- */
 body.theme-memes .win { background: var(--paper); border: 4px solid var(--ink); border-radius: 0; box-shadow: var(--shadow); }
 body.theme-memes .win-title {
   margin: 0; padding: 5px 12px;
@@ -44,7 +41,7 @@ body.theme-memes .eyebrow { background: var(--meme-pink); color: #fff; border: 3
 body.theme-memes .online-actions, body.theme-memes .invite-block, body.theme-memes .room-roster { background: var(--paper); border: 4px solid var(--ink); box-shadow: var(--shadow); color: #000; }
 body.theme-memes .online-actions::before, body.theme-memes .invite-block::before, body.theme-memes .room-roster::before { background: var(--ink); color: var(--meme-yellow); font: 400 13px var(--display); letter-spacing: .05em; text-transform: uppercase; border-bottom: 4px solid var(--ink); }
 
-/* ---- Boutons : epais, flashy, qui "pop" ---- */
+/* ---- Buttons: thick, loud, popping ---- */
 body.theme-memes .action {
   background: var(--meme-yellow); color: var(--ink); border: 4px solid var(--ink); border-radius: 0;
   box-shadow: 4px 4px 0 var(--ink);
@@ -87,7 +84,7 @@ body.theme-memes .pending-label { color: #000; font-weight: 700; }
 body.theme-memes .victory { background: var(--meme-yellow); border: 4px solid var(--ink); box-shadow: var(--shadow); }
 body.theme-memes .victory h2 { font: 400 34px var(--display); color: var(--ink); text-transform: uppercase; }
 
-/* ---- Panneaux latéraux ---- */
+/* ---- Side panels ---- */
 body.theme-memes .hp-bar { border: 3px solid var(--ink); background: #fff; }
 body.theme-memes .hp-fill { background: var(--meme-pink); }
 body.theme-memes .me-name b { font: 400 16px var(--display); color: var(--ink); text-transform: uppercase; }

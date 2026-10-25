@@ -1,5 +1,4 @@
-/* Odomètre de dés. Tout est piloté par --cell, posé par le JS.
-   Police optionnelle : Barlow Condensed (sinon repli sur Arial Narrow). */
+/* Dice odometer, driven by --cell (set by JS). Optional font: Barlow Condensed (else Arial Narrow). */
 
 .dice-tray {
     --gold: 238, 229, 139;

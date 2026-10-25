@@ -1,5 +1,5 @@
-// i18n minimal (même modèle que Free the Memes) : messages plats par langue
-// dans locales/<langue>.json, variables {entre accolades}, repli sur le français.
+// Minimal i18n (same model as Free the Memes): flat messages in locales/<lang>.json,
+// {variables} in braces, French fallback.
 const DEFAULT_LOCALE = "fr";
 const SUPPORTED_LOCALES = ["fr", "en"];
 
@@ -26,7 +26,7 @@ export const loadLocale = async (locale, { baseUrl = "./locales", fetcher = fetc
   return response.json();
 };
 
-// Langue du navigateur si supportée, sinon français.
+// Browser language if supported, else French.
 export const getLocale = () => {
   if (typeof navigator === "undefined") {
     return DEFAULT_LOCALE;

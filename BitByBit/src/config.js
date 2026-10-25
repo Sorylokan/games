@@ -1,19 +1,19 @@
-// Réglages du jeu, regroupés ici pour pouvoir les ajuster sans fouiller le code.
+// Game tuning, in one place.
 
-export const BASE_SPEED = 6.5;   // cases par seconde pour un porteur (avant son multiplicateur d'espèce)
-export const SPAWN_MS = 130;     // délai entre deux porteurs qui sortent d'une même boîte
-export const MAX_OUT = 5;        // porteurs dehors en même temps par boîte
-export const BOX_OPEN_MS = 280;  // délai entre la pose d'une boîte et la sortie du premier porteur
-export const BOX_CLOSE_MS = 500; // durée de l'effacement d'une boîte vidée
-export const QUEUE_COUNT = 3;    // nombre de files de boîtes
+export const BASE_SPEED = 6.5;   // carrier speed in cells/s (before the species multiplier)
+export const SPAWN_MS = 130;     // delay between two carriers leaving the same box
+export const MAX_OUT = 5;        // carriers out at once per box
+export const BOX_OPEN_MS = 280;  // delay before a placed box sends its first carrier
+export const BOX_CLOSE_MS = 500; // fade-out time of an emptied box
+export const QUEUE_COUNT = 3;    // number of box queues
 
-// Clés de sauvegarde dans le navigateur. Le préfixe « pc- » date de « Petite Colonie » :
-// on le garde pour que la progression des joueurs survive au renommage.
+// localStorage keys. The "pc-" prefix comes from the old name ("Petite Colonie"):
+// kept so players don't lose their progress.
 export const STORAGE = {
   level: 'pc-level',
   best: 'pc-best',
   skin: 'pc-skin',
   lang: 'pc-lang',
-  murals: 'pc-murals', // fresques perso enregistrées (atelier)
-  draft: 'pc-draft',   // fresque en cours dans l'atelier
+  murals: 'pc-murals', // saved custom murals (editor)
+  draft: 'pc-draft',   // mural being edited
 };

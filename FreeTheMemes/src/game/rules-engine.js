@@ -125,7 +125,7 @@ export const killPlayer = (state, playerId, context = {}) => {
     bodyCountAtDeath
   };
   const rawKiller = context.source ? state.players[context.source] : null;
-  // Pas de récompense si on se tue soi-même ou si le tueur est déjà mort.
+  // No reward for killing yourself, or if the killer is already dead.
   const killer = rawKiller && rawKiller.id !== playerId && rawKiller.alive ? rawKiller : null;
   const hasSpinner = Boolean(killer?.equipment.includes("gods-hand-spinner"));
   const rewardAction = killer && !hasSpinner && player.equipment.length > 0

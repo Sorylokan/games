@@ -1,5 +1,5 @@
-// Fourmi (thèmes Classique, Printemps, Été, Hiver). Vue de dessus, tournée dans le sens de la marche,
-// dessinée dans la couleur du texte du thème.
+// Ant (Classic, Spring, Summer, Winter themes). Top view, rotated to face its heading,
+// drawn in the theme's text color.
 import { app } from '../../game/state.js';
 import { toScreen } from '../../game/geometry.js';
 import { ctx, tile } from '../canvas.js';

@@ -1,7 +1,5 @@
-/* THEME BUREAU 2004 : le look "bureau d'ordinateur" historique, devenu un theme.
-   Activation : <link> après styles.css + class="theme-desktop-2004" sur <body>.
-   Ne contient QUE l'apparence (couleurs, fond, ombres, police) : la structure
-   vit dans styles.css. Sert aussi de reference pour ecrire un nouveau theme. */
+/* Desktop 2004 theme: the original "computer desktop" look. Appearance only (layout is in styles.css);
+also the reference for writing a new theme. */
 
 body.theme-desktop-2004 {
   --desk: #2a3fd8; --ink: #101020; --paper: #fff; --chrome: #dcdcec; --muted: #5a5a78;

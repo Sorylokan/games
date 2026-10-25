@@ -1,6 +1,6 @@
-// Automne : renards, et de temps en temps un hérisson.
-// Chaque fonction dessine l'espèce debout, centrée en (0, 0), à l'échelle « 30 unités = 1 case ».
-// Paramètres : ph (phase d'animation), flip (1 ou -1 selon la direction), carry (couleur du pixel porté ou null).
+// Autumn: foxes, and now and then a hedgehog.
+// Each function draws the species standing, centered on (0, 0), 30 units = 1 cell.
+// ph: animation phase, flip: 1 or -1 (direction), carry: carried pixel color or null.
 import { ctx, tile, dot } from '../canvas.js';
 
 export function drawFox(ph, flip, carry) {

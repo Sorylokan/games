@@ -21,7 +21,7 @@ test('pas de doublement d\'un score négatif, même s\'il n\'est pas le plus bas
   const r = finishScenario(p0, p1);
   assert.deepEqual(r.roundScores.final, [-2, -12]);
   assert.equal(r.roundScores.doubled, false);
-  assert.equal(r.players[0].total, -2); // un score négatif fait baisser le total
+  assert.equal(r.players[0].total, -2); // a negative score lowers the total
 });
 
 test('au décompte, les colonnes identiques révélées sont retirées avant de compter', () => {

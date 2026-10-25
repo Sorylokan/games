@@ -1,4 +1,4 @@
-// Traduction (copie de src/i18n.js de Grid of Greed / FTM : module générique, rien à adapter).
+// Translator (same generic module as Grid of Greed / Free the Memes).
 const DEFAULT_LOCALE = "fr";
 
 const replaceVariables = (text, variables) => text.replace(
@@ -24,8 +24,7 @@ export const createTranslator = ({ locale, fallbackLocale = DEFAULT_LOCALE, mess
   };
 };
 
-// Dossier locales/ trouvé à partir de CE fichier (src/i18n.js), pas de la page : le jeu (index.html)
-// et l'atelier (editor/index.html) ne sont pas au même niveau mais partagent les mêmes traductions.
+// locales/ is resolved from this file, not the page: the game and editor/ sit at different depths.
 const LOCALES_URL = new URL("../locales", import.meta.url).href;
 
 export const loadLocale = async (locale, { baseUrl = LOCALES_URL, fetcher = fetch } = {}) => {

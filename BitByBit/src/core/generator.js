@@ -1,17 +1,16 @@
-// Fabrication des files de boîtes d'un niveau : faisable pour un joueur attentif,
-// mais piégeuse pour qui pose les boîtes au hasard.
+// Builds a level's box queues: solvable with care, a trap when boxes are placed at random.
 import { clone, remaining, reachable, collect, settle, rand, pick, parseMap } from './grid.js';
 
 const QUEUES = 3;
-const PACKET = [4, 12]; // pixels par boîte, par défaut (voir packetFor dans data/levels.js)
+const PACKET = [4, 12]; // default pixels per box (see packetFor in data/levels.js)
 
-// Nombre de boîtes d'une file (pour borner les boucles : on pose au plus une boîte par étape).
+// Total boxes: bounds the loops below (at most one box placed per step).
 const boxCount = (queues) => queues.reduce((s, q) => s + q.length, 0);
 
-// Démonte la fresque dans un ordre possible, en paquets de [lo, hi] pixels d'une même couleur.
+// One valid order to take the mural apart, in single-color packets of lo..hi pixels.
 export function buildSequence(target, N, rnd = Math.random, [lo, hi] = PACKET) {
   const g = clone(target), seq = [];
-  let guard = remaining(g) + 1; // chaque tour emporte au moins un pixel
+  let guard = remaining(g) + 1; // each pass removes at least one pixel
   while (remaining(g) && guard-- > 0) {
     const colors = [...new Set(reachable(g, N).map(([r, c]) => g[r][c]))];
     const color = pick(colors, rnd);
@@ -21,7 +20,7 @@ export function buildSequence(target, N, rnd = Math.random, [lo, hi] = PACKET) {
   return seq;
 }
 
-// Joueur prudent simulé : pose toujours la boîte qui débloque le plus. S'il gagne, le niveau est faisable.
+// Simulated careful player: always places the box that unlocks the most. If it wins, the level is solvable.
 export function solvable(target, N, queues, cap) {
   const g = clone(target), qs = queues.map((q) => q.slice());
   let line = [];
@@ -45,8 +44,7 @@ export function solvable(target, N, queues, cap) {
   return false;
 }
 
-// Joueur qui pose les boîtes au hasard : part des parties gagnées sur `runs` essais.
-// Sert à mesurer la difficulté (plus c'est bas, plus le niveau demande de réfléchir).
+// Win rate of a player placing boxes at random over `runs` games. Lower = harder level.
 export function randomWins(target, N, queues, cap, runs, rnd = Math.random) {
   let wins = 0;
   for (let k = 0; k < runs; k++) {
@@ -64,7 +62,7 @@ export function randomWins(target, N, queues, cap, runs, rnd = Math.random) {
   return wins / runs;
 }
 
-// Aucune file ne doit démarrer vide : on y déplace la dernière boîte de la file la plus longue.
+// No queue may start empty: move the last box of the longest queue into it.
 function fillEmptyQueues(qs) {
   for (const q of qs) {
     if (q.length) continue;
@@ -73,7 +71,7 @@ function fillEmptyQueues(qs) {
   }
 }
 
-// Une proposition de files : l'ordre de démontage, un peu mélangé, réparti au hasard entre les files.
+// Candidate queues: a valid order, slightly shuffled, dealt at random between queues.
 function candidate(target, N, lvl, nextId, rnd) {
   for (let attempt = 0; attempt < 40; attempt++) {
     const seq = buildSequence(target, N, rnd, lvl.packet);
@@ -89,8 +87,8 @@ function candidate(target, N, lvl, nextId, rnd) {
   return null;
 }
 
-// Génère un niveau complet : la grille de départ et les files de boîtes.
-// lvl vient de data/levels.js ; nextId fournit des identifiants uniques aux boîtes.
+// Full level: the grid and the box queues, keeping the hardest of `lvl.tries` candidates.
+// lvl comes from data/levels.js; nextId gives each box a unique id.
 export function generate(lvl, nextId, rnd = Math.random) {
   const N = lvl.map.length;
   const target = parseMap(lvl.map);
@@ -101,7 +99,7 @@ export function generate(lvl, nextId, rnd = Math.random) {
     const r = randomWins(target, N, qs, lvl.cap, lvl.runs ?? 12, rnd);
     if (r < easiest) { easiest = r; queues = qs; }
   }
-  if (!queues) { // filet de sécurité : l'ordre exact de démontage, toujours faisable
+  if (!queues) { // fallback: the exact take-apart order, always solvable
     queues = Array.from({ length: QUEUES }, () => []);
     buildSequence(target, N, rnd, lvl.packet).forEach((a, i) => queues[i % QUEUES].push({ id: nextId(), ...a }));
   }

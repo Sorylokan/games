@@ -1,4 +1,4 @@
-// Atelier : dessin du canevas (image de fond, grille, pixels) et saisie souris / doigt.
+// Editor canvas: background image, grid, pixels, and mouse / touch input.
 import { COLORS } from '../data/colors.js';
 import { $ } from '../dom.js';
 import { app } from '../game/state.js';
@@ -20,17 +20,16 @@ export function setBackgroundOpacity(v) { bg.opacity = v; draw(); }
 export function setBackgroundVisible(v) { bg.visible = v; draw(); }
 export const hasBackground = () => !!bg.img;
 
-// Placement « contain » de l'image dans un carré de côté s : entière, centrée, proportions gardées.
-// Sert à l'aperçu ET à la conversion, pour que les deux aient exactement le même cadrage.
+// "Contain" fit of the image in an s×s square. Shared by the preview and the conversion
+// so both use exactly the same framing.
 function fitImage(img, s) {
   const k = Math.min(s / img.width, s / img.height);
   const w = img.width * k, h = img.height * k;
   return { k, x: (s - w) / 2, y: (s - h) / 2, w, h };
 }
 
-// Pixels RGBA de l'image de fond réduite à (N×S)² : S pixels d'échantillon par côté de case, qui
-// voteront pour la couleur de la case. null s'il n'y a pas d'image. Les bandes vides autour d'une
-// image non carrée restent transparentes.
+// RGBA pixels of the background image scaled to (N×S)², S samples per cell side, or null if no image.
+// Margins around a non-square image stay transparent.
 export function imagePixels(N, S = 1) {
   if (!bg.img) return null;
   const side = N * S;
@@ -65,16 +64,16 @@ export function draw() {
   const pal = app.pal, N = ed.N, cell = size / N;
   ctx.clearRect(0, 0, size, size);
 
-  // image de fond, entière et centrée, sous la grille
+  // background image, under the grid
   if (bg.img && bg.visible) {
     const f = fitImage(bg.img, size);
     ctx.globalAlpha = bg.opacity;
-    ctx.imageSmoothingEnabled = f.k < 1; // un petit pixel art agrandi reste net
+    ctx.imageSmoothingEnabled = f.k < 1; // keep upscaled pixel art crisp
     ctx.drawImage(bg.img, f.x, f.y, f.w, f.h);
     ctx.globalAlpha = 1;
   }
 
-  // grille fine
+  // thin grid
   ctx.strokeStyle = pal.line; ctx.lineWidth = 1; ctx.globalAlpha = 0.7;
   ctx.beginPath();
   for (let i = 0; i <= N; i++) {
@@ -83,7 +82,7 @@ export function draw() {
   }
   ctx.stroke(); ctx.globalAlpha = 1;
 
-  // pixels, avec le même rendu que dans le jeu
+  // pixels, drawn like in the game
   const g = cell * 0.06;
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
     const v = ed.cells[r][c];
@@ -93,7 +92,7 @@ export function draw() {
     if (pal.light) { ctx.strokeStyle = 'rgba(60,45,25,.16)'; ctx.stroke(); }
   }
 
-  // case survolée : aperçu de l'outil
+  // hovered cell: tool preview
   if (hover) {
     const [r, c] = hover;
     ctx.strokeStyle = ed.color === ERASER ? pal.txt : COLORS[ed.color];
@@ -109,7 +108,7 @@ function cellAt(e) {
 }
 
 function bindPointer() {
-  let last = null, stroke = null; // stroke : couleur du trait en cours (clic droit = gomme)
+  let last = null, stroke = null; // stroke: current stroke color (right-click = eraser)
 
   cv.addEventListener('contextmenu', (e) => e.preventDefault());
   cv.addEventListener('pointerdown', (e) => {

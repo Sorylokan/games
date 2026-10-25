@@ -1,5 +1,5 @@
-// Colonne de droite : infos de la fresque et files de boîtes.
-// Reconstruite seulement quand quelque chose change (pas à chaque image), sinon les clics se perdent.
+// Side column: mural info and box queues.
+// Rebuilt only when something changes (not every frame), otherwise clicks get lost.
 import { COLORS, inkFor } from '../data/colors.js';
 import { QUEUE_COUNT } from '../config.js';
 import { $ } from '../dom.js';
@@ -11,7 +11,7 @@ const boxHTML = (a, small) =>
 
 let queueBtns = [];
 
-// Crée les boutons des files une fois pour toutes. onPlace(qi, bouton) est appelé au clic.
+// Creates the queue buttons once. onPlace(qi, button) is called on click.
 export function initPanel(onPlace) {
   queueBtns = Array.from({ length: QUEUE_COUNT }, (_, qi) => {
     const b = document.createElement('button');
@@ -53,7 +53,7 @@ export function renderUI() {
   info.className = free <= 1 ? 'warn' : '';
 }
 
-// Progression : mise à jour à chaque image, sans toucher au reste.
+// Progress: updated every frame, nothing else.
 export function renderProgress() {
   const st = app.st;
   if (!st) return;
@@ -61,9 +61,9 @@ export function renderProgress() {
   $('bar').style.width = (st.picked / st.total * 100) + '%';
 }
 
-// Petit tremblement quand on clique une file alors que la ligne est pleine.
+// Small shake when a queue is clicked while the line is full.
 export function shake(el) {
   el.classList.remove('shake');
-  void el.offsetWidth; // relance l'animation
+  void el.offsetWidth; // restart the animation
   el.classList.add('shake');
 }

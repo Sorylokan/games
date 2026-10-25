@@ -1,6 +1,4 @@
-/* =========================================================
-   COURBE DE VITESSE (continue)
-   ========================================================= */
+/* --- Speed curve --- */
 
 const ACC = 0.10, DEC = 0.28, POW = 4;
 const V = 1 / (ACC / 2 + (1 - ACC - DEC) + DEC / POW);
@@ -21,9 +19,7 @@ const REDUCED = window.matchMedia &&
 const SLOTS = 8;
 
 
-/* =========================================================
-   ODOMÈTRE (un dé)
-   ========================================================= */
+/* --- Odometer (one die) --- */
 
 class Odometer {
 
@@ -33,8 +29,8 @@ class Odometer {
         this.o       = o;
 
         this.cell = o.cell;
-        this.T    = o.cell * o.peekTop;      // hauteur visible au-dessus
-        this.position = sides - 1;           // affiche la valeur "sides"
+        this.T    = o.cell * o.peekTop;      // visible height above
+        this.position = sides - 1;           // shows the "sides" value
         this.frame = null;
         this.finish = null;
 
@@ -61,7 +57,7 @@ class Odometer {
         return (((i % this.sides) + this.sides) % this.sides) + 1;
     }
 
-    /* Perspective : échelle s(d) et position y(d) (intégrale de s) */
+    /* Perspective: scale s(d) and position y(d) (integral of s) */
     shape(d) {
         const a = Math.abs(d);
         const k = 1 - (d < 0 ? this.o.topScale : this.o.bottomScale);
@@ -98,7 +94,7 @@ class Odometer {
         }
     }
 
-    /* Affichage immédiat, sans animation */
+    /* Immediate display, no animation */
     set(value) {
         this.cancel();
         this.setPosition(Math.round(this.position) + ((value - this.value + this.sides) % this.sides));
@@ -110,7 +106,7 @@ class Odometer {
         if (this.finish) { this.finish(null); this.finish = null; }   // ancien lancer : null
     }
 
-    /* Retourne une Promise résolue avec "result" à l'arrêt */
+    /* Returns a Promise resolved with "result" when it stops */
     roll(result) {
         this.cancel();
 
@@ -153,10 +149,7 @@ class Odometer {
                 void this.element.offsetWidth;
                 this.element.classList.add("settled");
 
-                // Retirer la classe apres le flash : sinon, quand l'UI regenere le
-                // plateau (render -> innerHTML) et reinsere la tray dans le DOM,
-                // l'animation CSS repart a chaque render (flash intempestif a
-                // chaque clic, meme hors lancer / tour adverse).
+                // Remove the class after the flash, otherwise the CSS animation replays on every render.
                 this.element.addEventListener("animationend",
                     () => this.element.classList.remove("settled"), { once: true });
 
@@ -172,20 +165,17 @@ class Odometer {
 }
 
 
-/* =========================================================
-   PLATEAU (plusieurs dés)
-   =========================================================
-   new DiceTray(element, [6, 4], options)
-
-   options (toutes facultatives) :
-     cell         taille de la case centrale en px        (56)
-     topScale     hauteur de la case du dessus, 0..1      (.72)
-     bottomScale  hauteur de la case du dessous, 0..1     (.50)
-     peekTop      partie visible au-dessus, en cases      (.55)
-     peekBottom   partie visible au-dessous, en cases     (.40)
-     onTick(die)           à chaque chiffre qui défile
-     onSettle(die, value)  quand un dé s'arrête
-   ========================================================= */
+/* --- Tray (several dice) ---
+new DiceTray(element, [6, 4], options)
+options (all optional):
+cell         center cell size in px                  (56)
+topScale     height of the cell above, 0..1           (.72)
+bottomScale  height of the cell below, 0..1           (.50)
+peekTop      visible part above, in cells             (.55)
+peekBottom   visible part below, in cells             (.40)
+onTick(die)           on every number going by
+onSettle(die, value)  when a die stops
+*/
 
 export class DiceTray {
 
@@ -214,7 +204,7 @@ export class DiceTray {
         });
     }
 
-    /* roll([5, 2]) -> Promise<[5, 2]>.  Sans argument : tirage aléatoire. */
+    /* roll([5, 2]) -> Promise<[5, 2]>. No argument: random roll. */
     roll(results) {
         return Promise.all(this.dice.map((die, i) => {
             const r = results && results[i] != null

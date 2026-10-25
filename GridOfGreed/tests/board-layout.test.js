@@ -1,9 +1,9 @@
-// Tests du placement des joueurs (calqué sur la maquette et le tableau du brief).
+// Seat placement tests.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { layoutFor, myCell, centerCell } from "../src/board-layout.js";
 
-// Cases attendues pour chaque nombre de joueurs, vues depuis le siège 0.
+// Expected cells per player count, seen from seat 0.
 const EXPECTED = {
   2: ["TM"],
   3: ["TL", "TR"],
@@ -36,10 +36,10 @@ test("nombre de joueurs invalide : liste vide", () => {
 });
 
 test("chaque joueur voit le plateau depuis sa propre place", () => {
-  // 4 joueurs : depuis le siège 2, lui-même est en bas, et les autres suivent.
+  // 4 players, from seat 2: that seat is at the bottom, the others follow.
   const from2 = layoutFor(4, 2).map((x) => [x.index, NAME[x.cell.join(",")]]);
   assert.deepEqual(from2, [[2, "BM"], [3, "ML"], [0, "TM"], [1, "MR"]]);
-  // Aucune case en double, personne au centre.
+  // No duplicate cell, nobody in the center.
   const cells = from2.map(([, c]) => c);
   assert.equal(new Set(cells).size, cells.length);
 });

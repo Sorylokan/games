@@ -1,4 +1,4 @@
-// Lecture / écriture dans localStorage, sans jamais planter (navigation privée, stockage bloqué…).
+// localStorage that never throws (private browsing, blocked storage…).
 
 export const store = {
   get(key, fallback) {
@@ -10,6 +10,6 @@ export const store = {
     }
   },
   set(key, value) {
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* stockage indisponible : tant pis */ }
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage unavailable */ }
   },
 };

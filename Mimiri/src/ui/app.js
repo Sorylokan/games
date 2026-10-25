@@ -1,5 +1,4 @@
-// Interface de Mimiri : branche le moteur (src/game/engine.js) sur la page
-// et applique le thème actif (src/themes/*.js + src/ui/theme-*.css).
+// Mimiri UI: wires the engine to the page and applies the active theme.
 import { SIZES, DAILY_SIZE, applyPress, isSolved, countOn, scramble, dailyGrid, dayKey, touchedBy } from "../game/engine.js";
 import { THEMES } from "../themes/index.js";
 import { getPref, setPref, getJSON, setJSON } from "./prefs.js";
@@ -11,22 +10,21 @@ const themeSelect = $("opt-theme");
 const langSelect = $("opt-lang");
 
 let game = null; // { mode, n, cells, initial, moves, won, newRecord, key }
-let T = null;    // module du thème actif (render + texts par langue)
-let TT = null;   // textes du thème dans la langue active
-let t = (key) => key; // traducteur UI (remplacé par loadMessages)
+let T = null;    // active theme module (render + texts per language)
+let TT = null;   // theme texts in the active language
+let t = (key) => key; // UI translator (set by loadMessages)
 let locale = SUPPORTED_LOCALES.includes(getPref("lang")) ? getPref("lang") : getLocale();
 
-// ---- Langue ----
+// ---- Language ----
 
-// Charge les messages de la langue active (+ le repli par défaut), sans faire
-// échouer l'init si un fichier manque.
+// Loads the active language (+ fallback); a missing file doesn't break startup.
 async function loadMessages() {
   const read = (l) => loadLocale(l).catch(() => ({}));
   const [active, fallback] = await Promise.all([read(locale), read(DEFAULT_LOCALE)]);
   t = createTranslator({ locale, messages: { [locale]: active, [DEFAULT_LOCALE]: fallback } });
 }
 
-// Textes du thème actif dans la langue active (repli : champs FR du module).
+// Theme texts in the active language (fallback: the module's French fields).
 function applyThemeTexts() {
   TT = T.texts?.[locale] ?? T;
   document.title = `Mimiri – ${TT.title}`;
@@ -36,7 +34,7 @@ function applyThemeTexts() {
   $("left-label").textContent = TT.leftLabel;
 }
 
-// Textes d'interface (hors thème) dans la langue active.
+// UI texts (not theme-specific).
 function applyI18n() {
   document.documentElement.lang = locale;
   $("sizes-label").textContent = t("ui.gridSize");
@@ -46,7 +44,7 @@ function applyI18n() {
   $("moves-label").textContent = t("ui.moves");
   $("best-label").textContent = t("ui.best");
   themeSelect.setAttribute("aria-label", t("ui.themeLabel"));
-  // Labels des thèmes dans la langue active (clés theme.<id> dans les locales).
+  // Theme names (theme.<id> keys).
   themeSelect.querySelectorAll("option[value]").forEach((opt) => {
     opt.textContent = opt.value === "chaos" ? t("ui.chaos") : t(`theme.${opt.value}`);
   });
@@ -56,7 +54,7 @@ function applyI18n() {
   boardEl.setAttribute("aria-label", t("ui.boardLabel"));
 }
 
-// ---- Records (meilleur nombre de coups par taille de grille et par jour) ----
+// ---- Records (fewest moves per grid size and per day) ----
 const bestFor = (key) => getJSON("best", {})[key] ?? "–";
 function saveBest(key, moves) {
   const all = getJSON("best", {});
@@ -66,8 +64,8 @@ function saveBest(key, moves) {
   return true;
 }
 
-// ---- Parties ----
-const persist = () => setJSON("save", game); // reprise de la partie après la pause
+// ---- Games ----
+const persist = () => setJSON("save", game); // resume after leaving
 
 function newGame(mode, n, cells, key) {
   game = { mode, n, cells, initial: [...cells], moves: 0, won: false, newRecord: false, key };
@@ -87,7 +85,7 @@ function resetGame() {
 function restore() {
   const g = getJSON("save", null);
   if (!g || !Array.isArray(g.cells) || !SIZES.includes(g.n) || g.cells.length !== g.n * g.n) return null;
-  if (g.mode === "daily" && g.key !== "daily-" + dayKey()) return null; // le défi d'hier n'est plus valable
+  if (g.mode === "daily" && g.key !== "daily-" + dayKey()) return null; // yesterday's challenge has expired
   return g;
 }
 
@@ -100,12 +98,11 @@ function press(i) {
     game.newRecord = saveBest(game.key, game.moves);
   }
   render(i); persist();
-  // Mode chaos : un autre thème à chaque coup. Pure déco — la grille et les
-  // records ne changent pas, seul l'habillage bascule. Figé une fois gagné.
+  // Chaos mode: a new theme on every move (looks only). Frozen once won.
   if (chaosActive && !game.won) applyTheme("chaos");
 }
 
-// ---- Affichage ----
+// ---- Rendering ----
 function buildBoard() {
   boardEl.innerHTML = "";
   boardEl.style.gridTemplateColumns = `repeat(${game.n}, 1fr)`;
@@ -118,12 +115,12 @@ function buildBoard() {
   }
 }
 
-// `pressed` : case cliquée (pour l'animation des cases touchées), absent en cas de simple redessin.
+// `pressed`: clicked cell (animates the affected cells); omitted for a plain redraw.
 function render(pressed) {
   const touched = new Set(pressed === undefined ? [] : touchedBy(game.n, pressed));
   game.cells.forEach((v, i) => {
     const b = boardEl.children[i];
-    const state = v ? "on" : "off"; // on = à corriger, off = gagné
+    const state = v ? "on" : "off"; // on = to fix, off = solved
     if (b.dataset.state === state) return;
     b.dataset.state = state;
     b.className = "cell " + state;
@@ -155,22 +152,20 @@ function render(pressed) {
   $("btn-daily").classList.toggle("active", game.mode === "daily");
 }
 
-// ---- Thème (même mécanique que Free the Memes : classe sur <body> + feuille CSS dédiée) ----
+// ---- Theme (class on <body> + its own stylesheet) ----
 const themeLink = document.createElement("link");
 themeLink.rel = "stylesheet";
 document.head.append(themeLink);
 
-// Anciens identifiants français → nouveaux (renommage 2026-10) : on convertit la
-// préférence sauvegardée pour ne pas perdre le choix des joueurs existants.
+// Old French theme ids → new ones (renamed 2026-10), so saved choices still work.
 const LEGACY_THEME_IDS = { chatons: "kittens", chiots: "puppies", grincheux: "grumpy", jardin: "garden" };
 const savedTheme = LEGACY_THEME_IDS[getPref("theme")] ?? getPref("theme", THEMES[0].id);
 
-let themeSeq = 0; // évite qu'un changement de thème rapide écrase le suivant
-let chaosActive = false;   // mode « chaos » : un nouveau thème à chaque coup
-let currentThemeId = null; // thème réellement affiché (en chaos, il change tout le temps)
+let themeSeq = 0; // a fast theme switch must not be overwritten by a slower one
+let chaosActive = false;   // chaos mode: new theme on every move
+let currentThemeId = null; // theme actually shown (changes all the time in chaos mode)
 
-// id === "chaos" : pseudo-thème (absent du registre THEMES) qui habille la grille
-// d'un thème tiré au hasard, différent du précédent, à chaque appel.
+// id === "chaos": pseudo-theme (not in THEMES) picking a random theme, different from the last one.
 async function applyTheme(id) {
   chaosActive = id === "chaos";
   const pool = THEMES.filter((th) => th.id !== currentThemeId);
@@ -182,7 +177,7 @@ async function applyTheme(id) {
   if (seq !== themeSeq) return;
   T = mod.default;
   currentThemeId = def.id;
-  setPref("theme", chaosActive ? "chaos" : def.id); // le choix « chaos » survit au rechargement
+  setPref("theme", chaosActive ? "chaos" : def.id); // "chaos" survives a reload
 
   document.body.classList.remove(...[...document.body.classList].filter((c) => c.startsWith("theme-")));
   document.body.classList.add(`theme-${def.id}`);
@@ -191,13 +186,13 @@ async function applyTheme(id) {
 
   applyThemeTexts();
 
-  if (game) { // on force le redessin de toutes les cases avec le nouveau thème
+  if (game) { // force a redraw of every cell
     for (const b of boardEl.children) b.dataset.state = "";
     render();
   }
 }
 
-// ---- Initialisation ----
+// ---- Startup ----
 async function init() {
   await loadMessages();
   applyI18n();
@@ -215,7 +210,7 @@ async function init() {
     applyI18n();
     if (T) {
       applyThemeTexts();
-      if (game) { // redessine tout : aria-labels et message dans la nouvelle langue
+      if (game) { // redraw everything: aria-labels and message in the new language
         for (const b of boardEl.children) b.dataset.state = "";
         render();
       }

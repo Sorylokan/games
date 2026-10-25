@@ -1,4 +1,4 @@
-// Petits raccourcis DOM partagés.
+// Shared DOM shortcuts.
 
 export const $ = (id) => document.getElementById(id);
 

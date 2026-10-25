@@ -1,5 +1,4 @@
-// Point d'entrée UI : accueil (créer/rejoindre en deux clics) puis salon.
-// Aucune logique de règles ici (brief, section 7) : tout passe par networking/.
+// UI entry point: home (create/join in two clicks), lobby, table. No rules here: everything goes through networking/.
 import { createTranslator, loadLocale, getLocale, DEFAULT_LOCALE } from "../i18n.js";
 import { TrysteroNetwork } from "../networking/trystero-network.js";
 import { createHostSession, createClientSession } from "../networking/game-session.js";
@@ -12,19 +11,19 @@ import { playEvents, setMuted, click as sndClick } from "./sound.js";
 
 const $ = (id) => document.getElementById(id);
 
-let t = (k, v) => k; // traducteur, remplacé au démarrage
-let network = null;  // transport Trystero partagé
-let session = null;  // session hôte ou client
+let t = (k, v) => k; // translator, set on startup
+let network = null;  // shared Trystero transport
+let session = null;  // host or client session
 let myId = null;
 let isHost = false;
-let lastView = null; // dernière vue reçue (redimensionnement, changement de langue)
-let lastLobby = null; // dernier état du salon (changement de langue)
+let lastView = null; // last view received (resize, language change)
+let lastLobby = null; // last lobby state (language change)
 let assignedTimer;
 let lobbyCode = "";
 let lobbyLink = "";
 let codeShown = false;
 
-// État purement local de la table : sélection de révélation + mode défausser/retourner.
+// Local-only table state: cards picked to reveal, discard-and-flip mode.
 const ui = { revealPicks: [], discardFlipMode: false, endHidden: false };
 
 // --- i18n ---
@@ -35,11 +34,11 @@ function applyTexts() {
     el.setAttribute("title", t(el.dataset.i18nTitle));
     el.setAttribute("aria-label", t(el.dataset.i18nTitle));
   });
-  // Labels d'optgroup (catégories du sélecteur de thème) : attribut label, pas textContent.
+  // optgroup labels use the label attribute, not textContent.
   document.querySelectorAll("[data-i18n-label]").forEach((el) => { el.setAttribute("label", t(el.dataset.i18nLabel)); });
 }
 
-// Jeton de siège stable par salle : survit au rechargement pour la reconnexion.
+// Stable seat token per room: survives a reload, used to reconnect.
 function seatToken(roomId) {
   const key = `gog-seat:${roomId}`;
   let token = localStorage.getItem(key);
@@ -50,7 +49,7 @@ function seatToken(roomId) {
   return token;
 }
 
-// Pseudo sauvegardé pour ne pas le retaper à chaque partie.
+// Remembered nickname.
 function savedName() {
   return localStorage.getItem("gog-name") ?? "";
 }
@@ -74,12 +73,12 @@ function setConnecting(on) {
   }
 }
 
-// --- Salon ---
+// --- Lobby ---
 const MASK = "••••-••••";
 
 function paintCode() {
   $("lobby-code").textContent = codeShown ? lobbyCode : MASK;
-  // Le lien contient le code : on le masque aussi, sinon il se lirait dans la boîte.
+  // The link contains the code, so mask it too.
   $("lobby-link").textContent = codeShown ? lobbyLink : lobbyLink.replace(lobbyCode, MASK);
   $("toggle-code").setAttribute("aria-pressed", String(codeShown));
 }
@@ -123,7 +122,7 @@ function renderLobby(lobby) {
     ul.append(li);
   }
 
-  // Réglages : modifiables par l'hôte, en lecture seule pour les autres.
+  // Settings: editable by the host, read-only for others.
   $("seats-val").textContent = maxPlayers;
   $("seats-minus").disabled = !isHost || maxPlayers <= Math.max(lobby.minPlayers, lobby.players.length);
   $("seats-plus").disabled = !isHost || maxPlayers >= lobby.seatLimit;
@@ -138,21 +137,18 @@ function renderLobby(lobby) {
     : t("lobby.onlyHostStarts");
 }
 
-// Envoie une action au moteur : l'hôte l'exécute lui-même, le client l'envoie.
-// L'hôte fait autorité (brief §3) ; un refus se traduit par... rien : la vue
-// ne change pas, le coup est simplement ignoré.
+// Sends an action: the host runs it, a client sends it to the host. A refused move just changes nothing.
 function sendAction(action) {
   const request = createActionRequest(myId, action);
   if (isHost) session?.authority.handleRequest(request);
   else session?.requestAction(request);
 }
 
-// Une vue reçue (client) ou produite localement (hôte) : on bascule du salon
-// vers la table au premier état, puis on redessine à chaque mise à jour.
+// A view (received, or produced by the host): switch from lobby to table on the first one, then redraw.
 function showTable(view, events = []) {
   if (!view) return;
   lastView = view;
-  playEvents(events); // sons des événements moteur (noop si sourdine)
+  playEvents(events); // engine event sounds (no-op when muted)
   if ($("table").hidden) {
     document.querySelector(".home").hidden = true;
     $("lobby").hidden = true;
@@ -172,7 +168,7 @@ addEventListener("resize", () => {
   if (!$("table").hidden && lastView) fitBoard(lastView.players.length);
 });
 
-// --- Créer (1 clic) : code généré, salon ouvert, on est l'hôte ---
+// --- Create (1 click): new code, lobby open, we are the host ---
 async function createRoom() {
   const name = cleanName($("name").value, "");
   if (!name) return showError("app.errorName");
@@ -184,11 +180,11 @@ async function createRoom() {
     await withTimeout(network.connect(code));
     history.replaceState(null, "", `#salle=${code}`);
     isHost = true;
-    myId = "p1"; // l'hôte est toujours le premier siège
+    myId = "p1"; // the host is always the first seat
     session = createHostSession(network, {
       hostName: name,
       onLobby: renderLobby,
-      // L'hôte reçoit sa vue masquée comme les clients (host-authority).
+      // The host gets a masked view like the clients.
       onStateChange: showTable,
     });
     showLobby(code);
@@ -199,8 +195,7 @@ async function createRoom() {
   }
 }
 
-// connect() de Trystero peut pendre indéfiniment si les relais nostr sont
-// lents ou bloqués : on borne l'attente pour ne pas rester sur « Connexion… ».
+// Trystero's connect() can hang forever if nostr relays are slow or blocked: cap the wait.
 function withTimeout(promise, ms = 12000) {
   return Promise.race([
     promise,
@@ -208,7 +203,7 @@ function withTimeout(promise, ms = 12000) {
   ]);
 }
 
-// --- Rejoindre (code dans l'URL ou saisi) : 2 clics ---
+// --- Join (code from the URL or typed): 2 clicks ---
 async function joinRoom(code) {
   const name = cleanName($("name").value, "");
   if (!name) return showError("app.errorName");
@@ -219,7 +214,7 @@ async function joinRoom(code) {
   try {
     network = new TrysteroNetwork();
     await withTimeout(network.connect(normalized));
-    history.replaceState(null, "", `#salle=${normalized}`);   // <- ici
+    history.replaceState(null, "", `#salle=${normalized}`);
     session = createClientSession(network, {
       onLobby: renderLobby,
       onAssigned: (playerId) => {
@@ -252,7 +247,7 @@ async function joinRoom(code) {
   }
 }
 
-// --- Préférences globales (barre du haut) : langue, thème, sons ---
+// --- Global preferences (top bar): language, theme, sound ---
 async function setLanguage(lang) {
   if (!LANGS.includes(lang)) lang = DEFAULT_LOCALE;
   const [active, fallback] = await Promise.all([
@@ -286,18 +281,18 @@ $("opt-theme").addEventListener("change", (e) => applyTheme(e.target.value));
 $("toggle-sound").addEventListener("click", () =>
   applySound($("toggle-sound").getAttribute("aria-pressed") !== "true"));
 
-// Clic discret sur les actions principales de l'accueil et du salon.
+// Soft click on the main home and lobby actions.
 ["create", "start", "copy-code", "copy-link"].forEach((id) =>
   $(id)?.addEventListener("click", sndClick));
 
 $("create").addEventListener("click", createRoom);
-// Champ vide : on prend le code du lien d'invitation (#salle=...) s'il y en a un.
+// Empty field: use the code from the invite link (#salle=...) if any.
 $("join-form").addEventListener("submit", (e) => {
   e.preventDefault();
   joinRoom($("code").value.trim() || getRoomIdFromLocation() || "");
 });
 
-// Les boutons de copie gardent leur icône : on affiche une coche pendant 1,5 s.
+// Copy buttons keep their icon and show a check mark for 1.5 s.
 const flashCopied = (btn) => {
   btn.classList.add("copied");
   setTimeout(() => btn.classList.remove("copied"), 1500);
@@ -315,7 +310,7 @@ $("toggle-code").addEventListener("click", () => {
   paintCode();
 });
 
-// Réglages du salon (hôte uniquement : les contrôles sont désactivés pour les autres).
+// Lobby settings (host only; disabled for others).
 $("seats-minus").addEventListener("click", () =>
   session?.authority.setSettings({ maxPlayers: lastLobby.settings.maxPlayers - 1 }));
 $("seats-plus").addEventListener("click", () =>
@@ -326,11 +321,11 @@ $("start").addEventListener("click", () => {
   if (isHost) session?.authority.startMatch();
 });
 
-// Pré-remplit pseudo + code si l'URL porte #salle=... : coller le lien suffit.
+// Prefill the nickname (the room code itself is never prefilled).
 $("name").value = savedName();
-$("code").value = ""; // le code n'est jamais pré-rempli : seul le pseudo est mémorisé
+$("code").value = ""; // never prefilled
 
-// Démarrage : préférences sauvegardées, puis traductions (repli français).
+// Startup: saved preferences, then translations (French fallback).
 applyTheme(readTheme());
 applySound(soundEnabled());
 const browserLang = getLocale();

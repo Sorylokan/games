@@ -1,4 +1,4 @@
-/* Composants : fenêtre de fin de fresque, cartes de la colonne, files de boîtes. */
+/* Components: overlay window, side cards, box queues. */
 
 .overlay {
   position: absolute; inset: 0; border-radius: 12px; display: grid; place-items: center; padding: 20px;
@@ -14,7 +14,7 @@
 
 .overlay .row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
 
-/* La fenêtre peut contenir une longue liste (fresques de la communauté) : elle défile. */
+/* Scrolls when it holds a long list (community murals). */
 .overlay .panel { max-height: 100%; overflow-y: auto; }
 
 .community-btn { width: 100%; margin-top: 12px; font-size: 13px; }
@@ -41,7 +41,7 @@
 
 .stats b { font: 500 15px var(--display); color: var(--txt); }
 
-/* Files de boîtes */
+/* Box queues */
 .queues { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
 .queue {

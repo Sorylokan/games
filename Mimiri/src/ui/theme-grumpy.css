@@ -1,7 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,600&family=Nunito:wght@600;700&display=swap");
 
-/* THEME GRINCHEUX : cases violettes orageuses pour les chats de mauvaise humeur,
-   gris-bleu une fois ravis. Activé par <link> après styles.css et class="theme-grumpy" sur <body>. */
+/* Grumpy theme: stormy purple cells for grumpy cats, blue-gray once they're happy. */
 body.theme-grumpy {
   --bg: #1B1833; --card: #404258; --line: #50577A; --txt: #f1eefb; --mut: #b4b8d2;
   --accent: #7ed9a2; --accent-ink: #1B1833;
@@ -11,7 +10,7 @@ body.theme-grumpy {
 }
 body.theme-grumpy h1 { font-style: italic; }
 
-/* Décor : ciel d'orage violet en haut, éclaircie verte en bas, petits nuages en filigrane. */
+/* Decoration: purple storm sky on top, green clearing below, faint small clouds. */
 body.theme-grumpy {
   background-image:
     radial-gradient(54rem 36rem at 85% 6%, rgba(68, 23, 82, .75), transparent 64%),

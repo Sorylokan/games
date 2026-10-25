@@ -1,11 +1,11 @@
-/* Thèmes « Festif » : Halloween, Noël. */
+/* Festive themes: Halloween, Christmas. */
 
 :root[data-skin="halloween"] { --bg: #130b1a; --card: #1d1223; --accent: #f08a24; --line: #3f2a46; --txt: #eadcf0; --mut: #9c85a6; }
 
 :root[data-skin="xmas"]      { --bg: #3a0d15; --card: #2b0a10; --accent: #e3c06b; --line: #5e1f2a; --txt: #f6ebe6; --mut: #c49c99; }
 
 :root[data-skin="halloween"] body {
-  /* grosse lune orangée et brume violette */
+  /* big orange moon, purple mist */
   background-image:
     radial-gradient(1.1px 1.1px at 85.6% 20.9%, rgba(234,220,240,.45), transparent 70%),
     radial-gradient(1.2px 1.2px at 34.2% 25.3%, rgba(234,220,240,.45), transparent 70%),
@@ -24,7 +24,7 @@
 }
 
 :root[data-skin="xmas"] body {
-  /* bordeaux profond, neige et lueur dorée */
+  /* deep burgundy, snow, golden glow */
   background-image:
     radial-gradient(3.2px 3.2px at 67.1% 95.5%, rgba(255,255,255,.8), transparent 70%),
     radial-gradient(2.6px 2.6px at 30.4% 14.1%, rgba(255,255,255,.55), transparent 70%),

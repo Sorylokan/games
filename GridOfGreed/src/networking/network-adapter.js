@@ -1,4 +1,4 @@
-// Copie conforme de network-adapter.js de FTM : interface neutre de transport.
+// Neutral transport interface (same as Free the Memes).
 export class NetworkAdapter {
   #handlers = new Map();
 
