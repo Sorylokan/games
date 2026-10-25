@@ -26,7 +26,8 @@ const rand = (min, max) => min + Math.random() * (max - min);
 const chance = (p) => Math.random() < p;
 
 let ctx = null;
-let master, mix, reverb, wow, noise;
+let master, mix, reverb, wow, noise, sfxBus;
+let chordLog = []; // [{ start, keys }] of the last scheduled bars
 let enabled = store.get(STORAGE.music, true);
 let playing = false;
 let timer = null;
@@ -44,7 +45,10 @@ function setup() {
   master = ctx.createGain();
   master.gain.value = 0;
   const limiter = ctx.createDynamicsCompressor();
-  master.connect(limiter).connect(ctx.destination);
+  limiter.connect(ctx.destination);
+  master.connect(limiter);
+  sfxBus = ctx.createGain();
+  sfxBus.connect(limiter);
 
   // "Tape": everything goes through a soft low-pass.
   const tape = ctx.createBiquadFilter();
@@ -203,6 +207,7 @@ function scheduleBar(start) {
   const section = bar % 16;
   const drums = bar >= 2 && section !== 15; // 2-bar intro, a break every 16 bars
   const melody = (section >= 4 && section < 8) || (section >= 10 && section < 14);
+  chordLog = [...chordLog.slice(-3), { start, keys: chord.keys }];
 
   chord.keys.forEach((m, i) => keys(m, start + i * 0.022 + rand(0, 0.012), rand(0.05, 0.065), BAR * 0.95));
   if (chance(0.45)) {
@@ -263,7 +268,16 @@ function stop() {
   clearInterval(timer);
   master.gain.cancelScheduledValues(ctx.currentTime);
   master.gain.setTargetAtTime(0, ctx.currentTime, 0.1);
-  setTimeout(() => { if (!playing) ctx.suspend(); }, 600); // free the CPU
+  chordLog = [];
+}
+
+// For the sound effects (sfx.js): the audio context, their output, and the chord being heard
+// (Cmaj9 without music). Null until the browser allows sound.
+export function audio() {
+  if (!ctx && !setup()) return null;
+  if (ctx.state === 'suspended' && !document.hidden) ctx.resume();
+  const now = chordLog.filter((c) => c.start <= ctx.currentTime).pop();
+  return { ctx, out: sfxBus, chord: now ? now.keys : CHORDS[2].keys };
 }
 
 // Button + saved choice. Browsers only allow sound after a click or a key press.
@@ -281,7 +295,7 @@ export function initMusic(button) {
   window.addEventListener('keydown', unlock, { once: true });
   // Paused while the tab is hidden.
   document.addEventListener('visibilitychange', () => {
-    if (!ctx || !playing) return;
+    if (!ctx) return;
     if (document.hidden) ctx.suspend(); else ctx.resume();
   });
 }

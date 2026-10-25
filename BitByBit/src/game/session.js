@@ -12,6 +12,7 @@ import { resize } from '../render/canvas.js';
 import { renderUI, shake } from '../ui/panel.js';
 import { showOverlay, hideOverlay } from '../ui/overlay.js';
 import { t } from '../ui/lang.js';
+import * as sfx from '../ui/sfx.js';
 
 // Adventure: mural number li.
 export function start(li) {
@@ -63,9 +64,10 @@ export function place(qi, el) {
   const q = st.queues[qi];
   if (!q.length) return;
   const i = st.line.indexOf(null);
-  if (i < 0) { shake(el); return; }
+  if (i < 0) { shake(el); sfx.full(); return; }
   const a = q.shift(), now = performance.now();
   st.line[i] = { ...a, slot: i, sent: 0, got: 0, out: 0, nextAt: now + BOX_OPEN_MS, blocked: false, doneAt: 0, placedAt: now };
+  sfx.place();
   renderUI();
 }
 
@@ -109,6 +111,7 @@ function moveCarriers(st, now, dt) {
       st.claimed.delete(id);
       st.pickedAt.set(id, now);
       st.picked++; st.ver++; st.bfsCache.clear();
+      sfx.pickup(a.color, a.r, st.N);
       a.back = true; a.d = 0; a.pts = a.pts.slice().reverse();
       return true;
     }
@@ -138,6 +141,7 @@ function checkEnd(st, now) {
 function lose() {
   const st = app.st;
   st.status = 'lose';
+  sfx.stuck();
   showOverlay(t('end.stuckTitle'), t('end.stuckText'), [
     !st.rescueUsed && { label: t('end.addSlot'), fn: () => {
       st.rescueUsed = true; st.line.push(null); st.status = 'play';
@@ -151,6 +155,7 @@ function lose() {
 function win() {
   const st = app.st;
   st.status = 'win';
+  sfx.win();
   if (st.lvl.custom) {
     const name = st.lvl.name || t('custom.untitled');
     // No "Edit" for community murals: it would reveal the hidden editor.

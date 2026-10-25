@@ -15,10 +15,12 @@ import { initPanel, renderUI, renderProgress } from './ui/panel.js';
 import { initSkinSelect, fillSkinSelect, setSkin, renderRules } from './ui/skin.js';
 import { initLangSelect, initialLang, setLang } from './ui/lang.js';
 import { initMusic } from './ui/music.js';
+import { initSfx } from './ui/sfx.js';
 
 // --- interface ---
 initPanel(place);
 initMusic($('music'));
+initSfx($('sfx'));
 initSkinSelect(setSkin);
 initLangSelect(changeLang);
 
