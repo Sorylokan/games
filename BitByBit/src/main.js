@@ -14,9 +14,11 @@ import { draw } from './render/board.js';
 import { initPanel, renderUI, renderProgress } from './ui/panel.js';
 import { initSkinSelect, fillSkinSelect, setSkin, renderRules } from './ui/skin.js';
 import { initLangSelect, initialLang, setLang } from './ui/lang.js';
+import { initMusic } from './ui/music.js';
 
 // --- interface ---
 initPanel(place);
+initMusic($('music'));
 initSkinSelect(setSkin);
 initLangSelect(changeLang);
 

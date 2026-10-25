@@ -13,6 +13,7 @@ export const STORAGE = {
   level: 'pc-level',
   best: 'pc-best',
   skin: 'pc-skin',             // the language key ('pc-lang') lives in src/i18n.js
+  music: 'pc-music',
   murals: 'pc-murals', // saved custom murals (editor)
   draft: 'pc-draft',   // mural being edited
 };

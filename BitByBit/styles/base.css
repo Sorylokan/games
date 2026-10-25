@@ -57,6 +57,9 @@ button.ghost { border-color: var(--line); color: var(--txt); }
 
 .speed-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
 
+.music-btn[aria-pressed="false"] { color: var(--mut); }
+.music-btn[aria-pressed="true"] .off { display: none; }
+
 select { font: inherit; font-size: 13px; color: var(--txt); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
 
 /* Links styled as icon buttons */

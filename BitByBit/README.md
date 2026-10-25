@@ -46,7 +46,7 @@ src/
     image-to-map.js        image → mural conversion
   game/                    state, board geometry, carrier paths, game flow (session.js)
   render/                  canvas drawing; carriers/ has one file per theme
-  ui/                      side panel, end window, theme and language switches
+  ui/                      side panel, end window, theme and language switches, music (generated live)
   editor/                  editor code (the page is editor/index.html)
 tests/                     node tests
 ```
