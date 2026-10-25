@@ -1,0 +1,81 @@
+# Fresques de la communauté (Bit by Bit) : vérification des propositions et pull request à l'acceptation.
+# - Ticket « fresque » ouvert ou modifié → le robot vérifie le code et répond (lien pour jouer la fresque).
+# - Étiquette « acceptée » posée par un mainteneur → la fresque est ajoutée à BitByBit/src/data/community.js,
+#   les tests tournent, et une pull request est ouverte (à fusionner à la main).
+# Le contenu du ticket n'est jamais collé dans les commandes : il passe par des variables d'environnement.
+name: Fresques de la communauté
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: fresque-${{ github.event.issue.number }}
+
+jobs:
+  check:
+    if: github.event.action != 'labeled' && contains(github.event.issue.labels.*.name, 'fresque')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Vérifier le code de la fresque
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+        run: node .github/scripts/fresque.mjs check
+      - name: Répondre dans le ticket
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh issue comment "$ISSUE_NUMBER" --body-file comment.md
+
+  accept:
+    if: >-
+      github.event.action == 'labeled' && github.event.label.name == 'acceptée'
+      && contains(github.event.issue.labels.*.name, 'fresque')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Ajouter la fresque à community.js
+        id: add
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+        run: node .github/scripts/fresque.mjs accept
+      - name: Tests de Bit by Bit
+        if: steps.add.outputs.ok == 'true'
+        working-directory: BitByBit
+        run: node --test "tests/*.test.js"
+      - name: Ouvrir la pull request
+        if: steps.add.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "fresque/ticket-$ISSUE_NUMBER"
+          git add BitByBit/src/data/community.js
+          git commit -m "$(cat pr-title.txt)"
+          git push --force -u origin HEAD
+          url=$(gh pr create --base main --title "$(cat pr-title.txt)" --body-file pr-body.md)
+          gh issue comment "$ISSUE_NUMBER" --body "🎉 Pull request prête : $url (il reste à la fusionner)."
+      - name: Expliquer le refus
+        if: steps.add.outputs.ok == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh issue comment "$ISSUE_NUMBER" --body-file comment.md

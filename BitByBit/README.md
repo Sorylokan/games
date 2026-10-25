@@ -87,11 +87,15 @@ Le brouillon est sauvé à chaque coup de pinceau : recharger la page ne perd ri
 ## Fresques de la communauté
 
 Dans l'atelier, « Proposer cette fresque » ouvre un ticket GitHub pré-rempli
-(formulaire `.github/ISSUE_TEMPLATE/fresque.yml`, étiquette `fresque`). Pour accepter une proposition :
-1. copier le code `BB1-…` et le pseudo du ticket ;
-2. ajouter une ligne en tête de `COMMUNITY` dans `src/data/community.js` :
-   `{ author: 'Pseudo', code: 'BB1-…' },` ;
-3. `npm test` vérifie que le code est complet et valide.
+(formulaire `.github/ISSUE_TEMPLATE/fresque.yml`, étiquette `fresque`). Ensuite, un robot GitHub
+(`.github/workflows/fresque.yml` + `.github/scripts/fresque.mjs`) s'occupe du reste :
+1. **ticket ouvert ou modifié** : il vérifie le code et répond (taille, couleurs, lien ▶ pour jouer la fresque) ;
+2. **étiquette `acceptée` posée** (seuls les mainteneurs peuvent) : il ajoute la ligne dans `src/data/community.js`,
+   lance les tests et ouvre une pull request qui fermera le ticket ;
+3. **il reste à fusionner la pull request** : GitHub Pages met le site à jour.
+
+À la main, c'est une ligne en tête de `COMMUNITY` dans `src/data/community.js` :
+`{ author: 'Pseudo', code: 'BB1-…' },` (puis `npm test` vérifie que le code est complet).
 
 Dès qu'il y a au moins une fresque, le bouton « Fresques de la communauté » apparaît dans le jeu.
 Ces fresques ne touchent pas à la progression de l'aventure et n'ont pas de bouton « Modifier »
