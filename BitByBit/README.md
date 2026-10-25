@@ -74,7 +74,8 @@ tests/                     tests node (règles, générateur, données)
 
 L'atelier n'est lié nulle part : on y accède en ajoutant `editor/` à l'adresse du jeu
 (`…/games/BitByBit/editor/`). Il permet de :
-- choisir le nombre de pixels de côté (4 à 24) et peindre avec la palette du jeu
+- choisir le nombre de pixels de côté (4 à 50) et peindre avec la palette du jeu
+  (au-delà de 24, les boîtes contiennent plus de pixels : voir `packetFor` dans `src/data/levels.js`)
   (pinceau, remplissage, pipette, gomme, clic droit = gomme, Ctrl+Z) ;
 - charger une image de fond pour la décalquer (transparence réglable, non enregistrée) ;
 - jouer sa fresque (lien `…/BitByBit/#play=BB1-…`), l'enregistrer dans « Mes fresques » ;
@@ -82,6 +83,19 @@ L'atelier n'est lié nulle part : on y accède en ajoutant `editor/` à l'adress
 - obtenir l'entrée à coller dans `src/data/maps.js` pour en faire une fresque officielle.
 
 Le brouillon est sauvé à chaque coup de pinceau : recharger la page ne perd rien.
+
+## Fresques de la communauté
+
+Dans l'atelier, « Proposer cette fresque » ouvre un ticket GitHub pré-rempli
+(formulaire `.github/ISSUE_TEMPLATE/fresque.yml`, étiquette `fresque`). Pour accepter une proposition :
+1. copier le code `BB1-…` et le pseudo du ticket ;
+2. ajouter une ligne en tête de `COMMUNITY` dans `src/data/community.js` :
+   `{ author: 'Pseudo', code: 'BB1-…' },` ;
+3. `npm test` vérifie que le code est complet et valide.
+
+Dès qu'il y a au moins une fresque, le bouton « Fresques de la communauté » apparaît dans le jeu.
+Ces fresques ne touchent pas à la progression de l'aventure et n'ont pas de bouton « Modifier »
+(il mènerait à l'atelier, qui reste caché).
 Après une fresque perso, l'écran de fin propose « Modifier », qui rouvre l'atelier.
 
 ## Recettes

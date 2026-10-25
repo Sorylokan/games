@@ -53,7 +53,8 @@ function drawPixels(st, u, pal, now) {
 function drawBox(box, i, now) {
   const { st, geo, pal } = app;
   const s = slotPos(i), [px, py] = toScreen(s.x, s.y);
-  const sz = Math.min(64, geo.u * 1.55, geo.w / st.line.length - 14);
+  // taille liée à la case, mais jamais sous ~46 % de la ligne (grandes fresques aux cases minuscules)
+  const sz = Math.min(64, Math.max(geo.u * 1.55, geo.lh * geo.u * 0.46), geo.w / st.line.length - 14);
 
   if (!box) { // place libre : cadre pointillé qui respire, assez marqué pour se voir sur tous les thèmes
     const a = reduceMotion ? 0.8 : 0.7 + 0.2 * Math.sin(now / 700 + i);

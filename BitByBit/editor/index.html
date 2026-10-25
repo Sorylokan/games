@@ -46,7 +46,7 @@
           <span data-i18n="ed.size">Pixels de côté</span>
           <div class="stepper">
             <button type="button" class="icon-btn" id="sizeMinus" aria-label="−">−</button>
-            <input id="size" type="number" min="4" max="24" inputmode="numeric">
+            <input id="size" type="number" min="4" max="50" inputmode="numeric">
             <button type="button" class="icon-btn" id="sizePlus" aria-label="+">+</button>
           </div>
         </div>
@@ -120,6 +120,8 @@
           <input id="importCode" autocomplete="off" spellcheck="false" data-i18n-ph="ed.importPh">
           <button type="button" class="ghost" id="import" data-i18n="ed.import">Importer</button>
         </div>
+        <button type="button" class="suggest" id="suggest" data-i18n="ed.suggest">Proposer cette fresque</button>
+        <p class="muted" data-i18n="ed.suggestHelp">Ouvre un formulaire GitHub (compte gratuit) : si elle est retenue, elle rejoint les fresques de la communauté.</p>
         <details class="dev">
           <summary data-i18n="ed.devTitle">Pour les fresques officielles</summary>
           <p class="muted" data-i18n="ed.devHelp">À coller dans src/data/maps.js, puis ajouter le nom dans locales/.</p>

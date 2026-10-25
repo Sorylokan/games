@@ -15,10 +15,25 @@ export function levelAt(i) {
   };
 }
 
-// Niveau pour une fresque perso (atelier) : difficulté moyenne, moins d'essais si la grille est grande.
-export function customLevel({ name, map }) {
+// Pixels par boîte : 4 à 12 jusqu'à 24 de côté. Au-delà, les boîtes grossissent avec la surface,
+// pour garder à peu près le même nombre de boîtes à poser qu'une fresque 24×24 (et un calcul rapide).
+export function packetFor(N) {
+  const k = Math.max(1, (N / 24) ** 2);
+  return [Math.round(4 * k), Math.round(12 * k)];
+}
+
+// Niveau pour une fresque perso (atelier) : difficulté moyenne. Plus la grille est grande, moins on
+// génère d'essais (tries) et moins on simule de parties au hasard pour les comparer (runs) : le calcul
+// se fait au lancement, il doit rester court même sur téléphone.
+// author : présent pour une fresque de la communauté (data/community.js).
+export function customLevel({ name, map, author = null }) {
   const N = map.length;
-  return { id: null, name, map, round: 0, custom: true, cap: 4, mix: 8, tries: N > 16 ? 4 : N > 12 ? 6 : 8 };
+  return {
+    id: null, name, map, author, community: !!author, round: 0, custom: true, cap: 4, mix: 8,
+    tries: N > 32 ? 2 : N > 16 ? 4 : N > 12 ? 6 : 8,
+    runs: N > 32 ? 6 : 12,
+    packet: packetFor(N),
+  };
 }
 
 // Vrai quand on vient de finir la dernière fresque de la série.

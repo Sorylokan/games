@@ -19,7 +19,8 @@ export function start(li) {
   store.set(STORAGE.level, li);
 }
 
-// Fresque perso venue de l'atelier (ne touche pas à la progression de l'aventure).
+// Fresque perso venue de l'atelier, ou de la communauté si mural.author est donné
+// (ne touche pas à la progression de l'aventure).
 export function startCustom(mural) {
   launch(customLevel(mural), null);
 }
@@ -143,7 +144,7 @@ function lose() {
       hideOverlay(); resize(); renderUI();
     } },
     { label: t('end.restart'), ghost: !st.rescueUsed, fn: restart },
-    st.lvl.custom && { label: t('custom.edit'), ghost: true, fn: editLink },
+    st.lvl.custom && !st.lvl.community && { label: t('custom.edit'), ghost: true, fn: editLink },
   ]);
 }
 
@@ -152,9 +153,10 @@ function win() {
   st.status = 'win';
   if (st.lvl.custom) {
     const name = st.lvl.name || t('custom.untitled');
+    // Pas de « Modifier » pour la communauté : il mènerait à l'atelier, qui reste caché.
     showOverlay(t('end.winTitle'), t(st.rescueUsed ? 'end.winHelped' : 'end.winClean', { name }), [
       { label: t('end.replay'), fn: restart },
-      { label: t('custom.edit'), ghost: true, fn: editLink },
+      !st.lvl.community && { label: t('custom.edit'), ghost: true, fn: editLink },
       { label: t('custom.adventure'), ghost: true, fn: backToAdventure },
     ]);
     return;

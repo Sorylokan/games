@@ -27,7 +27,7 @@ export function renderUI() {
   const st = app.st;
   if (!st) return;
   if (st.lvl.custom) {
-    $('lvlNum').textContent = t('custom.badge');
+    $('lvlNum').textContent = st.lvl.community ? t('community.by', { author: st.lvl.author }) : t('custom.badge');
     $('lvlName').textContent = st.lvl.name || t('custom.untitled');
   } else {
     $('lvlNum').textContent = t('side.number', { n: st.li + 1 }) + (st.lvl.round ? ` · ${t('side.round', { n: st.lvl.round + 1 })}` : '');

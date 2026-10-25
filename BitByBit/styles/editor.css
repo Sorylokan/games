@@ -62,6 +62,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 
 .code-row { display: flex; gap: 8px; margin-bottom: 8px; }
 .code-row input { flex: 1; min-width: 0; font: 12px ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.suggest { width: 100%; margin: 4px 0 6px; }
 .dev summary { cursor: pointer; font-size: 13px; color: var(--mut); margin-top: 4px; }
 .dev textarea { width: 100%; resize: vertical; margin: 6px 0; font: 11px/1.4 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
 

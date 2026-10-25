@@ -3,7 +3,7 @@
 import { COLORS } from '../data/colors.js';
 
 export const MIN_SIZE = 4;
-export const MAX_SIZE = 24;
+export const MAX_SIZE = 50; // au-delà, les boîtes et le calcul des niveaux deviennent lourds (voir packetFor)
 const PREFIX = 'BB1-'; // « Bit by Bit », version 1 du format
 
 export const cleanName = (s) => String(s ?? '').replace(/[<>|]/g, '').trim().slice(0, 30);

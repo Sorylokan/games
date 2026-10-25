@@ -47,6 +47,15 @@ async function copy(text, field) {
 // L'atelier vit dans editor/ : le jeu est un dossier au-dessus.
 const playUrl = (mural) => '../#play=' + encodeMural(mural);
 
+// Proposer une fresque : formulaire GitHub (.github/ISSUE_TEMPLATE/fresque.yml) pré-rempli par l'adresse.
+const ISSUES_URL = 'https://github.com/Sorylokan/games/issues/new';
+const MAX_URL = 7000; // au-delà, GitHub peut refuser l'adresse : le code passe alors par le presse-papier
+function suggestUrl(mural, withCode) {
+  const p = new URLSearchParams({ template: 'fresque.yml', title: `[Fresque] ${mural.name || t('custom.untitled')}` });
+  if (withCode) p.set('code', encodeMural(mural));
+  return `${ISSUES_URL}?${p}`;
+}
+
 // ---------- rendu des panneaux ----------
 function buildPalette() {
   const box = $('palette');
@@ -88,6 +97,7 @@ function renderInfo() {
   $('play').disabled = empty;
   $('save').disabled = empty;
   $('copyCode').disabled = empty;
+  $('suggest').disabled = empty;
   $('code').value = empty ? '' : encodeMural(toMural());
   $('snippet').value = empty ? '' : toMapsSnippet(toMural());
 }
@@ -269,6 +279,15 @@ function bindControls() {
   confirmable($('new'), () => ed.dirty && !isEmpty(), () => { newMural(ed.N); afterLoad(); });
 
   $('copyCode').addEventListener('click', () => copy($('code').value, $('code')));
+  $('suggest').addEventListener('click', () => {
+    const mural = toMural();
+    // Le code est toujours copié AVANT d'ouvrir l'onglet (après, la page n'a plus le focus et la copie échoue).
+    navigator.clipboard?.writeText(encodeMural(mural)).catch(() => {});
+    const full = suggestUrl(mural, true);
+    const fits = full.length <= MAX_URL;
+    window.open(fits ? full : suggestUrl(mural, false), '_blank', 'noopener');
+    status(fits ? 'ed.suggestOpened' : 'ed.suggestPaste');
+  });
   $('copySnippet').addEventListener('click', () => copy($('snippet').value, $('snippet')));
   const doImport = () => {
     const m = decodeMural($('importCode').value);

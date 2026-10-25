@@ -73,6 +73,12 @@
   "custom.edit": "Edit",
   "custom.adventure": "Back to the adventure",
 
+  "community.button": "Community murals ({n})",
+  "community.title": "Community murals",
+  "community.text": "Drawn by players. Pick one to take apart!",
+  "community.by": "by {author}",
+  "community.close": "Close",
+
   "ed.backToGame": "Back to the game",
   "ed.hint": "Click to paint, right-click to erase. Shortcuts: B brush, F fill, I picker, E eraser, Ctrl+Z undo.",
   "ed.mural": "Your mural",
@@ -117,6 +123,10 @@
   "ed.copyManual": "Can't copy here: the text is selected, press Ctrl+C.",
   "ed.importPh": "Paste a BB1-… code",
   "ed.import": "Import",
+  "ed.suggest": "Suggest this mural",
+  "ed.suggestHelp": "Opens a GitHub form (free account): if it's picked, it joins the community murals.",
+  "ed.suggestOpened": "Form opened in a new tab. The code is copied too, just in case.",
+  "ed.suggestPaste": "This mural is too big to fill in the form by itself: paste the code (already copied) into the “Code” field.",
   "ed.badCode": "This code isn't valid. Check that it's complete.",
   "ed.devTitle": "For official murals",
   "ed.devHelp": "Paste into src/data/maps.js, then add the name to each file in locales/.",

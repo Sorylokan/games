@@ -73,6 +73,12 @@
   "custom.edit": "Modifier",
   "custom.adventure": "Reprendre l'aventure",
 
+  "community.button": "Fresques de la communauté ({n})",
+  "community.title": "Fresques de la communauté",
+  "community.text": "Dessinées par des joueurs. Choisis-en une pour la démonter !",
+  "community.by": "par {author}",
+  "community.close": "Fermer",
+
   "ed.backToGame": "Retour au jeu",
   "ed.hint": "Clic pour peindre, clic droit pour gommer. Raccourcis : B pinceau, F remplir, I pipette, E gomme, Ctrl+Z annuler.",
   "ed.mural": "Ta fresque",
@@ -117,6 +123,10 @@
   "ed.copyManual": "Copie impossible ici : le texte est sélectionné, fais Ctrl+C.",
   "ed.importPh": "Colle un code BB1-…",
   "ed.import": "Importer",
+  "ed.suggest": "Proposer cette fresque",
+  "ed.suggestHelp": "Ouvre un formulaire GitHub (compte gratuit) : si elle est retenue, elle rejoint les fresques de la communauté.",
+  "ed.suggestOpened": "Formulaire ouvert dans un nouvel onglet. Le code est aussi copié, au cas où.",
+  "ed.suggestPaste": "Fresque trop grande pour remplir le formulaire toute seule : colle le code (déjà copié) dans le champ « Code ».",
   "ed.badCode": "Ce code n'est pas valide. Vérifie qu'il est complet.",
   "ed.devTitle": "Pour les fresques officielles",
   "ed.devHelp": "À coller dans src/data/maps.js, puis ajouter le nom dans chaque fichier de locales/.",

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generate, solvable } from '../src/core/generator.js';
 import { remaining } from '../src/core/grid.js';
-import { levelAt } from '../src/data/levels.js';
+import { levelAt, customLevel, packetFor } from '../src/data/levels.js';
 import { MAPS } from '../src/data/maps.js';
 
 let id = 0;
@@ -19,6 +19,23 @@ test('chaque niveau généré est faisable et compte exactement les pixels de la
     const ids = new Set(boxes.map((b) => b.id));
     assert.equal(ids.size, boxes.length, 'identifiants de boîtes uniques');
   }
+});
+
+test('grande fresque perso (48×48) : faisable, complète, et pas plus de boîtes qu\'une 24×24', () => {
+  const L = 'HXAWDRYGBN';
+  const map = Array.from({ length: 48 }, (_, r) => Array.from({ length: 48 }, (_, c) => L[(Math.floor(r / 6) + Math.floor(c / 8)) % L.length]).join(''));
+  const lvl = customLevel({ name: 'grand', map });
+  const { N, target, queues } = generate(lvl, nextId);
+  const boxes = queues.flat();
+  assert.equal(boxes.reduce((s, b) => s + b.count, 0), remaining(target));
+  assert.ok(solvable(target, N, queues, lvl.cap));
+  assert.ok(boxes.length < 200, `${boxes.length} boîtes`);
+});
+
+test('taille des boîtes : inchangée jusqu\'à 24 de côté, puis proportionnelle à la surface', () => {
+  assert.deepEqual(packetFor(12), [4, 12]);
+  assert.deepEqual(packetFor(24), [4, 12]);
+  assert.deepEqual(packetFor(48), [16, 48]);
 });
 
 test('la difficulté monte : moins de places après les premières fresques', () => {

@@ -6,6 +6,9 @@ import { $ } from './dom.js';
 import { app } from './game/state.js';
 import { start, startCustom, restart, place, update } from './game/session.js';
 import { decodeMural } from './core/mural-code.js';
+import { communityMurals } from './data/community.js';
+import { showOverlay, hideOverlay } from './ui/overlay.js';
+import { t } from './ui/lang.js';
 import { resize } from './render/canvas.js';
 import { draw } from './render/board.js';
 import { initPanel, renderUI, renderProgress } from './ui/panel.js';
@@ -23,7 +26,26 @@ async function changeLang(lang) {
   fillSkinSelect();
   renderRules();
   renderUI();
+  renderCommunityBtn();
 }
+
+// Fresques de la communauté : un bouton (s'il y en a) qui ouvre la liste par-dessus le plateau.
+const community = communityMurals();
+function renderCommunityBtn() {
+  const b = $('communityBtn');
+  b.hidden = !community.length;
+  b.textContent = t('community.button', { n: community.length });
+}
+$('communityBtn').addEventListener('click', () => {
+  showOverlay(t('community.title'), t('community.text'), [
+    ...community.map((m) => ({
+      label: `${m.name || t('custom.untitled')} · ${t('community.by', { author: m.author })}`,
+      ghost: true,
+      fn: () => startCustom(m),
+    })),
+    { label: t('community.close'), fn: hideOverlay },
+  ]);
+});
 $('restart').addEventListener('click', restart);
 $('speed').addEventListener('click', () => {
   app.speed = app.speed === 1 ? 2 : 1;
@@ -45,6 +67,7 @@ new ResizeObserver(() => {
 await setLang(initialLang());
 fillSkinSelect();
 setSkin(store.get(STORAGE.skin, DEFAULT_SKIN));
+renderCommunityBtn();
 // index.html#play=BB1-… : on joue une fresque perso (lien venu de l'atelier ou d'un ami).
 const playCode = location.hash.match(/^#play=(.+)$/)?.[1];
 const mural = playCode && decodeMural(decodeURIComponent(playCode));

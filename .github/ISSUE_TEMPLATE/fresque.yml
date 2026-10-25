@@ -1,0 +1,40 @@
+# Formulaire « Proposer une fresque » pour Bit by Bit.
+# L'atelier (BitByBit/editor/) ouvre ce formulaire pré-rempli : ?template=fresque.yml&title=…&code=…
+# Une proposition acceptée s'ajoute dans BitByBit/src/data/community.js (code + pseudo).
+name: "Bit by Bit : proposer une fresque / suggest a mural"
+description: "Propose ta fresque pour la série « Fresques de la communauté » / Suggest your mural for the community series."
+title: "[Fresque] "
+labels: ["fresque"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci ! Ta fresque sera relue avant d'être ajoutée au jeu. / Thanks! Your mural will be reviewed before it's added.
+  - type: input
+    id: code
+    attributes:
+      label: "Code de la fresque / Mural code (BB1-…)"
+      description: "Rempli automatiquement depuis l'atelier. Sinon, colle le code copié. / Filled in from the workshop, or paste the copied code."
+      placeholder: "BB1-…"
+    validations:
+      required: true
+  - type: input
+    id: pseudo
+    attributes:
+      label: "Pseudo à afficher dans le jeu / Name to show in the game"
+      description: "Facultatif : sinon, ton pseudo GitHub. / Optional: otherwise your GitHub username."
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: "Un mot sur ta fresque ? / Anything to add?"
+    validations:
+      required: false
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: "Droits / Rights"
+      options:
+        - label: "C'est mon dessin, ou j'ai le droit de le partager. / I made it, or I'm allowed to share it."
+          required: true

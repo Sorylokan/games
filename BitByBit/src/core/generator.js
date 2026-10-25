@@ -3,15 +3,19 @@
 import { clone, remaining, reachable, collect, settle, rand, pick, parseMap } from './grid.js';
 
 const QUEUES = 3;
+const PACKET = [4, 12]; // pixels par boîte, par défaut (voir packetFor dans data/levels.js)
 
-// Démonte la fresque dans un ordre possible, en paquets de 4 à 12 pixels d'une même couleur.
-export function buildSequence(target, N, rnd = Math.random) {
+// Nombre de boîtes d'une file (pour borner les boucles : on pose au plus une boîte par étape).
+const boxCount = (queues) => queues.reduce((s, q) => s + q.length, 0);
+
+// Démonte la fresque dans un ordre possible, en paquets de [lo, hi] pixels d'une même couleur.
+export function buildSequence(target, N, rnd = Math.random, [lo, hi] = PACKET) {
   const g = clone(target), seq = [];
-  let guard = 0;
-  while (remaining(g) && guard++ < 500) {
+  let guard = remaining(g) + 1; // chaque tour emporte au moins un pixel
+  while (remaining(g) && guard-- > 0) {
     const colors = [...new Set(reachable(g, N).map(([r, c]) => g[r][c]))];
     const color = pick(colors, rnd);
-    const n = collect(g, N, color, rand(4, 12, rnd));
+    const n = collect(g, N, color, rand(lo, hi, rnd));
     if (n) seq.push({ color, count: n });
   }
   return seq;
@@ -21,7 +25,7 @@ export function buildSequence(target, N, rnd = Math.random) {
 export function solvable(target, N, queues, cap) {
   const g = clone(target), qs = queues.map((q) => q.slice());
   let line = [];
-  for (let step = 0; step < 500; step++) {
+  for (let step = 0, max = boxCount(qs) + 1; step < max; step++) {
     line = settle(g, N, line);
     if (!remaining(g)) return true;
     if (line.length >= cap) return false;
@@ -48,7 +52,7 @@ export function randomWins(target, N, queues, cap, runs, rnd = Math.random) {
   for (let k = 0; k < runs; k++) {
     const g = clone(target), qs = queues.map((q) => q.slice());
     let line = [];
-    for (let step = 0; step < 500; step++) {
+    for (let step = 0, max = boxCount(qs) + 1; step < max; step++) {
       line = settle(g, N, line);
       if (!remaining(g)) { wins++; break; }
       const open = qs.filter((q) => q.length);
@@ -72,7 +76,7 @@ function fillEmptyQueues(qs) {
 // Une proposition de files : l'ordre de démontage, un peu mélangé, réparti au hasard entre les files.
 function candidate(target, N, lvl, nextId, rnd) {
   for (let attempt = 0; attempt < 40; attempt++) {
-    const seq = buildSequence(target, N, rnd);
+    const seq = buildSequence(target, N, rnd, lvl.packet);
     const mixed = seq
       .map((a, i) => ({ a, k: i + rnd() * lvl.mix }))
       .sort((x, y) => x.k - y.k)
@@ -94,12 +98,12 @@ export function generate(lvl, nextId, rnd = Math.random) {
   for (let t = 0; t < lvl.tries; t++) {
     const qs = candidate(target, N, lvl, nextId, rnd);
     if (!qs) continue;
-    const r = randomWins(target, N, qs, lvl.cap, 12, rnd);
+    const r = randomWins(target, N, qs, lvl.cap, lvl.runs ?? 12, rnd);
     if (r < easiest) { easiest = r; queues = qs; }
   }
   if (!queues) { // filet de sécurité : l'ordre exact de démontage, toujours faisable
     queues = Array.from({ length: QUEUES }, () => []);
-    buildSequence(target, N, rnd).forEach((a, i) => queues[i % QUEUES].push({ id: nextId(), ...a }));
+    buildSequence(target, N, rnd, lvl.packet).forEach((a, i) => queues[i % QUEUES].push({ id: nextId(), ...a }));
   }
   return { N, target, queues };
 }

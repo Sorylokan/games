@@ -13,7 +13,10 @@ export function resize() {
   const w = cv.parentElement.clientWidth - 20;
   if (w <= 0) return;
   const u = w / (st.N + 2);                       // taille d'une case
-  const lh = Math.max(1.9, Math.min(3.4, 96 / u)); // hauteur de la ligne de boîtes, en cases
+  // Hauteur de la ligne de boîtes : en pixels d'écran, au moins 72 px, pour que les boîtes restent
+  // lisibles même quand une grande fresque rend les cases minuscules. lh = la même hauteur, en cases.
+  const linePx = Math.max(u * 1.9, Math.min(96, u * 3.4), 72);
+  const lh = linePx / u;
   const h = u * (st.N + 2 + lh);
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   cv.width = Math.round(w * dpr);
