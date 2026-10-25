@@ -12,8 +12,7 @@ export const QUEUE_COUNT = 3;    // number of box queues
 export const STORAGE = {
   level: 'pc-level',
   best: 'pc-best',
-  skin: 'pc-skin',
-  lang: 'pc-lang',
+  skin: 'pc-skin',             // the language key ('pc-lang') lives in src/i18n.js
   murals: 'pc-murals', // saved custom murals (editor)
   draft: 'pc-draft',   // mural being edited
 };

@@ -1,0 +1,43 @@
+# Checks translation pull requests. Read-only, so safe on forks.
+name: Translations
+
+on:
+  pull_request:
+    paths:
+      - "**/locales/**"
+      - "**/src/i18n.js"
+      - "scripts.js"
+      - "card_*.json"
+      - "Mimiri/src/themes/**"
+      - ".github/scripts/check-locales.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Language files (keys, {variables}, LANGS)
+        run: node .github/scripts/check-locales.mjs
+      - name: Free the Memes tests
+        if: always()
+        working-directory: FreeTheMemes
+        run: node --test tests/locales.test.js tests/i18n.test.js
+      - name: Grid of Greed tests
+        if: always()
+        working-directory: GridOfGreed
+        run: node --test tests/locales.test.js tests/i18n.test.js
+      - name: Mimiri tests
+        if: always()
+        working-directory: Mimiri
+        run: node --test tests/locales.test.js tests/themes.test.js
+      - name: Bit by Bit tests
+        if: always()
+        working-directory: BitByBit
+        run: node --test tests/locales.test.js tests/data.test.js

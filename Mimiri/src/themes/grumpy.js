@@ -1,29 +1,8 @@
 // "Grumpy cats" theme: hug them all back to a smile. on = grumpy cat (to fix), off = happy cat.
-// Colors live in theme-grumpy.css; texts and drawing here.
+// Colors live in theme-grumpy.css; texts in locales/ (theme.grumpy.*); drawing here.
 import { cat, EYE, NOSE, FURS } from "./cat.js";
 
 export default {
-  title: "Chats grincheux",
-  goal: "Fais un câlin à un chat pour lui redonner le sourire… mais ça change aussi l'humeur de ses voisins !",
-  leftLabel: "Grincheux",
-  win: "Tous les chats sourient, bravo ! 😸",
-  hint: "Un câlin change l'humeur du chat et de ses 4 voisins.",
-  ariaOn: "Chat grincheux",
-  ariaOff: "Chat joyeux",
-
-  // Translations (the fields above are French, the reference checked by the tests).
-  texts: {
-    en: {
-      title: "Grumpy Cats",
-      goal: "Pet a cat to make it smile again… but it also changes its neighbours' mood!",
-      leftLabel: "Grumpy",
-      win: "All the cats are smiling, well done! 😸",
-      hint: "A cuddle changes the mood of the cat and its 4 neighbours.",
-      ariaOn: "Grumpy cat",
-      ariaOff: "Happy cat"
-    }
-  },
-
   render(on, idx) {
     const fur = FURS[idx % FURS.length];
     if (on) {

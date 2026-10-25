@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,14 +11,14 @@
 
 <header class="topbar">
   <div class="brand-group">
-    <a class="back" id="back" href="../">
+    <a class="back" id="back" href="../" data-i18n-title="ui.back">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
     </a>
     <span class="brand">Mimiri</span>
   </div>
   <div class="bar-tools">
-    <select id="opt-theme" aria-label="Thème"></select>
-    <select id="opt-lang" aria-label="Langue"></select>
+    <select id="opt-theme" aria-label="Theme" data-i18n-aria="ui.themeLabel"></select>
+    <select id="opt-lang" aria-label="Language" data-i18n-aria="ui.langLabel"></select>
   </div>
 </header>
 
@@ -37,28 +37,28 @@
     </div>
     <div class="controls">
       <div class="group">
-        <span class="group-label" id="sizes-label">Taille de la grille</span>
+        <span class="group-label" id="sizes-label" data-i18n="ui.gridSize">Grid size</span>
         <div class="bar" id="sizes"></div>
       </div>
       <div class="actions">
-        <button type="button" class="pill" id="btn-daily">Défi du jour</button>
-        <button type="button" class="pill ghost" id="btn-new">Nouvelle grille</button>
-        <button type="button" class="pill ghost" id="btn-reset">Recommencer</button>
+        <button type="button" class="pill" id="btn-daily" data-i18n="ui.daily">Daily challenge</button>
+        <button type="button" class="pill ghost" id="btn-new" data-i18n="ui.new">New grid</button>
+        <button type="button" class="pill ghost" id="btn-reset" data-i18n="ui.restart">Restart</button>
       </div>
     </div>
   </section>
 
   <!-- Center: the grid, as big as the space allows -->
   <section class="board-zone">
-    <div id="board" role="group" aria-label="Grille de jeu"></div>
+    <div id="board" role="group" aria-label="Game board" data-i18n-aria="ui.boardLabel"></div>
   </section>
 
   <!-- Right: score in big numbers -->
   <section class="panel score">
     <div class="stats">
       <div class="stat"><span id="left-label"></span><b id="left">0</b></div>
-      <div class="stat"><span id="moves-label">Coups</span><b id="moves">0</b></div>
-      <div class="stat"><span id="best-label">Record</span><b id="best">–</b></div>
+      <div class="stat"><span id="moves-label" data-i18n="ui.moves">Moves</span><b id="moves">0</b></div>
+      <div class="stat"><span id="best-label" data-i18n="ui.best">Best</span><b id="best">–</b></div>
     </div>
     <div id="message" aria-live="polite"></div>
   </section>

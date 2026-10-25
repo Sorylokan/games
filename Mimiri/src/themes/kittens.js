@@ -1,29 +1,8 @@
 // "Kittens" theme: play with the kittens to wake them all. on = sleeping (to fix), off = awake.
-// Colors live in theme-kittens.css; texts and drawing here.
+// Colors live in theme-kittens.css; texts in locales/ (theme.kittens.*); drawing here.
 import { cat, BIG_EYES, EYE, NOSE } from "./cat.js";
 
 export default {
-  title: "Chatons câlins",
-  goal: "Joue avec un chaton pour le réveiller… mais attention, ça change aussi l'état de ses voisins !",
-  leftLabel: "Endormis",
-  win: "Tous les chatons sont réveillés et pleins d'énergie, bravo ! 🐾",
-  hint: "Jouer avec un chaton réveille (ou endort) le chaton et ses 4 voisins.",
-  ariaOn: "Chaton endormi",
-  ariaOff: "Chaton réveillé",
-
-  // Translations (the fields above are French, the reference checked by the tests).
-  texts: {
-    en: {
-      title: "Cuddly Kittens",
-      goal: "Play with a kitten to wake it up… but watch out, it also flips its neighbours!",
-      leftLabel: "Asleep",
-      win: "All the kittens are awake and full of energy, well done! 🐾",
-      hint: "Playing with a kitten wakes it up (or puts it back to sleep), along with its 4 neighbours.",
-      ariaOn: "Sleeping kitten",
-      ariaOff: "Awake kitten"
-    }
-  },
-
   render(on, idx) {
     if (!on) {
       return cat(idx, `${BIG_EYES}${NOSE}

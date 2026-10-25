@@ -1,0 +1,58 @@
+name: "Translation: new language or fix"
+description: "Translate the games into your language, or fix a translation."
+title: "[Translation] "
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping! 🌍 Everything is explained in [TRANSLATING.md](https://github.com/Sorylokan/games/blob/main/TRANSLATING.md).
+        Comfortable with GitHub? A pull request is the fastest way: a check runs on it and tells you if a key is missing.
+        Otherwise, use this form and attach your files.
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      description: "Its name in English and in itself, and its code if you know it."
+      placeholder: "German / Deutsch (de)"
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is it?
+      options:
+        - A new language
+        - A fix to an existing translation
+    validations:
+      required: true
+  - type: checkboxes
+    id: projects
+    attributes:
+      label: Which parts?
+      description: "Translating one game is already great, no need to do everything."
+      options:
+        - label: Catalog (home page)
+        - label: Free the Memes
+        - label: Grid of Greed
+        - label: Mimiri
+        - label: Bit by Bit
+  - type: textarea
+    id: files
+    attributes:
+      label: Your files or changes
+      description: "Drag and drop your .json files here (you may need to zip them), or describe the fix: which game, which text, what it should say."
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else?
+      description: "Questions, unsure translations, credit name…"
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: License
+      options:
+        - label: "I wrote this translation myself (no machine translation pasted without checking), and it can be used in these games."
+          required: true

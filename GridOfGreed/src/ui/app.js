@@ -1,12 +1,12 @@
 // UI entry point: home (create/join in two clicks), lobby, table. No rules here: everything goes through networking/.
-import { createTranslator, loadLocale, getLocale, DEFAULT_LOCALE } from "../i18n.js";
+import { LANGS, DEFAULT_LOCALE, loadTranslator, initialLocale, saveLocale, applyTexts, fillLangSelect } from "../i18n.js";
 import { TrysteroNetwork } from "../networking/trystero-network.js";
 import { createHostSession, createClientSession } from "../networking/game-session.js";
 import { createRoomId, createRoomLink, getRoomIdFromLocation, isValidRoomCode, normalizeRoomCode } from "../networking/room.js";
 import { MESSAGE_TYPES, cleanName, createActionRequest } from "../networking/messages.js";
 import { renderTable, fitBoard } from "./table.js";
 import { renderSidebar, playerDot } from "./sidebar.js";
-import { LANGS, THEMES, getPref, setPref, soundEnabled, readTheme } from "./prefs.js";
+import { THEMES, setPref, soundEnabled, readTheme } from "./prefs.js";
 import { playEvents, setMuted, click as sndClick } from "./sound.js";
 
 const $ = (id) => document.getElementById(id);
@@ -25,18 +25,6 @@ let codeShown = false;
 
 // Local-only table state: cards picked to reveal, discard-and-flip mode.
 const ui = { revealPicks: [], discardFlipMode: false, endHidden: false };
-
-// --- i18n ---
-function applyTexts() {
-  document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
-  document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
-  document.querySelectorAll("[data-i18n-title]").forEach((el) => {
-    el.setAttribute("title", t(el.dataset.i18nTitle));
-    el.setAttribute("aria-label", t(el.dataset.i18nTitle));
-  });
-  // optgroup labels use the label attribute, not textContent.
-  document.querySelectorAll("[data-i18n-label]").forEach((el) => { el.setAttribute("label", t(el.dataset.i18nLabel)); });
-}
 
 // Stable seat token per room: survives a reload, used to reconnect.
 function seatToken(roomId) {
@@ -249,16 +237,12 @@ async function joinRoom(code) {
 
 // --- Global preferences (top bar): language, theme, sound ---
 async function setLanguage(lang) {
-  if (!LANGS.includes(lang)) lang = DEFAULT_LOCALE;
-  const [active, fallback] = await Promise.all([
-    loadLocale(lang).catch(() => ({})),
-    loadLocale(DEFAULT_LOCALE),
-  ]);
-  t = createTranslator({ locale: lang, messages: { [lang]: active, [DEFAULT_LOCALE]: fallback } });
+  if (!LANGS[lang]) lang = DEFAULT_LOCALE;
+  t = await loadTranslator(lang);
   document.documentElement.lang = lang;
   $("opt-lang").value = lang;
-  setPref("lang", lang);
-  applyTexts();
+  saveLocale(lang);
+  applyTexts(t);
   if (lastLobby && !$("lobby").hidden) renderLobby(lastLobby);
   if (lastView && !$("table").hidden) showTable(lastView);
 }
@@ -325,8 +309,9 @@ $("start").addEventListener("click", () => {
 $("name").value = savedName();
 $("code").value = ""; // never prefilled
 
-// Startup: saved preferences, then translations (French fallback).
+// Startup: saved preferences, then translations.
 applyTheme(readTheme());
 applySound(soundEnabled());
-const browserLang = getLocale();
-await setLanguage(getPref("lang", LANGS.includes(browserLang) ? browserLang : DEFAULT_LOCALE));
+const startLang = initialLocale();
+fillLangSelect($("opt-lang"), startLang);
+await setLanguage(startLang);

@@ -13,7 +13,10 @@ Online rooms are peer-to-peer (WebRTC via Trystero/Nostr): there is no game
 server — the host's browser runs the authoritative rules engine. Share the
 invite link or room code with friends.
 
-The UI is available in English and French (`locales/en.json` is the reference).
+The UI is available in English and French (`locales/en.json` is the reference). To add a language:
+copy `locales/en.json` to `locales/xx.json`, translate the values (not the keys), and add
+`xx: "Language name"` to `LANGS` in `src/i18n.js` (the same module in every game of this repo).
+Full guide: [TRANSLATING.md](../TRANSLATING.md).
 
 ## Development
 

@@ -28,6 +28,9 @@ let nextUp = new Map();
 
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)");
 
+// Translator of the last render, for helpers that build cards (aria-labels).
+let tr = (key) => key;
+
 const FLY_MS = 450;     // card flight duration
 const FLIP_MS = 500;    // flip duration (same as .in in the CSS)
 const COL_DELAY = 500;  // pause before a matching column leaves
@@ -221,7 +224,7 @@ function cardEl(card, { uid: id, clickable = false, picked = false, onClick = nu
   b.dataset.r = range(card.v ?? 0);
   if (id) b.dataset.uid = id;
   const known = card.up && card.v !== null;
-  b.setAttribute("aria-label", known ? `Carte ${card.v}` : "Carte cachée");
+  b.setAttribute("aria-label", known ? tr("table.card", { value: card.v }) : tr("table.hiddenCard"));
   b.innerHTML = `<span class="in"><span class="b"></span><span class="f">${known ? card.v : ""}</span></span>`;
   if (clickable && onClick) {
     b.classList.add("can");
@@ -457,6 +460,7 @@ function endScreenEl(view, myId, ui, t, isHost, onRematch, refresh) {
 
 // Redraws the whole table. ui = { revealPicks: [[col,row]…], discardFlipMode, endHidden }.
 export function renderTable(boardEl, panelSlot, view, myId, { t, isHost, ui, onAction, onNextRound, onRematch, events = [] }) {
+  tr = t;
   prevUp = nextUp;
   nextUp = new Map();
   const myIndex = view.players.findIndex((p) => p.id === myId);

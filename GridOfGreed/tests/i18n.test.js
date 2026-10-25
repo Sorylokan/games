@@ -1,11 +1,11 @@
 // Translator tests (mirrors Free the Memes).
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createTranslator, getLocale, DEFAULT_LOCALE } from "../src/i18n.js";
+import { createTranslator, DEFAULT_LOCALE } from "../src/i18n.js";
 
 const messages = {
-  fr: { greet: "Salut {name} !", only: "Seulement en français", "errors.missingTranslation": "[{key}]" },
-  en: { greet: "Hi {name}!" },
+  en: { greet: "Hi {name}!", only: "English only", "errors.missingTranslation": "[{key}]" },
+  fr: { greet: "Salut {name} !" },
 };
 
 test("traduit dans la langue active avec variables", () => {
@@ -13,9 +13,9 @@ test("traduit dans la langue active avec variables", () => {
   assert.equal(t("greet", { name: "Zoé" }), "Salut Zoé !");
 });
 
-test("retombe sur la langue de repli quand la clé manque", () => {
-  const t = createTranslator({ locale: "en", messages });
-  assert.equal(t("only"), "Seulement en français");
+test("retombe sur la langue de référence quand la clé manque", () => {
+  const t = createTranslator({ locale: "fr", messages });
+  assert.equal(t("only"), "English only");
 });
 
 test("clé inconnue : message de repli avec le nom de la clé", () => {
@@ -24,11 +24,10 @@ test("clé inconnue : message de repli avec le nom de la clé", () => {
 });
 
 test("variables absentes conservées telles quelles", () => {
-  const t = createTranslator({ locale: "en", messages });
-  assert.equal(t("greet"), "Hi {name}!");
+  const t = createTranslator({ locale: "fr", messages });
+  assert.equal(t("greet"), "Salut {name} !");
 });
 
-test("langue par défaut hors navigateur", () => {
-  assert.equal(DEFAULT_LOCALE, "fr");
-  assert.equal(getLocale(), "fr");
+test("langue de référence : l'anglais", () => {
+  assert.equal(DEFAULT_LOCALE, "en");
 });

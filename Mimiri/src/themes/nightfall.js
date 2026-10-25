@@ -1,5 +1,5 @@
 // "Nightfall" theme: soft stars to switch off. on = lit star (to fix), off = outline (solved).
-// Colors live in theme-nightfall.css; texts and drawing here.
+// Colors live in theme-nightfall.css; texts in locales/ (theme.nightfall.*); drawing here.
 const ON = "#f4d47c";      // soft moon yellow (matches --accent in theme-nightfall.css)
 const OFF = "#3a4266";     // off outline
 
@@ -12,27 +12,6 @@ const STAR_ON = `<svg viewBox="${VIEW}" preserveAspectRatio="xMidYMid meet" aria
 const STAR_OFF = `<svg viewBox="${VIEW}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g transform="${FRAME}"><path d="${STAR_PATH}" fill="none" stroke="${OFF}" stroke-width="22" stroke-linejoin="round"/></g></svg>`;
 
 export default {
-  title: "Nightfall",
-  goal: "Éteins une étoile… mais attention, ça bascule aussi ses voisines !",
-  leftLabel: "Allumées",
-  win: "Toutes les étoiles sont éteintes, bonne nuit !",
-  hint: "Éteindre une étoile la bascule, ainsi que ses 4 voisines.",
-  ariaOn: "Étoile allumée",
-  ariaOff: "Étoile éteinte",
-
-  // Translations (the fields above are French, the reference checked by the tests).
-  texts: {
-    en: {
-      title: "Nightfall",
-      goal: "Switch off a star… but watch out, it also flips its neighbours!",
-      leftLabel: "Still on",
-      win: "All the stars are out, good night!",
-      hint: "Switching a star flips it, along with its 4 neighbours.",
-      ariaOn: "Star lit",
-      ariaOff: "Star out"
-    }
-  },
-
   render(on) {
     return on ? STAR_ON : STAR_OFF;
   }

@@ -1,29 +1,8 @@
 // "Puppies" theme: play with the puppies to wake them all. on = sleeping (to fix), off = awake.
-// Colors live in theme-puppies.css; texts and drawing here.
+// Colors live in theme-puppies.css; texts in locales/ (theme.puppies.*); drawing here.
 import { dog, BIG_EYES, EYE, NOSE } from "./dog.js";
 
 export default {
-  title: "Chiots câlins",
-  goal: "Joue avec un chiot pour le réveiller… mais attention, ça change aussi l'état de ses voisins !",
-  leftLabel: "Endormis",
-  win: "Tous les chiots sont réveillés et prêts à jouer, bravo ! 🐶",
-  hint: "Jouer avec un chiot le réveille (ou l'endort), ainsi que ses 4 voisins.",
-  ariaOn: "Chiot endormi",
-  ariaOff: "Chiot réveillé",
-
-  // Translations (the fields above are French, the reference checked by the tests).
-  texts: {
-    en: {
-      title: "Cuddly Puppies",
-      goal: "Play with a puppy to wake it up… but watch out, it also flips its neighbours!",
-      leftLabel: "Asleep",
-      win: "All the puppies are awake and ready to play, well done! 🐶",
-      hint: "Playing with a puppy wakes it up (or puts it back to sleep), along with its 4 neighbours.",
-      ariaOn: "Sleeping puppy",
-      ariaOff: "Awake puppy"
-    }
-  },
-
   render(on, idx) {
     if (!on) {
       // Awake: big eyes, open mouth, tongue out, ears up.

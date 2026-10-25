@@ -30,6 +30,8 @@
   "lobby.host": "host",
   "lobby.showCode": "Show or hide the code",
   "table.ready": "ready",
+  "table.card": "Card {value}",
+  "table.hiddenCard": "Hidden card",
   "table.revealHint": "Reveal 2 cards ({count}/2)",
   "table.confirm": "Confirm",
   "table.waitingReveal": "Waiting for the others…",

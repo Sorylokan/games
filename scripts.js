@@ -7,9 +7,9 @@
 const $ = (id) => document.getElementById(id);
 const catalog = $("catalog");
 
-// Available languages: locales/xx.json + a line here (cards fall back to French).
+// Available languages: locales/xx.json + a line here (missing texts fall back to English).
 const LANGS = { fr: "Français", en: "English" };
-const DEFAULT_LANG = "fr";
+const DEFAULT_LANG = "en";
 const LANG_KEY = "games-lang";
 
 let lang = DEFAULT_LANG;

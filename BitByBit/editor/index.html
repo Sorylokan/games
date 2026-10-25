@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -25,25 +25,25 @@
     <div class="tools">
       <select id="lang" data-i18n-title="bar.lang"></select>
       <select id="skin" data-i18n-title="bar.theme"></select>
-      <a class="btn-link ghost" href="../" data-i18n="ed.backToGame">Retour au jeu</a>
+      <a class="btn-link ghost" href="../" data-i18n="ed.backToGame">Back to the game</a>
     </div>
   </header>
 
   <main class="table editor">
     <section class="board" id="board">
       <canvas id="ed"></canvas>
-      <p class="hint" data-i18n="ed.hint">Clic pour peindre, clic droit pour gommer.</p>
+      <p class="hint" data-i18n="ed.hint">Click to paint, right-click to erase. Shortcuts: B brush, F fill, I picker, E eraser, Ctrl+Z undo.</p>
     </section>
 
     <aside class="side">
       <section class="side-card">
-        <h3><span data-i18n="ed.mural">Ta fresque</span> <small id="pixInfo"></small></h3>
+        <h3><span data-i18n="ed.mural">Your mural</span> <small id="pixInfo"></small></h3>
         <label class="field">
-          <span data-i18n="ed.name">Nom</span>
+          <span data-i18n="ed.name">Name</span>
           <input id="name" maxlength="30" autocomplete="off" data-i18n-ph="ed.namePh">
         </label>
         <div class="field">
-          <span data-i18n="ed.size">Pixels de côté</span>
+          <span data-i18n="ed.size">Pixels per side</span>
           <div class="stepper">
             <button type="button" class="icon-btn" id="sizeMinus" aria-label="−">−</button>
             <input id="size" type="number" min="4" max="50" inputmode="numeric">
@@ -51,87 +51,87 @@
           </div>
         </div>
         <div class="row-btns">
-          <button type="button" class="ghost" id="undo" data-i18n="ed.undo">Annuler</button>
-          <button type="button" class="ghost" id="clear" data-i18n="ed.clear">Tout effacer</button>
+          <button type="button" class="ghost" id="undo" data-i18n="ed.undo">Undo</button>
+          <button type="button" class="ghost" id="clear" data-i18n="ed.clear">Clear all</button>
         </div>
       </section>
 
       <section class="side-card">
-        <h3 data-i18n="ed.paint">Peinture</h3>
+        <h3 data-i18n="ed.paint">Paint</h3>
         <div class="palette" id="palette"></div>
         <div class="seg" id="toolBar">
-          <button type="button" data-tool="brush" data-i18n="ed.brush">Pinceau</button>
-          <button type="button" data-tool="fill" data-i18n="ed.fill">Remplir</button>
-          <button type="button" data-tool="pick" data-i18n="ed.pick">Pipette</button>
+          <button type="button" data-tool="brush" data-i18n="ed.brush">Brush</button>
+          <button type="button" data-tool="fill" data-i18n="ed.fill">Fill</button>
+          <button type="button" data-tool="pick" data-i18n="ed.pick">Picker</button>
         </div>
       </section>
 
       <section class="side-card">
-        <h3 data-i18n="ed.bgTitle">Image de fond</h3>
-        <p class="muted" data-i18n="ed.bgHelp">Charge une image pour la décalquer : elle reste sous la grille et n'est pas enregistrée.</p>
+        <h3 data-i18n="ed.bgTitle">Background image</h3>
+        <p class="muted" data-i18n="ed.bgHelp">Load a picture to trace over: it stays under the grid and isn't saved with the mural.</p>
         <div class="row-btns">
-          <label class="file-btn ghost"><input type="file" id="bgFile" accept="image/*"><span data-i18n="ed.bgLoad">Choisir une image</span></label>
-          <button type="button" class="ghost" id="bgConvert" data-i18n="ed.bgConvert" hidden>Convertir en pixels</button>
-          <button type="button" class="ghost" id="bgRemove" data-i18n="ed.bgRemove" hidden>Retirer</button>
+          <label class="file-btn ghost"><input type="file" id="bgFile" accept="image/*"><span data-i18n="ed.bgLoad">Choose an image</span></label>
+          <button type="button" class="ghost" id="bgConvert" data-i18n="ed.bgConvert" hidden>Convert to pixels</button>
+          <button type="button" class="ghost" id="bgRemove" data-i18n="ed.bgRemove" hidden>Remove</button>
         </div>
         <div class="bg-controls" id="bgControls" hidden>
           <label class="field">
-            <span data-i18n="ed.bgOpacity">Transparence</span>
+            <span data-i18n="ed.bgOpacity">Opacity</span>
             <input type="range" id="bgOpacity" min="10" max="100" value="50">
           </label>
-          <label class="check"><input type="checkbox" id="bgVisible" checked> <span data-i18n="ed.bgShow">Afficher</span></label>
+          <label class="check"><input type="checkbox" id="bgVisible" checked> <span data-i18n="ed.bgShow">Show</span></label>
         </div>
         <!-- Conversion settings: applied live after "Convert to pixels" -->
         <div class="conv-controls" id="convControls" hidden>
-          <p class="muted" data-i18n="ed.convHelp">Après la conversion, ces réglages s'appliquent en direct.</p>
+          <p class="muted" data-i18n="ed.convHelp">After converting, these settings apply live (Ctrl+Z goes back to before the conversion).</p>
           <label class="field">
             <span><span data-i18n="ed.convSaturation">Saturation</span> <output id="convSaturationVal"></output></span>
             <input type="range" id="convSaturation" min="50" max="200" step="5" value="130">
           </label>
           <label class="field">
-            <span><span data-i18n="ed.convContrast">Contraste</span> <output id="convContrastVal"></output></span>
+            <span><span data-i18n="ed.convContrast">Contrast</span> <output id="convContrastVal"></output></span>
             <input type="range" id="convContrast" min="50" max="200" step="5" value="115">
           </label>
           <label class="field">
-            <span><span data-i18n="ed.convColors">Couleurs max</span> <output id="convColorsVal"></output></span>
+            <span><span data-i18n="ed.convColors">Max colors</span> <output id="convColorsVal"></output></span>
             <input type="range" id="convColors" min="2" max="24" step="1" value="8">
           </label>
-          <label class="check"><input type="checkbox" id="convCleanup" checked> <span data-i18n="ed.convCleanup">Nettoyer les pixels isolés</span></label>
-          <label class="check"><input type="checkbox" id="convTransparent"> <span data-i18n="ed.convTransparent">Fond transparent</span></label>
+          <label class="check"><input type="checkbox" id="convCleanup" checked> <span data-i18n="ed.convCleanup">Clean up stray pixels</span></label>
+          <label class="check"><input type="checkbox" id="convTransparent"> <span data-i18n="ed.convTransparent">Transparent background</span></label>
         </div>
       </section>
 
       <section class="side-card">
         <div class="actions">
-          <button type="button" id="play" data-i18n="ed.play">Jouer cette fresque</button>
-          <button type="button" class="ghost" id="save" data-i18n="ed.save">Enregistrer</button>
-          <button type="button" class="ghost" id="new" data-i18n="ed.new">Nouvelle</button>
+          <button type="button" id="play" data-i18n="ed.play">Play this mural</button>
+          <button type="button" class="ghost" id="save" data-i18n="ed.save">Save</button>
+          <button type="button" class="ghost" id="new" data-i18n="ed.new">New</button>
         </div>
         <p class="status" id="status" role="status" aria-live="polite"></p>
       </section>
 
       <section class="side-card">
-        <h3 data-i18n="ed.share">Partager</h3>
+        <h3 data-i18n="ed.share">Share</h3>
         <div class="code-row">
           <input id="code" readonly data-i18n-title="ed.codeLabel">
-          <button type="button" class="ghost" id="copyCode" data-i18n="ed.copy">Copier</button>
+          <button type="button" class="ghost" id="copyCode" data-i18n="ed.copy">Copy</button>
         </div>
         <div class="code-row">
           <input id="importCode" autocomplete="off" spellcheck="false" data-i18n-ph="ed.importPh">
-          <button type="button" class="ghost" id="import" data-i18n="ed.import">Importer</button>
+          <button type="button" class="ghost" id="import" data-i18n="ed.import">Import</button>
         </div>
-        <button type="button" class="suggest" id="suggest" data-i18n="ed.suggest">Proposer cette fresque</button>
-        <p class="muted" data-i18n="ed.suggestHelp">Ouvre un formulaire GitHub (compte gratuit) : si elle est retenue, elle rejoint les fresques de la communauté.</p>
+        <button type="button" class="suggest" id="suggest" data-i18n="ed.suggest">Suggest this mural</button>
+        <p class="muted" data-i18n="ed.suggestHelp">Opens a GitHub form (free account): if it's picked, it joins the community murals.</p>
         <details class="dev">
-          <summary data-i18n="ed.devTitle">Pour les fresques officielles</summary>
-          <p class="muted" data-i18n="ed.devHelp">À coller dans src/data/maps.js, puis ajouter le nom dans locales/.</p>
+          <summary data-i18n="ed.devTitle">For official murals</summary>
+          <p class="muted" data-i18n="ed.devHelp">Paste into src/data/maps.js, then add the name to each file in locales/.</p>
           <textarea id="snippet" readonly rows="8"></textarea>
-          <button type="button" class="ghost" id="copySnippet" data-i18n="ed.copy">Copier</button>
+          <button type="button" class="ghost" id="copySnippet" data-i18n="ed.copy">Copy</button>
         </details>
       </section>
 
       <section class="side-card">
-        <h3 data-i18n="ed.library">Mes fresques</h3>
+        <h3 data-i18n="ed.library">My murals</h3>
         <ul class="lib" id="lib"></ul>
       </section>
     </aside>

@@ -1,5 +1,5 @@
 import { DiceTray } from "./dice-tray.js";
-import { createTranslator, loadLocale, getLocale } from "../i18n.js";
+import { LANGS, loadTranslator, initialLocale, saveLocale } from "../i18n.js";
 import { createLocalGame } from "../game/setup.js";
 import { GAME_PHASES } from "../game/game-state.js";
 import { startGame, beginTurn, completeAreaAction, completeAttack, completeMovement, endTurn } from "../game/turn-manager.js";
@@ -12,7 +12,7 @@ import { resolvePendingAction } from "../game/cards.js";
 import { createRoomId, createRoomLink, getRoomIdFromLocation, normalizeRoomCode, isValidRoomCode } from "../networking/room.js";
 import { createHostSession, createClientSession } from "../networking/game-session.js";
 import { createActionRequest, cleanName, MESSAGE_TYPES } from "../networking/messages.js";
-import { SECRET_REACTION, isSecretPendingType } from "../networking/serialization.js";
+import { SECRET_REACTION } from "../networking/serialization.js";
 import { resolveEquipmentReward } from "../game/rules-engine.js";
 import { isValidMovementDestination, getAdjacentAreaIds, resolveMovementAction, resolveMovementDestination, resolveMovementRollChoice } from "../movement.js";
 import { ABILITY_BY_CHARACTER } from "../game/abilities.js";
@@ -171,7 +171,7 @@ let logOpen = false;
 const logWin = document.createElement("div");
 logWin.className = "term";
 logWin.hidden = true;
-logWin.innerHTML = `<div class="term-bar"><span>journal.ps1</span><button type="button" class="term-x" aria-label="Close">×</button></div><div class="term-body"></div>`;
+logWin.innerHTML = `<div class="term-bar"><span>journal.ps1</span><button type="button" class="term-x">×</button></div><div class="term-body"></div>`;
 document.body.append(logWin);
 logWin.querySelector(".term-x").addEventListener("click", () => { logOpen = false; logWin.hidden = true; });
 const termBar = logWin.querySelector(".term-bar");
@@ -197,7 +197,8 @@ const fillLog = () => {
   // Game log: game events only (debug output goes to the console).
   termBody.innerHTML = state.events.slice(-80)
     .filter((e) => !pendingDice.has(e))
-    .map((e) => `<div>${describeEvent(e)}</div>`).join("");
+    .map(describeEvent).filter(Boolean)
+    .map((line) => `<div>${line}</div>`).join("");
   if (termBody.dataset.stick !== "0") termBody.scrollTop = termBody.scrollHeight;
 };
 
@@ -207,7 +208,7 @@ const players = Array.from({ length: MAX_PLAYERS }, (_, i) => ({ id: `player-${i
 let roomLobby = null;
 
 const AREA_NAME_KEYS = Object.fromEntries(Object.values(AREAS).map((area) => [area.id, area.nameKey]));
-const getAreaLabel = (areaId) => (areaId ? translate(AREA_NAME_KEYS[areaId] ?? areaId) : "Nowhere yet");
+const getAreaLabel = (areaId) => translate(areaId ? AREA_NAME_KEYS[areaId] ?? areaId : "ui.nowhereYet");
 const getEquipmentLabel = (cardId) => {
   const card = getCard(cardId);
   return card ? translate(card.nameKey) : cardId.replaceAll("-", " ");
@@ -224,12 +225,13 @@ let roomCodeShown = false;
 
 // ---- Theme ----
 // A theme = a line here + its theme-<id>.css (styles.css is neutral, the theme provides the whole look).
+// Theme names are translated under theme.<id>.
 const THEMES = [
-  { id: "persona5", label: "Persona 5", css: "./src/ui/theme-persona5.css" },
-  { id: "synthwave", label: "Synthwave", css: "./src/ui/theme-synthwave.css" },
-  { id: "msn", label: "MSN / Web 2000", css: "./src/ui/theme-msn.css" },
-  { id: "memes", label: "Meme Culture", css: "./src/ui/theme-memes.css" },
-  { id: "desktop-2004", label: "Bureau 2004", css: "./src/ui/theme-bureau2004.css" }
+  { id: "persona5", css: "./src/ui/theme-persona5.css" },
+  { id: "synthwave", css: "./src/ui/theme-synthwave.css" },
+  { id: "msn", css: "./src/ui/theme-msn.css" },
+  { id: "memes", css: "./src/ui/theme-memes.css" },
+  { id: "desktop-2004", css: "./src/ui/theme-bureau2004.css" }
 ];
 let theme = localStorage.getItem("ftm-theme");
 if (!THEMES.some((t) => t.id === theme)) theme = THEMES[0].id;
@@ -248,38 +250,27 @@ const applyTheme = (id) => {
 };
 applyTheme(theme);
 
-// ---- Langue ----
-const SUPPORTED_LOCALES = [{ code: "en", label: "English" }, { code: "fr", label: "Français" }];
-const isSupported = (code) => SUPPORTED_LOCALES.some((l) => l.code === code);
-let locale = localStorage.getItem("ftm-locale");
-if (!isSupported(locale)) locale = isSupported(getLocale()) ? getLocale() : "en";
-let englishMessages = null;
+// ---- Language (list, storage and loading in src/i18n.js) ----
+let locale = initialLocale();
 
-const loadMessages = async (code) => {
-  englishMessages ??= await loadLocale("en");
-  const messages = { en: englishMessages };
-  if (code !== "en") {
-    try { messages[code] = await loadLocale(code); } catch { /* missing file: English fallback */ }
-  }
-  translate = createTranslator({ locale: code, messages });
-};
+const loadMessages = async (code) => { translate = await loadTranslator(code); };
 const setLocale = async (code) => {
-  if (!isSupported(code)) return;
+  if (!LANGS[code]) return;
   locale = code;
-  localStorage.setItem("ftm-locale", code);
+  saveLocale(code);
   document.documentElement.lang = code;
   await loadMessages(code);
   render();
 };
 const renderLocaleSelect = () => `<select class="locale-select" data-locale aria-label="${escHtml(T("ui.language"))}">${
-  SUPPORTED_LOCALES.map((l) => `<option value="${l.code}" ${l.code === locale ? "selected" : ""}>${l.label}</option>`).join("")
+  Object.entries(LANGS).map(([code, label]) => `<option value="${code}" ${code === locale ? "selected" : ""}>${label}</option>`).join("")
 }</select>`;
 
 // Back-to-catalog link at the start of every top bar. Also a .wordmark so it takes the logo color of each theme.
 const renderBackLink = () => `<a class="wordmark back-link" href="../" title="${escHtml(T("ui.allGames"))}" aria-label="${escHtml(T("ui.allGames"))}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>`;
 
 const renderThemeSelect = () => `<select class="locale-select" data-theme-select aria-label="${escHtml(T("ui.theme"))}">${
-  THEMES.map((t) => `<option value="${t.id}" ${t.id === theme ? "selected" : ""}>${t.label}</option>`).join("")
+  THEMES.map((t) => `<option value="${t.id}" ${t.id === theme ? "selected" : ""}>${escT(`theme.${t.id}`)}</option>`).join("")
 }</select>`;
 
 app.addEventListener("change", (e) => {
@@ -321,7 +312,7 @@ const pieceIndexFor = (playerId) => {
 const renderPieceToken = (player, active, attackableIds = null) => {
   const attackable = attackableIds?.has(player.id);
   return `
-  <span class="piece piece-${pieceIndexFor(player.id)} ${player.id === active.id ? "current" : ""} ${player.alive ? "" : "dead"} ${attackable ? "attackable" : ""}" data-piece="${player.id}" ${attackable ? `data-attack-target="${player.id}" role="button" tabindex="0"` : ""} title="${player.alive ? player.name : `${escHtml(player.name)}, eliminated`}">
+  <span class="piece piece-${pieceIndexFor(player.id)} ${player.id === active.id ? "current" : ""} ${player.alive ? "" : "dead"} ${attackable ? "attackable" : ""}" data-piece="${player.id}" ${attackable ? `data-attack-target="${player.id}" role="button" tabindex="0"` : ""} title="${player.alive ? escHtml(player.name) : escT("ui.pieceEliminated", { name: player.name })}">
     <span class="piece-avatar">${player.name.slice(0, 1).toUpperCase()}</span>
     <span class="piece-name">${escHtml(player.name)}</span>
   </span>`;
@@ -360,7 +351,7 @@ const actionForPhase = Object.freeze({
 });
 const playerLabel = (playerId) => {
   const player = state?.players[playerId];
-  if (!player) return playerId ?? "unknown player";
+  if (!player) return playerId ?? T("ui.unknownPlayer");
 
   if (!player.characterId) return player.name;
   const character = getCharacter(player.characterId);
@@ -368,27 +359,43 @@ const playerLabel = (playerId) => {
   return mayRevealCharacter ? `${escHtml(player.name)} (${translate(character.nameKey)})` : player.name;
 };
 
-const describeEvent = (event) => {
-  if (event.type === "PLAYER_MOVED") return `${playerLabel(event.playerId)} moved to ${getAreaLabel(event.areaId)}${event.total ? ` (roll ${event.total})` : ""}.`;
-  if (event.type === "ATTACK_STARTED") return `${playerLabel(event.attackerId)} attacked ${playerLabel(event.targetId)}.`;
-  if (event.type === "ATTACK_RESOLVED") return `${playerLabel(event.attackerId)} dealt ${event.damage} damage to ${playerLabel(event.targetId)} (${event.d6 != null ? `d6 ${event.d6} − d4 ${event.d4} = ${Math.abs(event.d6 - event.d4)}` : `d4 ${event.d4}`}${event.bonus ? `, +${event.bonus} equipment` : ""}).`;
-  if (event.type === "DAMAGE_DEALT") return `${playerLabel(event.playerId)} lost ${event.amount} HP.`;
-  if (event.type === "DAMAGE_PREVENTED") return `Damage to ${playerLabel(event.playerId)} was prevented${event.reason ? ` (${event.reason})` : ""}.`;
-  if (event.type === "HEAL_APPLIED") return `${playerLabel(event.playerId)} recovered ${event.amount} HP.`;
-  if (event.type === "PLAYER_DIED") return `${playerLabel(event.playerId)} died. Body count: ${event.bodyCountAtDeath}.`;
-  if (event.type === "ABILITY_USED") return `${playerLabel(event.playerId)} used ${event.abilityId}.`;
-  if (event.type === "CHARACTER_REVEALED") return `${playerLabel(event.playerId)} revealed their Character.`;
-  if (event.type === "EQUIPMENT_ACQUIRED") return `${playerLabel(event.playerId)} acquired ${getEquipmentLabel(event.cardId)}.`;
-  if (event.type === "EQUIPMENT_STOLEN") return `${playerLabel(event.toPlayerId)} stole ${event.cardId ? getEquipmentLabel(event.cardId) : "Equipment"} from ${playerLabel(event.fromPlayerId)}.`;
-  if (event.type === "MOVEMENT_ROLLED") return `${playerLabel(event.playerId)} rolled ${event.d6} + ${event.d4} = ${event.total}.`;
-  if (event.type === "CARD_DRAWN") return `${playerLabel(event.playerId)} drew from the ${T(`pending.deck.${event.deckId}`)} deck.`;
-  if (event.type === "AREA_ATTACK_RESOLVED") return `${playerLabel(event.attackerId)} hit ${event.targetIds.length} player(s) for ${event.damage} damage each (d6 ${event.d6 ?? "–"}, d4 ${event.d4}).`;
-  if (event.type === "EQUIPMENT_TRANSFERRED") return `${playerLabel(event.toPlayerId)} received ${getEquipmentLabel(event.cardId)} from ${playerLabel(event.fromPlayerId)}.`;
-  if (event.type === "TURN_STARTED") return `${playerLabel(event.playerId)}'s turn started.`;
-  if (event.type === "TURN_ENDED") return `${playerLabel(event.playerId)}'s turn ended.`;
-  if (event.type === "VICTORY_REACHED") return `Victory reached by ${event.playerId}.`;
-  return `${event.type.replaceAll("_", " ")}${event.playerId ? ` - ${playerLabel(event.playerId)}` : ""}.`;
+// One log line per event (log.* keys); events without a line return "" and are skipped.
+const describeEvent = (e) => {
+  const who = playerLabel;
+  const dice = e.d6 != null ? `d6 ${e.d6} − d4 ${e.d4} = ${Math.abs(e.d6 - e.d4)}` : `d4 ${e.d4}`;
+  switch (e.type) {
+    case "PLAYER_MOVED": return T(e.total ? "log.movedRoll" : "log.moved", { name: who(e.playerId), area: getAreaLabel(e.areaId), total: e.total });
+    case "ATTACK_STARTED": return T("log.attackStarted", { attacker: who(e.attackerId), target: who(e.targetId) });
+    case "ATTACK_RESOLVED": return T("log.attackResolved", {
+      attacker: who(e.attackerId), target: who(e.targetId), damage: e.damage,
+      dice: e.bonus ? `${dice}, ${T("log.equipmentBonus", { bonus: e.bonus })}` : dice
+    });
+    case "AREA_ATTACK_RESOLVED": return T("log.areaAttack", { attacker: who(e.attackerId), count: e.targetIds.length, damage: e.damage, dice });
+    case "DAMAGE_DEALT": return T("log.damage", { name: who(e.playerId), amount: e.amount });
+    case "DAMAGE_PREVENTED": return T("log.damagePrevented", { name: who(e.playerId) });
+    case "HEAL_APPLIED": return T("log.heal", { name: who(e.playerId), amount: e.amount });
+    case "HP_SET": return T("log.hpSet", { name: who(e.playerId) });
+    case "PLAYER_DIED": return T("log.died", { name: who(e.playerId), count: e.bodyCountAtDeath });
+    case "ABILITY_USED": return T("log.abilityUsed", { name: who(e.playerId) });
+    case "CHARACTER_REVEALED": return T("log.revealed", { name: who(e.playerId) });
+    case "CHARACTER_REVEALED_TO_PLAYER": return T("log.peeked", { viewer: who(e.viewerId), name: who(e.playerId) });
+    case "TEMPORARY_EFFECT_APPLIED": return T("log.protected", { name: who(e.playerId) });
+    case "EQUIPMENT_ACQUIRED": return T("log.equipmentAcquired", { name: who(e.playerId), card: getEquipmentLabel(e.cardId) });
+    case "EQUIPMENT_STOLEN": return T("log.equipmentStolen", {
+      to: who(e.toPlayerId), from: who(e.fromPlayerId), card: e.cardId ? getEquipmentLabel(e.cardId) : T("log.someEquipment")
+    });
+    case "EQUIPMENT_TRANSFERRED": return T("log.equipmentReceived", { to: who(e.toPlayerId), from: who(e.fromPlayerId), card: getEquipmentLabel(e.cardId) });
+    case "MOVEMENT_ROLLED": return T("log.rolled", { name: who(e.playerId), d6: e.d6, d4: e.d4, total: e.total });
+    case "CARD_DRAWN": return T("log.cardDrawn", { name: who(e.playerId), deck: T(`pending.deck.${e.deckId}`) });
+    case "TURN_STARTED": return T("log.turnStarted", { name: who(e.playerId) });
+    case "TURN_ENDED": return T("log.turnEnded", { name: who(e.playerId) });
+    case "VICTORY_REACHED": return T("log.victory", { name: who(e.playerId) });
+    default: return "";
+  }
 };
+
+// Translated reason of a refused action: errors.<CODE> if known, else a generic message.
+const errorText = (result) => T(translate.has(`errors.${result?.error}`) ? `errors.${result.error}` : "errors.actionRefused");
 
 // Error toast in the dock when an action is refused (a silent refusal looks like a broken button).
 let gameNotice = null;
@@ -402,7 +409,7 @@ const setGameNotice = (text) => {
 const run = (result, label = "action") => {
   if (!result.ok) {
     warnLog(`RESULT ${label}: REJECTED - ${result.error}: ${result.message ?? "Action rejected"}`);
-    setGameNotice(`${result.message ?? result.error ?? "Action refusée"}`);
+    setGameNotice(errorText(result));
     render();
     return false;
   }
@@ -417,6 +424,7 @@ const runAsHost = (action, payload, label) => {
   const result = hostSession.authority.handleRequest(createActionRequest(assignedPlayerId, action, payload));
   if (!result.ok) {
     warnLog(`RESULT ${label}: REJECTED - ${result.message.error}: ${result.message.message}`);
+    setGameNotice(errorText(result.message));
     return false;
   }
   state = result.state;
@@ -433,14 +441,14 @@ const sendAction = (action, payload, label) => {
 };
 
 const currentPlayer = () => state.players[state.currentPlayerId];
-const phaseLabel = () => state.phase.replaceAll("-", " ");
+const phaseLabel = () => escT(`phase.${state.phase}`);
 const canControlCurrentPlayer = () => roomRole === "local" || state?.currentPlayerId === assignedPlayerId;
 
 const handleStart = () => {
   if (!isHost || !hostSession) return;
   const started = hostSession.authority.startMatch();
   if (!started.ok) {
-    setNotice("lobby.error", { message: started.message });
+    setNotice("lobby.error", { message: errorText(started) });
     render();
     return;
   }
@@ -548,7 +556,7 @@ const handleJoinRoom = () => {
 const lobbyStatusLabel = () => {
   if (roomNotice) return T(roomNotice.key, roomNotice.vars);
   if (roomStatus === "connected") return isHost ? T("lobby.hostLobby", { n: peers.length }) : T("lobby.guestWaiting");
-  return roomStatus === "connecting" ? T("lobby.connecting") : roomStatus;
+  return roomStatus === "connecting" ? T("lobby.connecting") : "";
 };
 
 const copyText = async (text, okKey, inputSelector) => {
@@ -567,7 +575,7 @@ const copyText = async (text, okKey, inputSelector) => {
 const handleCopyInvite = () => copyText(createRoomLink(roomId), "lobby.linkCopied", "[data-invite-link]");
 const handleCopyCode = () => copyText(roomId, "lobby.codeCopied", "[data-room-code]");
 const handleNameChange = (event) => {
-  localPlayerName = cleanName(event.target.value);
+  localPlayerName = cleanName(event.target.value, "") || randomPlayerName();
   localStorage.setItem("ftm-player-name", localPlayerName);
 };
 
@@ -796,11 +804,8 @@ const renderPendingReactionPanel = (pendingReaction, pendingMovementDestinations
   const canResolve = roomRole === "local" || pendingReaction.playerId === assignedPlayerId;
 
   if (!canResolve) {
-    // Character-specific reaction: naming it would give the character away.
-    const waiting = isSecretPendingType(pendingReaction.type)
-      ? escT("ui.waitingForChoice", { name: ownerLabel })
-      : escT("ui.waitingForResolve", { name: ownerLabel, action: pendingReaction.type.replaceAll("_", " ").toLowerCase() });
-    return `<p class="pending-label" style="margin-top:8px">${waiting}</p>`;
+    // Never name the action: some would give the character away, and they are engine ids anyway.
+    return `<p class="pending-label" style="margin-top:8px">${escT("ui.waitingForChoice", { name: ownerLabel })}</p>`;
   }
 
   const choiceButton = (label, choice, secondary = true) => (
@@ -1087,6 +1092,7 @@ app.addEventListener("click", (e) => {
 const render = () => {
   if (dragging) return;
   logWin.hidden = !(state && logOpen);
+  logWin.querySelector(".term-x").setAttribute("aria-label", T("ui.close"));
   if (!state) {
     if (roomId && roomRole !== "local") {
       const knownPlayers = roomRole === "host" && hostSession

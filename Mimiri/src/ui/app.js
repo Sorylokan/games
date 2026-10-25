@@ -2,7 +2,7 @@
 import { SIZES, DAILY_SIZE, applyPress, isSolved, countOn, scramble, dailyGrid, dayKey, touchedBy } from "../game/engine.js";
 import { THEMES } from "../themes/index.js";
 import { getPref, setPref, getJSON, setJSON } from "./prefs.js";
-import { createTranslator, loadLocale, getLocale, SUPPORTED_LOCALES, DEFAULT_LOCALE } from "../i18n.js";
+import { loadTranslator, initialLocale, saveLocale, applyTexts, fillLangSelect } from "../i18n.js";
 
 const $ = (id) => document.getElementById(id);
 const boardEl = $("board");
@@ -10,48 +10,34 @@ const themeSelect = $("opt-theme");
 const langSelect = $("opt-lang");
 
 let game = null; // { mode, n, cells, initial, moves, won, newRecord, key }
-let T = null;    // active theme module (render + texts per language)
-let TT = null;   // theme texts in the active language
+let T = null;    // active theme module (render)
 let t = (key) => key; // UI translator (set by loadMessages)
-let locale = SUPPORTED_LOCALES.includes(getPref("lang")) ? getPref("lang") : getLocale();
+let locale = initialLocale();
 
 // ---- Language ----
 
-// Loads the active language (+ fallback); a missing file doesn't break startup.
 async function loadMessages() {
-  const read = (l) => loadLocale(l).catch(() => ({}));
-  const [active, fallback] = await Promise.all([read(locale), read(DEFAULT_LOCALE)]);
-  t = createTranslator({ locale, messages: { [locale]: active, [DEFAULT_LOCALE]: fallback } });
+  t = await loadTranslator(locale);
 }
 
-// Theme texts in the active language (fallback: the module's French fields).
+const tt = (field) => t(`theme.${currentThemeId}.${field}`);
+
 function applyThemeTexts() {
-  TT = T.texts?.[locale] ?? T;
-  document.title = `Mimiri – ${TT.title}`;
-  $("title").textContent = TT.title;
-  $("goal").textContent = TT.goal;
-  $("hint").textContent = TT.hint;
-  $("left-label").textContent = TT.leftLabel;
+  const title = t(`theme.${currentThemeId}`);
+  document.title = `Mimiri – ${title}`;
+  $("title").textContent = title;
+  $("goal").textContent = tt("goal");
+  $("hint").textContent = tt("hint");
+  $("left-label").textContent = tt("leftLabel");
 }
 
-// UI texts (not theme-specific).
+// UI texts (not theme-specific): data-i18n* attributes, plus theme names in the select.
 function applyI18n() {
   document.documentElement.lang = locale;
-  $("sizes-label").textContent = t("ui.gridSize");
-  $("btn-daily").textContent = t("ui.daily");
-  $("btn-new").textContent = t("ui.new");
-  $("btn-reset").textContent = t("ui.restart");
-  $("moves-label").textContent = t("ui.moves");
-  $("best-label").textContent = t("ui.best");
-  themeSelect.setAttribute("aria-label", t("ui.themeLabel"));
-  // Theme names (theme.<id> keys).
+  applyTexts(t);
   themeSelect.querySelectorAll("option[value]").forEach((opt) => {
     opt.textContent = opt.value === "chaos" ? t("ui.chaos") : t(`theme.${opt.value}`);
   });
-  langSelect.setAttribute("aria-label", t("ui.langLabel"));
-  $("back").title = t("ui.back");
-  $("back").setAttribute("aria-label", t("ui.back"));
-  boardEl.setAttribute("aria-label", t("ui.boardLabel"));
 }
 
 // ---- Records (fewest moves per grid size and per day) ----
@@ -125,7 +111,7 @@ function render(pressed) {
     b.dataset.state = state;
     b.className = "cell " + state;
     b.innerHTML = T.render(!!v, i);
-    b.setAttribute("aria-label", v ? TT.ariaOn : TT.ariaOff);
+    b.setAttribute("aria-label", tt(v ? "ariaOn" : "ariaOff"));
     if (touched.has(i)) {
       b.classList.add("pop");
       setTimeout(() => b.classList.remove("pop"), 320);
@@ -140,7 +126,7 @@ function render(pressed) {
   const msg = $("message");
   if (game.won) {
     msg.className = "win";
-    msg.textContent = `${TT.win}${game.newRecord ? " " + t("ui.newRecord") : ""} (${t("ui.movesCount", { n: game.moves })})`;
+    msg.textContent = `${tt("win")}${game.newRecord ? " " + t("ui.newRecord") : ""} (${t("ui.movesCount", { n: game.moves })})`;
   } else {
     msg.className = "";
     msg.textContent = game.mode === "daily" ? t("ui.dailyNote") : "";
@@ -201,11 +187,10 @@ async function init() {
   themeSelect.insertAdjacentHTML("beforeend", `<option value="chaos">${t("ui.chaos")}</option>`);
   themeSelect.addEventListener("change", () => applyTheme(themeSelect.value));
 
-  langSelect.innerHTML = SUPPORTED_LOCALES.map((l) => `<option value="${l}">${l.toUpperCase()}</option>`).join("");
-  langSelect.value = locale;
+  fillLangSelect(langSelect, locale);
   langSelect.addEventListener("change", async () => {
     locale = langSelect.value;
-    setPref("lang", locale);
+    saveLocale(locale);
     await loadMessages();
     applyI18n();
     if (T) {

@@ -13,7 +13,13 @@ Small browser games written in vanilla JavaScript, served as static pages on Git
 | [Mimiri](https://sorylokan.github.io/games/Mimiri/) | Lights Out–style puzzle: each click flips a tile and its four neighbours. New grid every day. | 1 | Beta |
 | [Bit by Bit](https://sorylokan.github.io/games/BitByBit/) | Puzzle: little carriers take apart a pixel-art mural. Place their boxes in the right order before the line fills up. | 1 | Beta |
 
-All games are available in French and English, and most come with several visual themes.
+All games are available in English and French, and most come with several visual themes.
+
+## Translations welcome 🌍
+
+Want to play with friends in another language? Each game keeps its texts in one JSON file per
+language: copy the English one, translate it, open a pull request. No coding needed, and a check
+tells you if anything is missing. See **[TRANSLATING.md](TRANSLATING.md)**.
 
 ## Multiplayer
 
@@ -26,6 +32,8 @@ games/
 ├── index.html, scripts.js, styles.css   catalog page
 ├── cards.json                           which cards to show, and the featured game
 ├── card_*.json                          one card per game (text, style, preview)
+├── locales/                             catalog texts, one file per language (en.json is the reference)
+├── TRANSLATING.md                       how to add a language
 ├── FreeTheMemes/
 ├── GridOfGreed/
 ├── BitByBit/

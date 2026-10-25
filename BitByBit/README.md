@@ -32,7 +32,7 @@ src/
   main.js                  entry point: wiring, resume, animation loop
   config.js                tuning (speeds, delays, storage keys)
   storage.js               localStorage that never throws
-  i18n.js                  translator (same as Grid of Greed)
+  i18n.js                  languages, translator, HTML translation (same module in every game)
   data/
     colors.js              pixel palette (one letter = one color)
     maps.js                official murals
@@ -93,7 +93,8 @@ in every `locales/` file. Square grid, one letter per color from `src/data/color
 **Add a carrier species**: a draw function in `src/render/carriers/` (standing, centered on 0,0,
 30 units = 1 cell), register it in `src/render/carriers/index.js`, then add it to a theme's `carriers`.
 
-**Add a language**: copy `locales/en.json` to `locales/xx.json`, translate the values (not the keys),
-then add `xx: 'Language name'` to `LANGS` in `src/ui/lang.js`. `npm test` flags missing keys.
+**Add a language**: copy `locales/en.json` (the reference) to `locales/xx.json`, translate the values
+(not the keys), then add `xx: "Language name"` to `LANGS` in `src/i18n.js` (the same module in every game
+of this repo). Full guide: [TRANSLATING.md](../TRANSLATING.md). `npm test` flags missing keys.
 
 **Tune difficulty**: `src/data/levels.js` (line slots, queue shuffling); speeds and delays in `src/config.js`.

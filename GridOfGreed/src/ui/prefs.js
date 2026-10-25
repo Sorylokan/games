@@ -1,5 +1,4 @@
-// Global preferences (language, theme, sound) in localStorage.
-export const LANGS = ["fr", "en"];
+// Global preferences (theme, sound) in localStorage. The language is handled by src/i18n.js.
 export const THEMES = ["night", "palace", "ruby", "poker", "jackpot", "wizard"];
 
 export const getPref = (key, fallback) => {

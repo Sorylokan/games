@@ -1,5 +1,5 @@
 // "Garden" theme: water the buds until the whole garden blooms. on = closed bud (to fix), off = flower.
-// Page colors live in theme-garden.css; texts and drawing here.
+// Page colors live in theme-garden.css; texts in locales/ (theme.garden.*); drawing here.
 
 const PETALS = ["#F29F58", "#ff8fa3", "#f6d28b", "#d9a7ff"]; // flower color per cell
 const LEAF = "#2f7a4d";
@@ -15,14 +15,6 @@ const STEM = `
   <path d="M50 88 Q62 81 70 75" fill="none" stroke="${LEAF_DARK}" stroke-width="1.6" stroke-linecap="round"/>`;
 
 export default {
-  title: "Jardin fleuri",
-  goal: "Arrose un bouton pour le faire éclore… mais attention, ça change aussi l'état des fleurs voisines !",
-  leftLabel: "Boutons",
-  win: "Tout le jardin est en fleurs, bravo ! 🌸",
-  hint: "Arroser une fleur l'ouvre (ou la referme), ainsi que ses 4 voisines.",
-  ariaOn: "Bouton fermé",
-  ariaOff: "Fleur éclose",
-
   render(on, idx) {
     const c = PETALS[idx % PETALS.length];
     if (on) {
