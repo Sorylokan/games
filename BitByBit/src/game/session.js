@@ -14,6 +14,7 @@ import { showOverlay, hideOverlay } from '../ui/overlay.js';
 import { t } from '../ui/lang.js';
 import * as sfx from '../ui/sfx.js';
 import { setTension } from '../ui/music.js';
+import { fitSpeed } from '../ui/speed.js';
 
 // Adventure: mural number li.
 export function start(li) {
@@ -44,6 +45,7 @@ function launch(lvl, li) {
     rescueUsed: false,
   };
   setTension(!!lvl.boss);
+  fitSpeed();
   hideOverlay();
   resize();
   renderUI();

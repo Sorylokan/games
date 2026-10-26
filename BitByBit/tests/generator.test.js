@@ -21,13 +21,13 @@ test('chaque niveau généré est faisable et compte exactement les pixels de la
   }
 });
 
-test('départ jamais bloqué : une boîte utile en tête de file, et la marge prévue (aucune pour un boss)', () => {
+test('départ jamais bloqué : une boîte utile en tête de file, et un emplacement de marge', () => {
   for (let i = 0; i < 12; i++) {
     const lvl = { ...levelAt(i), tries: 2 };
     const { N, target, queues } = generate(lvl, nextId);
     const colors = new Set(reachable(target, N).map(([r, c]) => target[r][c]));
     assert.ok(queues.some((q) => colors.has(q[0].color)), `fresque ${i + 1} : aucune boîte utile au départ`);
-    assert.ok(solvable(target, N, queues, lvl.cap - lvl.margin), `fresque ${i + 1} : pas de marge`);
+    assert.ok(solvable(target, N, queues, lvl.cap, lvl.cap - lvl.margin), `fresque ${i + 1} : pas de marge`);
   }
 });
 
@@ -62,8 +62,7 @@ test('une fresque officielle peut imposer son nombre d\'emplacements (2 à 5)', 
   });
 });
 
-test('boss toutes les 10 fresques, sans marge', () => {
+test('boss toutes les 10 fresques, avec la même marge que les autres', () => {
   assert.deepEqual([8, 9, 10, 19].map((i) => levelAt(i).boss), [false, true, false, true]);
-  assert.equal(levelAt(9).margin, 0);
-  assert.equal(levelAt(8).margin, 1);
+  assert.equal(levelAt(9).margin, 1);
 });

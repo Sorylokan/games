@@ -2,7 +2,8 @@
 import { MAPS } from './maps.js';
 import { DEFAULT_SLOTS } from '../core/mural-code.js';
 
-// Every 10th level (10, 20…) is a boss: no spare slot, no rescue slot, tense music.
+// Every 10th level (10, 20…) is a boss: no rescue slot, tense music. It keeps the spare slot:
+// carriers' timing varies a little in the real game, and without it a boss could become unwinnable.
 export const BOSS_EVERY = 10;
 export const isBoss = (i) => (i + 1) % BOSS_EVERY === 0;
 
@@ -17,7 +18,7 @@ export function levelAt(i) {
     round,
     boss,
     cap: m.slots ?? (i < 3 ? 4 : 3),             // slots on the line (the mural may set its own)
-    margin: boss ? 0 : 1,                        // slots to spare in the generated solution
+    margin: 1,                                   // slots to spare in the generated solution
     mix: Math.min(16, 3 + i * 1.5),              // queue shuffling
     tries: Math.min(maxTries(N), 4 + i * 3 + round * 4), // candidates generated, the hardest is kept
     runs: runsFor(N),

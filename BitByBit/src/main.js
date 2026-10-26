@@ -16,6 +16,7 @@ import { initSkinSelect, fillSkinSelect, setSkin, renderRules } from './ui/skin.
 import { initLangSelect, initialLang, setLang } from './ui/lang.js';
 import { initMusic } from './ui/music.js';
 import { initSfx } from './ui/sfx.js';
+import { initSpeed, setSpeed } from './ui/speed.js';
 
 // --- interface ---
 initPanel(place);
@@ -51,11 +52,13 @@ $('communityBtn').addEventListener('click', () => {
   ]);
 });
 $('restart').addEventListener('click', restart);
-$('speed').addEventListener('click', () => {
-  app.speed = app.speed === 1 ? 2 : 1;
-  $('speed').textContent = '×' + app.speed;
-  $('speed').setAttribute('aria-pressed', String(app.speed === 2));
-});
+initSpeed();
+
+// For testing from the browser console: bitByBit.speed(10), bitByBit.level(9) (0 = first mural).
+window.bitByBit = {
+  speed: (n = 1) => setSpeed(Math.max(0.25, Math.min(20, Number(n) || 1))),
+  level: (i) => start(Math.max(0, Math.floor(Number(i) || 0))),
+};
 
 // Resize only when the board WIDTH changes: its height depends on the canvas,
 // so watching it would loop ("ResizeObserver loop").

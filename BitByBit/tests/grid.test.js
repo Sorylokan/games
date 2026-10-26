@@ -33,5 +33,5 @@ test('settle laisse les boîtes se débloquer mutuellement', () => {
   const g = parseMap(MAP);
   const left = settle(g, 4, [{ color: 'R', rem: 4 }, { color: 'B', rem: 12 }]);
   assert.equal(remaining(g), 0);
-  assert.equal(left.length, 0);
+  assert.deepEqual(left, [null, null]); // one entry per slot, emptied when the box is full
 });

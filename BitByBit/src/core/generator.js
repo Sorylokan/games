@@ -1,5 +1,5 @@
 // Builds a level's box queues: solvable with care, a trap when boxes are placed at random.
-import { clone, remaining, reachable, collect, settle, rand, pick, parseMap } from './grid.js';
+import { clone, remaining, reachable, collect, settle, entryCol, rand, pick, parseMap } from './grid.js';
 
 const QUEUES = 3;
 const PACKET = [4, 12]; // default pixels per box (see packetFor in data/levels.js)
@@ -7,33 +7,38 @@ const PACKET = [4, 12]; // default pixels per box (see packetFor in data/levels.
 // Total boxes: bounds the loops below (at most one box placed per step).
 const boxCount = (queues) => queues.reduce((s, q) => s + q.length, 0);
 
-// One valid order to take the mural apart, in single-color packets of lo..hi pixels.
-export function buildSequence(target, N, rnd = Math.random, [lo, hi] = PACKET) {
+// One valid order to take the mural apart, in single-color packets of lo..hi pixels, collected from
+// `entry` (the first slot's entry: placed one at a time, the boxes replay this exactly).
+export function buildSequence(target, N, rnd = Math.random, [lo, hi] = PACKET, entry = undefined) {
   const g = clone(target), seq = [];
   let guard = remaining(g) + 1; // each pass removes at least one pixel
   while (remaining(g) && guard-- > 0) {
     const colors = [...new Set(reachable(g, N).map(([r, c]) => g[r][c]))];
     const color = pick(colors, rnd);
-    const n = collect(g, N, color, rand(lo, hi, rnd));
+    const n = collect(g, N, color, rand(lo, hi, rnd), entry);
     if (n) seq.push({ color, count: n });
   }
   return seq;
 }
 
-// Two simulated careful players; if either wins, the level is solvable.
-export function solvable(target, N, queues, cap) {
-  return play(target, N, queues, cap, mostUseful) || play(target, N, queues, cap, inOrder);
+// Two simulated careful players; if either wins, the level is solvable. The line has `slots` slots
+// (carriers leave from their slot, as in the game) but at most `limit` boxes may sit on it at once.
+export function solvable(target, N, queues, slots, limit = slots) {
+  return play(target, N, queues, slots, limit, mostUseful) || play(target, N, queues, slots, limit, inOrder);
 }
 
+const used = (line) => line.filter(Boolean).length;
+
 // Player 1: always places the box that unlocks the most.
-function mostUseful(g, N, qs, line) {
+function mostUseful(g, N, qs, line, free) {
   let best = null;
   qs.forEach((q, qi) => {
     if (!q.length) return;
     const gg = clone(g);
-    const l2 = line.map((b) => ({ ...b })).concat({ color: q[0].color, rem: q[0].count });
+    const l2 = line.map((b) => b && { ...b });
+    l2[free] = { color: q[0].color, rem: q[0].count };
     const before = remaining(gg), after = settle(gg, N, l2);
-    const score = (before - remaining(gg)) * 10 - after.length * 25;
+    const score = (before - remaining(gg)) * 10 - used(after) * 25;
     if (!best || score > best.score) best = { qi, score };
   });
   return best ? best.qi : -1;
@@ -49,34 +54,36 @@ function inOrder(g, N, qs) {
   return best;
 }
 
-function play(target, N, queues, cap, pick) {
+// A box goes on the first free slot, as in the game.
+function play(target, N, queues, slots, limit, pick) {
   const g = clone(target), qs = queues.map((q) => q.slice());
-  let line = [];
+  let line = Array(slots).fill(null);
   for (let step = 0, max = boxCount(qs) + 1; step < max; step++) {
     line = settle(g, N, line);
     if (!remaining(g)) return true;
-    if (line.length >= cap) return false;
-    const qi = pick(g, N, qs, line);
+    const free = line.indexOf(null);
+    if (free < 0 || used(line) >= limit) return false;
+    const qi = pick(g, N, qs, line, free);
     if (qi < 0) return false;
     const a = qs[qi].shift();
-    line.push({ color: a.color, rem: a.count });
+    line[free] = { color: a.color, rem: a.count };
   }
   return false;
 }
 
 // Win rate of a player placing boxes at random over `runs` games. Lower = harder level.
-export function randomWins(target, N, queues, cap, runs, rnd = Math.random) {
+export function randomWins(target, N, queues, slots, runs, rnd = Math.random) {
   let wins = 0;
   for (let k = 0; k < runs; k++) {
     const g = clone(target), qs = queues.map((q) => q.slice());
-    let line = [];
+    let line = Array(slots).fill(null);
     for (let step = 0, max = boxCount(qs) + 1; step < max; step++) {
       line = settle(g, N, line);
       if (!remaining(g)) { wins++; break; }
-      const open = qs.filter((q) => q.length);
-      if (line.length >= cap || !open.length) break;
+      const open = qs.filter((q) => q.length), free = line.indexOf(null);
+      if (free < 0 || !open.length) break;
       const a = pick(open, rnd).shift();
-      line.push({ color: a.color, rem: a.count });
+      line[free] = { color: a.color, rem: a.count };
     }
   }
   return wins / runs;
@@ -102,7 +109,7 @@ function fairStart(target, N, qs) {
 function candidate(target, N, lvl, nextId, rnd) {
   const attempts = N > 32 ? 4 : N > 16 ? 12 : 40; // each one costs more on a big grid
   for (let attempt = 0; attempt < attempts; attempt++) {
-    const seq = buildSequence(target, N, rnd, lvl.packet);
+    const seq = buildSequence(target, N, rnd, lvl.packet, firstEntry(lvl, N));
     const mixed = seq
       .map((a, i) => ({ a: { ...a, order: i }, k: i + rnd() * lvl.mix }))
       .sort((x, y) => x.k - y.k)
@@ -110,10 +117,12 @@ function candidate(target, N, lvl, nextId, rnd) {
     const qs = Array.from({ length: QUEUES }, () => []);
     mixed.forEach((a) => qs[rand(0, QUEUES - 1, rnd)].push({ id: nextId(), ...a }));
     fillEmptyQueues(qs);
-    if (fairStart(target, N, qs) && solvable(target, N, qs, Math.max(1, lvl.cap - (lvl.margin ?? 1)))) return qs;
+    if (fairStart(target, N, qs) && solvable(target, N, qs, lvl.cap, Math.max(1, lvl.cap - (lvl.margin ?? 1)))) return qs;
   }
   return null;
 }
+
+const firstEntry = (lvl, N) => [N, entryCol(0, lvl.cap, N)];
 
 // Full level: the grid and the box queues, keeping the hardest of `lvl.tries` candidates.
 // lvl comes from data/levels.js; nextId gives each box a unique id.
@@ -128,9 +137,9 @@ export function generate(lvl, nextId, rnd = Math.random) {
     const d = Math.abs(r - (lvl.aim ?? 0));
     if (d < gap) { gap = d; queues = qs; }
   }
-  if (!queues) { // fallback: the exact take-apart order, always solvable
+  if (!queues) { // fallback: the exact take-apart order, always solvable one box at a time
     queues = Array.from({ length: QUEUES }, () => []);
-    buildSequence(target, N, rnd, lvl.packet).forEach((a, i) => queues[i % QUEUES].push({ id: nextId(), ...a, order: i }));
+    buildSequence(target, N, rnd, lvl.packet, firstEntry(lvl, N)).forEach((a, i) => queues[i % QUEUES].push({ id: nextId(), ...a, order: i }));
   }
   return { N, target, queues };
 }
