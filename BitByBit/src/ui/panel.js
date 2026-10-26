@@ -30,7 +30,8 @@ export function renderUI() {
     $('lvlNum').textContent = st.lvl.community ? t('community.by', { author: st.lvl.author }) : t('custom.badge');
     $('lvlName').textContent = st.lvl.name || t('custom.untitled');
   } else {
-    $('lvlNum').textContent = t('side.number', { n: st.li + 1 }) + (st.lvl.round ? ` · ${t('side.round', { n: st.lvl.round + 1 })}` : '');
+    $('lvlNum').textContent = t('side.number', { n: st.li + 1 }) + (st.lvl.round ? ` · ${t('side.round', { n: st.lvl.round + 1 })}` : '')
+      + (st.lvl.boss ? ` · ${t('boss.badge')}` : '');
     $('lvlName').textContent = t(`map.${st.lvl.id}`);
   }
   $('total').textContent = st.total;

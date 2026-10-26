@@ -67,6 +67,37 @@
   background-attachment: fixed, fixed, fixed;
 }
 
+/* Falling leaves: two groups (::before, ::after), each with two tiles of different sizes so the
+   pattern doesn't show. The fall (background) and the sway (transform) are separate animations
+   with unrelated durations, so nothing moves in sync. */
+:root[data-skin="autumn"] body::before,
+:root[data-skin="autumn"] body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+}
+
+:root[data-skin="autumn"] body::before {
+  background-image: url("../../assets/autumn-leaves-a.svg"), url("../../assets/autumn-leaves-b.svg");
+  background-size: 530px 530px, 710px 710px;
+  animation: leaves-far 83s linear infinite, sway-far 11s ease-in-out infinite alternate;
+}
+
+:root[data-skin="autumn"] body::after {
+  background-image: url("../../assets/autumn-leaves-c.svg"), url("../../assets/autumn-leaves-d.svg");
+  background-size: 610px 610px, 890px 890px;
+  animation: leaves-near 61s linear infinite, sway-near 17s ease-in-out -6s infinite alternate;
+}
+
+:root[data-skin="autumn"] .app { position: relative; z-index: 1; }
+
+@keyframes leaves-far  { from { background-position: 0 0, 230px 0; } to { background-position: 0 530px, 230px 710px; } }
+@keyframes leaves-near { from { background-position: 90px 0, 370px 0; } to { background-position: 90px 610px, 370px 890px; } }
+@keyframes sway-far  { from { transform: translateX(-12px) rotate(-.4deg); } to { transform: translateX(12px) rotate(.4deg); } }
+@keyframes sway-near { from { transform: translateX(-22px) rotate(.6deg); } to { transform: translateX(22px) rotate(-.6deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-skin="autumn"] body::before, :root[data-skin="autumn"] body::after { animation: none; }
+}
+
 :root[data-skin="winter"] body {
   /* bluish-white sky */
   background-image: linear-gradient(to bottom, #f4f8fc 0%, #e3ecf5 60%, #d6e3ef 100%);

@@ -42,7 +42,7 @@ src/
   core/                    pure rules, no browser (tested with node)
     grid.js                reachable pixels, pickup
     generator.js           builds solvable but tricky levels
-    mural-code.js          "BB1-…" share codes, export for maps.js
+    mural-code.js          "BB2-…" share codes (BB1 still read), export for maps.js
     image-to-map.js        image → mural conversion
   game/                    state, board geometry, carrier paths, game flow (session.js)
   render/                  canvas drawing; carriers/ has one file per theme
@@ -54,10 +54,11 @@ tests/                     node tests
 ## Custom murals (hidden editor)
 
 The editor isn't linked anywhere: add `editor/` to the game URL (`…/games/BitByBit/editor/`). It can:
+- choose the line slots (2 to 5, stored in the code);
 - paint a 4×4 to 50×50 mural with the game palette (brush, fill, picker, eraser, right-click erases, Ctrl+Z);
 - load a background image to trace, or convert it to pixels (saturation, contrast, max colors, cleanup,
   transparent background), with a live preview;
-- play the mural (`…/BitByBit/#play=BB1-…`), save it under "My murals", share it as a `BB1-…` code;
+- play the mural (`…/BitByBit/#play=BB2-…`), save it under "My murals", share it as a `BB2-…` code;
 - give the entry to paste into `src/data/maps.js` to make it an official mural.
 
 The draft is saved on every stroke. Above 24×24, boxes hold more pixels so a big mural doesn't
@@ -73,7 +74,7 @@ label `mural`). A workflow (`.github/workflows/fresque.yml`, `.github/scripts/fr
 3. merging the pull request publishes it.
 
 By hand, it's one line at the top of `COMMUNITY` in `src/data/community.js`:
-`{ author: 'Name', code: 'BB1-…' },`
+`{ author: 'Name', code: 'BB2-…' },`
 
 The "Community murals" button shows up in the game as soon as there is one. These murals don't affect
 adventure progress and have no "Edit" button (it would reveal the editor).

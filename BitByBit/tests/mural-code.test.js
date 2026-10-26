@@ -12,10 +12,24 @@ test('rle et unrle sont inverses', () => {
 });
 
 test('chaque fresque officielle survit à un aller-retour en code', () => {
-  for (const { id, map } of MAPS) {
-    const code = encodeMural({ name: `Fresque ${id} éèà`, map });
-    assert.match(code, /^BB1-[A-Za-z0-9_-]+$/);
-    assert.deepEqual(decodeMural(code), { name: `Fresque ${id} éèà`, map });
+  for (const [i, { id, map }] of MAPS.entries()) {
+    const slots = 2 + (i % 4);
+    const code = encodeMural({ name: `Fresque ${id} éèà`, map, slots });
+    assert.match(code, /^BB2-[A-Za-z0-9_-]+$/);
+    assert.deepEqual(decodeMural(code), { name: `Fresque ${id} éèà`, map, slots });
+  }
+});
+
+test('les anciens codes BB1 se lisent toujours, avec 4 emplacements', () => {
+  const v1 = 'BB1-' + Buffer.from('4|Vieux|16R').toString('base64url');
+  assert.deepEqual(decodeMural(v1), { name: 'Vieux', map: Array(4).fill('RRRR'), slots: 4 });
+  assert.equal(decodeMural(encodeMural({ name: '', map: Array(4).fill('RRRR') })).slots, 4);
+});
+
+test('nombre d\'emplacements hors limites : code refusé', () => {
+  for (const slots of [1, 6, 'x']) {
+    const bad = 'BB2-' + Buffer.from(`4|${slots}|x|16R`).toString('base64url');
+    assert.equal(decodeMural(bad), null, String(slots));
   }
 });
 

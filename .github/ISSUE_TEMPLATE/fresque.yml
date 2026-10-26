@@ -12,9 +12,9 @@ body:
   - type: input
     id: code
     attributes:
-      label: "Code de la fresque / Mural code (BB1-…)"
+      label: "Code de la fresque / Mural code (BB2-…)"
       description: "Rempli automatiquement depuis l'atelier. Sinon, colle le code copié. / Filled in from the workshop, or paste the copied code."
-      placeholder: "BB1-…"
+      placeholder: "BB2-…"
     validations:
       required: true
   - type: input

@@ -20,6 +20,8 @@ const CHORDS = [
   { bass: 45, keys: [55, 59, 60, 64] }, // Am9
 ];
 const MELODY = [67, 69, 72, 74, 76, 79, 81]; // C major pentatonic, always fits the chords
+const TENSE_CHORD = { bass: 40, keys: [56, 59, 62, 65] }; // E7(b9), replaces Am9 during a boss
+const TENSION_STEP = 1 / 3; // boss layers fade in (and out) over 3 bars
 
 const freq = (midi) => 440 * 2 ** ((midi - 69) / 12);
 const rand = (min, max) => min + Math.random() * (max - min);
@@ -34,6 +36,8 @@ let timer = null;
 let nextBar = 0;
 let bar = 0;
 let melodyIdx = 3;
+let tension = 0;       // 0 = calm, 1 = boss layers fully in
+let tensionTarget = 0;
 
 // --- audio graph ---
 
@@ -196,6 +200,25 @@ const snare = (t) => {
 };
 const hat = (t, vel) => noiseHit(t, 'highpass', 7500, 0.035 * vel, 0.035);
 
+// Boss layers: a bass pulse on every eighth, and a high string pad slowly opening up.
+function pulse(midi, t, level) {
+  tone('sine', freq(midi), t, 0.14 * level, 0.01, BEAT * 0.4, mix);
+  tone('triangle', freq(midi) * 2, t, 0.03 * level, 0.01, BEAT * 0.25, mix);
+}
+
+function pad(midi, t, level) {
+  const f = ctx.createBiquadFilter();
+  f.type = 'lowpass';
+  f.Q.value = 2;
+  f.frequency.setValueAtTime(500, t);
+  f.frequency.exponentialRampToValueAtTime(1600, t + BAR);
+  f.connect(mix);
+  const send = ctx.createGain();
+  send.gain.value = 0.5;
+  f.connect(send).connect(reverb);
+  for (const detune of [-8, 8]) tone('sawtooth', freq(midi), t, 0.02 * level, BAR * 0.4, BAR * 0.65, f, detune);
+}
+
 // --- arrangement ---
 
 // Eighth-note step (0–7) → time in the bar, with swing and a little human looseness.
@@ -203,7 +226,9 @@ const stepTime = (start, s, loose = 0) =>
   start + Math.floor(s / 2) * BEAT + (s % 2 ? SWING * BEAT : 0) + rand(-loose, loose);
 
 function scheduleBar(start) {
-  const chord = CHORDS[bar % CHORDS.length];
+  tension += Math.max(-TENSION_STEP, Math.min(TENSION_STEP, tensionTarget - tension));
+  const tense = tension > 0.5 && bar % CHORDS.length === CHORDS.length - 1;
+  const chord = tense ? TENSE_CHORD : CHORDS[bar % CHORDS.length];
   const section = bar % 16;
   const drums = bar >= 2 && section !== 15; // 2-bar intro, a break every 16 bars
   const melody = (section >= 4 && section < 8) || (section >= 10 && section < 14);
@@ -227,6 +252,12 @@ function scheduleBar(start) {
       if (s % 2 && chance(0.15)) continue;
       hat(stepTime(start, s, 0.006), s % 2 ? rand(0.5, 0.8) : rand(0.8, 1));
     }
+  }
+
+  if (tension > 0) {
+    for (let s = 0; s < 8; s++) pulse(chord.bass + 12, stepTime(start, s, 0.004), tension);
+    pad(chord.keys[2] + 12, start, tension);
+    pad(chord.keys[3] + 12, start, tension);
   }
 
   if (melody) {
@@ -269,6 +300,11 @@ function stop() {
   master.gain.cancelScheduledValues(ctx.currentTime);
   master.gain.setTargetAtTime(0, ctx.currentTime, 0.1);
   chordLog = [];
+}
+
+// Boss on/off: the layers follow at the next bar, without cutting the music.
+export function setTension(on) {
+  tensionTarget = on ? 1 : 0;
 }
 
 // For the sound effects (sfx.js): the audio context, their output, and the chord being heard

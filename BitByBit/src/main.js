@@ -43,7 +43,7 @@ function renderCommunityBtn() {
 $('communityBtn').addEventListener('click', () => {
   showOverlay(t('community.title'), t('community.text'), [
     ...community.map((m) => ({
-      label: `${m.name || t('custom.untitled')} · ${t('community.by', { author: m.author })}`,
+      label: `${m.name || t('custom.untitled')} · ${t('community.by', { author: m.author })} · ${t('custom.slots', { n: m.slots })}`,
       ghost: true,
       fn: () => startCustom(m),
     })),

@@ -71,7 +71,14 @@ function fillEmptyQueues(qs) {
   }
 }
 
+// At least one queue starts with a box that can collect right away.
+function fairStart(target, N, qs) {
+  const colors = new Set(reachable(target, N).map(([r, c]) => target[r][c]));
+  return qs.some((q) => q.length && colors.has(q[0].color));
+}
+
 // Candidate queues: a valid order, slightly shuffled, dealt at random between queues.
+// Must be solvable with `margin` slots fewer than the player has (default 1: a spare slot).
 function candidate(target, N, lvl, nextId, rnd) {
   for (let attempt = 0; attempt < 40; attempt++) {
     const seq = buildSequence(target, N, rnd, lvl.packet);
@@ -82,7 +89,7 @@ function candidate(target, N, lvl, nextId, rnd) {
     const qs = Array.from({ length: QUEUES }, () => []);
     mixed.forEach((a) => qs[rand(0, QUEUES - 1, rnd)].push({ id: nextId(), ...a }));
     fillEmptyQueues(qs);
-    if (solvable(target, N, qs, lvl.cap)) return qs;
+    if (fairStart(target, N, qs) && solvable(target, N, qs, Math.max(1, lvl.cap - (lvl.margin ?? 1)))) return qs;
   }
   return null;
 }
@@ -92,12 +99,13 @@ function candidate(target, N, lvl, nextId, rnd) {
 export function generate(lvl, nextId, rnd = Math.random) {
   const N = lvl.map.length;
   const target = parseMap(lvl.map);
-  let queues = null, easiest = 2;
+  let queues = null, gap = 2;
   for (let t = 0; t < lvl.tries; t++) {
     const qs = candidate(target, N, lvl, nextId, rnd);
     if (!qs) continue;
     const r = randomWins(target, N, qs, lvl.cap, lvl.runs ?? 12, rnd);
-    if (r < easiest) { easiest = r; queues = qs; }
+    const d = Math.abs(r - (lvl.aim ?? 0));
+    if (d < gap) { gap = d; queues = qs; }
   }
   if (!queues) { // fallback: the exact take-apart order, always solvable
     queues = Array.from({ length: QUEUES }, () => []);

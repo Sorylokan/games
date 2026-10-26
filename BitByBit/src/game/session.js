@@ -13,6 +13,7 @@ import { renderUI, shake } from '../ui/panel.js';
 import { showOverlay, hideOverlay } from '../ui/overlay.js';
 import { t } from '../ui/lang.js';
 import * as sfx from '../ui/sfx.js';
+import { setTension } from '../ui/music.js';
 
 // Adventure: mural number li.
 export function start(li) {
@@ -39,12 +40,18 @@ function launch(lvl, li) {
     claimed: new Set(),              // pixels already targeted
     pickedAt: new Map(),             // pickup time per pixel (small animation)
     ver: 0, bfsCache: new Map(),     // path cache, cleared on every pickup
-    status: 'play',
+    status: lvl.boss ? 'intro' : 'play',
     rescueUsed: false,
   };
+  setTension(!!lvl.boss);
   hideOverlay();
   resize();
   renderUI();
+  if (lvl.boss) {
+    showOverlay(t('boss.title'), t('boss.text', { name: t(`map.${lvl.id}`) }), [
+      { label: t('boss.go'), fn: () => { app.st.status = 'play'; hideOverlay(); renderUI(); } },
+    ]);
+  }
 }
 
 export const restart = () => (app.st.lvl.custom ? launch(app.st.lvl, null) : start(app.st.li));
@@ -143,11 +150,11 @@ function lose() {
   st.status = 'lose';
   sfx.stuck();
   showOverlay(t('end.stuckTitle'), t('end.stuckText'), [
-    !st.rescueUsed && { label: t('end.addSlot'), fn: () => {
+    !st.rescueUsed && !st.lvl.boss && { label: t('end.addSlot'), fn: () => {
       st.rescueUsed = true; st.line.push(null); st.status = 'play';
       hideOverlay(); resize(); renderUI();
     } },
-    { label: t('end.restart'), ghost: !st.rescueUsed, fn: restart },
+    { label: t('end.restart'), ghost: !st.rescueUsed && !st.lvl.boss, fn: restart },
     st.lvl.custom && !st.lvl.community && { label: t('custom.edit'), ghost: true, fn: editLink },
   ]);
 }
@@ -156,6 +163,7 @@ function win() {
   const st = app.st;
   st.status = 'win';
   sfx.win();
+  setTension(false);
   if (st.lvl.custom) {
     const name = st.lvl.name || t('custom.untitled');
     // No "Edit" for community murals: it would reveal the hidden editor.

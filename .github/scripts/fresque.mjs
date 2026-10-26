@@ -9,6 +9,7 @@ import { decodeMural, encodeMural, pixelCount, cleanName } from '../../BitByBit/
 const COMMUNITY_FILE = 'BitByBit/src/data/community.js';
 const PLAY_URL = 'https://sorylokan.github.io/games/BitByBit/#play=';
 const ACCEPT_LABEL = 'accepted'; // must match .github/workflows/fresque.yml
+const CODE_RE = /BB[12]-[A-Za-z0-9_-]+/;
 
 // GitHub issue form answers: "### Question" blocks followed by the answer.
 export function parseForm(body) {
@@ -26,7 +27,7 @@ const answer = (fields, start) => Object.entries(fields).find(([q]) => q.startsW
 // Reads the code (even wrapped in spaces or backticks) and the display name.
 export function readProposal(body, githubLogin) {
   const fields = parseForm(body);
-  const code = answer(fields, 'Code').match(/BB1-[A-Za-z0-9_-]+/)?.[0] ?? null;
+  const code = answer(fields, 'Code').match(CODE_RE)?.[0] ?? null;
   const mural = code && decodeMural(code);
   const author = cleanName(answer(fields, 'Pseudo')).replace(/[`*_[\]\\]/g, '').slice(0, 30) || githubLogin;
   // Re-encoded from the decoded mural: canonical form, cleaned name.
@@ -35,11 +36,12 @@ export function readProposal(body, githubLogin) {
 
 const summary = ({ mural, code }) => {
   const N = mural.map.length, colors = new Set(mural.map.join('').replace(/\./g, '')).size;
-  return `**${mural.name || 'Untitled'}**: ${N}×${N}, ${pixelCount(mural.map)} pixels, ${colors} color(s).\n\n` +
+  return `**${mural.name || 'Untitled'}**: ${N}×${N}, ${pixelCount(mural.map)} pixels, ${colors} color(s), ` +
+    `${mural.slots} slots.\n\n` +
     `[▶ Play this mural / Jouer cette fresque](${PLAY_URL}${code})`;
 };
 
-const BAD_CODE = '❌ I can\'t read the mural code. Make sure it\'s **complete** (it starts with `BB1-` and can be very ' +
+const BAD_CODE = '❌ I can\'t read the mural code. Make sure it\'s **complete** (it starts with `BB2-` or `BB1-` and can be very ' +
   'long), then edit the issue: I\'ll check again.\n\n' +
   '❌ Je n\'arrive pas à lire le code de la fresque. Vérifie qu\'il est **complet**, puis modifie le ticket : je revérifierai.';
 
@@ -51,7 +53,9 @@ function main(mode) {
   const p = readProposal(process.env.ISSUE_BODY, process.env.ISSUE_AUTHOR || 'anonymous');
   const number = Number(process.env.ISSUE_NUMBER) || 0;
   const community = readFileSync(COMMUNITY_FILE, 'utf8');
-  const already = p.ok && community.includes(p.code);
+  // Compared decoded: the same mural may be stored as an older BB1 code.
+  const codes = community.match(new RegExp(CODE_RE.source, 'g')) ?? [];
+  const already = p.ok && codes.some((c) => { const m = decodeMural(c); return m && encodeMural(m) === p.code; });
 
   if (mode === 'check') {
     writeFileSync('comment.md', !p.ok ? BAD_CODE

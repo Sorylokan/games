@@ -14,7 +14,7 @@ export function list() {
 }
 
 function write(entries) {
-  store.set(STORAGE.murals, entries.map(({ id, updated, name, map }) => ({ id, updated, code: encodeMural({ name, map }) })));
+  store.set(STORAGE.murals, entries.map(({ id, updated, ...mural }) => ({ id, updated, code: encodeMural(mural) })));
 }
 
 // Saves (or updates a known id). Returns the id.

@@ -42,14 +42,25 @@
           <span data-i18n="ed.name">Name</span>
           <input id="name" maxlength="30" autocomplete="off" data-i18n-ph="ed.namePh">
         </label>
-        <div class="field">
-          <span data-i18n="ed.size">Pixels per side</span>
-          <div class="stepper">
-            <button type="button" class="icon-btn" id="sizeMinus" aria-label="−">−</button>
-            <input id="size" type="number" min="4" max="50" inputmode="numeric">
-            <button type="button" class="icon-btn" id="sizePlus" aria-label="+">+</button>
+        <div class="field-row">
+          <div class="field">
+            <span data-i18n="ed.size">Pixels per side</span>
+            <div class="stepper">
+              <button type="button" class="icon-btn" id="sizeMinus" aria-label="−">−</button>
+              <input id="size" type="number" min="4" max="50" inputmode="numeric">
+              <button type="button" class="icon-btn" id="sizePlus" aria-label="+">+</button>
+            </div>
+          </div>
+          <div class="field">
+            <span data-i18n="ed.slots">Line slots</span>
+            <div class="stepper">
+              <button type="button" class="icon-btn" id="slotMinus" aria-label="−">−</button>
+              <input id="slots" type="number" min="2" max="5" inputmode="numeric">
+              <button type="button" class="icon-btn" id="slotPlus" aria-label="+">+</button>
+            </div>
           </div>
         </div>
+        <p class="muted field-help" data-i18n="ed.slotsHelp">Fewer slots, more tension. 4 is the usual.</p>
         <div class="row-btns">
           <button type="button" class="ghost" id="undo" data-i18n="ed.undo">Undo</button>
           <button type="button" class="ghost" id="clear" data-i18n="ed.clear">Clear all</button>

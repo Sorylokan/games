@@ -4,7 +4,12 @@ import { COLORS } from '../data/colors.js';
 
 export const MIN_SIZE = 4;
 export const MAX_SIZE = 50; // beyond this, boxes and level generation get heavy (see packetFor)
-const PREFIX = 'BB1-'; // "Bit by Bit", format version 1
+export const MIN_SLOTS = 2;
+export const MAX_SLOTS = 5;
+export const DEFAULT_SLOTS = 4;
+// "Bit by Bit", format version 2 (adds the slot count). Version 1 codes still read, with 4 slots.
+const PREFIX = 'BB2-';
+const PREFIX_V1 = 'BB1-';
 
 export const cleanName = (s) => String(s ?? '').replace(/[<>|]/g, '').trim().slice(0, 30);
 export const pixelCount = (map) => map.join('').replace(/\./g, '').length;
@@ -47,26 +52,36 @@ const fromB64 = (s) => {
   return new TextDecoder().decode(Uint8Array.from(atob(b), (c) => c.charCodeAt(0)));
 };
 
-// { name, map } → "BB1-…"
-export function encodeMural({ name, map }) {
-  return PREFIX + toB64(`${map.length}|${cleanName(name)}|${rle(map.join(''))}`);
+// { name, map, slots } → "BB2-…" (text inside: "size|slots|name|pixels")
+export function encodeMural({ name, map, slots = DEFAULT_SLOTS }) {
+  return PREFIX + toB64(`${map.length}|${slots}|${cleanName(name)}|${rle(map.join(''))}`);
 }
 
-// "BB1-…" → { name, map }, or null if the code is broken or invalid.
+// "BB2-…" or "BB1-…" → { name, map, slots }, or null if the code is broken or invalid.
 export function decodeMural(code) {
   try {
     const c = String(code ?? '').trim();
-    if (!c.startsWith(PREFIX)) return null;
-    const txt = fromB64(c.slice(PREFIX.length));
-    const a = txt.indexOf('|'), b = txt.lastIndexOf('|');
-    if (a < 0 || b <= a) return null;
+    const v1 = c.startsWith(PREFIX_V1);
+    if (!v1 && !c.startsWith(PREFIX)) return null;
+    let txt = fromB64(c.slice(PREFIX.length));
+    let slots = DEFAULT_SLOTS;
+    const a = txt.indexOf('|');
+    if (a < 0) return null;
     const N = Number(txt.slice(0, a));
+    if (!v1) { // "size|slots|…" → keep "size|…" for the shared parsing below
+      const s = txt.indexOf('|', a + 1);
+      slots = Number(txt.slice(a + 1, s));
+      if (s < 0 || !Number.isInteger(slots) || slots < MIN_SLOTS || slots > MAX_SLOTS) return null;
+      txt = txt.slice(0, a) + txt.slice(s);
+    }
+    const b = txt.lastIndexOf('|');
+    if (b <= a) return null;
     if (!Number.isInteger(N) || N < MIN_SIZE || N > MAX_SIZE) return null;
     const flat = unrle(txt.slice(b + 1));
     if (flat === null || flat.length !== N * N) return null;
     if (![...flat].every((ch) => ch === '.' || COLORS[ch])) return null;
     const map = Array.from({ length: N }, (_, r) => flat.slice(r * N, (r + 1) * N));
-    return { name: cleanName(txt.slice(a + 1, b)), map };
+    return { name: cleanName(txt.slice(a + 1, b)), map, slots };
   } catch {
     return null;
   }

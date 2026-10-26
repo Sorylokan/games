@@ -1,6 +1,6 @@
 // Editor model: the mural being edited, tools and undo history. No DOM.
 // The grid is N×N color letters, '.' for empty.
-import { MIN_SIZE, MAX_SIZE, cleanName } from '../core/mural-code.js';
+import { MIN_SIZE, MAX_SIZE, DEFAULT_SLOTS, cleanName } from '../core/mural-code.js';
 import { DIRS } from '../core/grid.js';
 
 export const ERASER = '.';
@@ -10,6 +10,7 @@ export const ed = {
   N: 12,
   cells: [],          // cells[r][c]
   name: '',
+  slots: DEFAULT_SLOTS, // line slots when the mural is played
   editingId: null,    // library id when editing a saved mural
   color: 'R',         // brush color (ERASER = eraser)
   tool: 'brush',      // 'brush' | 'fill' | 'pick'
@@ -20,20 +21,21 @@ export const ed = {
 const blank = (N) => Array.from({ length: N }, () => Array(N).fill(ERASER));
 
 export function newMural(N = 12) {
-  ed.N = N; ed.cells = blank(N); ed.name = ''; ed.editingId = null; ed.history = []; ed.dirty = false;
+  ed.N = N; ed.cells = blank(N); ed.name = ''; ed.slots = DEFAULT_SLOTS; ed.editingId = null; ed.history = []; ed.dirty = false;
 }
 
-export function loadMural({ name, map }, editingId = null) {
+export function loadMural({ name, map, slots = DEFAULT_SLOTS }, editingId = null) {
   ed.N = map.length;
   ed.cells = map.map((row) => [...row]);
   ed.name = cleanName(name);
+  ed.slots = slots;
   ed.editingId = editingId;
   ed.history = [];
   ed.dirty = false;
 }
 
 export const toMap = () => ed.cells.map((r) => r.join(''));
-export const toMural = () => ({ name: ed.name, map: toMap() });
+export const toMural = () => ({ name: ed.name, map: toMap(), slots: ed.slots });
 export const isEmpty = () => ed.cells.every((r) => r.every((v) => v === ERASER));
 
 // Call before a change so it can be undone.

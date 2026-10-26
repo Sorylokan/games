@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generate, solvable } from '../src/core/generator.js';
-import { remaining } from '../src/core/grid.js';
+import { remaining, reachable } from '../src/core/grid.js';
 import { levelAt, customLevel, packetFor } from '../src/data/levels.js';
 import { MAPS } from '../src/data/maps.js';
 
@@ -18,6 +18,16 @@ test('chaque niveau généré est faisable et compte exactement les pixels de la
     assert.ok(queues.every((q) => q.length > 0), `${lvl.name} : aucune file vide au départ`);
     const ids = new Set(boxes.map((b) => b.id));
     assert.equal(ids.size, boxes.length, 'identifiants de boîtes uniques');
+  }
+});
+
+test('départ jamais bloqué : une boîte utile en tête de file, et un emplacement de marge', () => {
+  for (let i = 0; i < 12; i++) {
+    const lvl = { ...levelAt(i), tries: 2 };
+    const { N, target, queues } = generate(lvl, nextId);
+    const colors = new Set(reachable(target, N).map(([r, c]) => target[r][c]));
+    assert.ok(queues.some((q) => colors.has(q[0].color)), `fresque ${i + 1} : aucune boîte utile au départ`);
+    assert.ok(solvable(target, N, queues, lvl.cap - 1), `fresque ${i + 1} : pas de marge`);
   }
 });
 
@@ -42,4 +52,10 @@ test('la difficulté monte : moins de places après les premières fresques', ()
   assert.equal(levelAt(0).cap, 4);
   assert.equal(levelAt(5).cap, 3);
   assert.ok(levelAt(MAPS.length).round === 1);
+});
+
+test('boss toutes les 10 fresques, sans marge', () => {
+  assert.deepEqual([8, 9, 10, 19].map((i) => levelAt(i).boss), [false, true, false, true]);
+  assert.equal(levelAt(9).margin, 0);
+  assert.equal(levelAt(8).margin, 1);
 });

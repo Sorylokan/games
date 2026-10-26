@@ -4,7 +4,7 @@ import { DEFAULT_SKIN } from '../data/skins.js';
 import { STORAGE } from '../config.js';
 import { store } from '../storage.js';
 import { $ } from '../dom.js';
-import { encodeMural, decodeMural, toMapsSnippet, pixelCount, cleanName, MIN_SIZE, MAX_SIZE } from '../core/mural-code.js';
+import { encodeMural, decodeMural, toMapsSnippet, pixelCount, cleanName, MIN_SIZE, MAX_SIZE, MIN_SLOTS, MAX_SLOTS } from '../core/mural-code.js';
 import { initLangSelect, initialLang, setLang, t } from '../ui/lang.js';
 import { initSkinSelect, fillSkinSelect, setSkin } from '../ui/skin.js';
 import { ed, ERASER, newMural, loadMural, toMural, toMap, isEmpty, snapshot, undo, resize, clear } from './model.js';
@@ -90,6 +90,9 @@ function renderInfo() {
   $('size').value = ed.N;
   $('sizeMinus').disabled = ed.N <= MIN_SIZE;
   $('sizePlus').disabled = ed.N >= MAX_SIZE;
+  $('slots').value = ed.slots;
+  $('slotMinus').disabled = ed.slots <= MIN_SLOTS;
+  $('slotPlus').disabled = ed.slots >= MAX_SLOTS;
   $('pixInfo').textContent = t('ed.pixels', { n: pixelCount(toMap()), total: ed.N * ed.N });
   $('undo').disabled = !ed.history.length;
   const empty = isEmpty();
@@ -132,7 +135,7 @@ function renderLibrary() {
     const b = document.createElement('b');
     b.textContent = m.name || t('custom.untitled');
     const small = document.createElement('small');
-    small.textContent = `${m.map.length} × ${m.map.length}`;
+    small.textContent = `${m.map.length} × ${m.map.length} · ${t('custom.slots', { n: m.slots })}`;
     meta.append(b, small);
     const acts = document.createElement('div');
     acts.className = 'acts';
@@ -229,6 +232,14 @@ function bindControls() {
   $('sizePlus').addEventListener('click', () => setSize(ed.N + 1));
   $('size').addEventListener('change', (e) => setSize(Number(e.target.value) || ed.N));
 
+  const setSlots = (n) => {
+    ed.slots = Math.max(MIN_SLOTS, Math.min(MAX_SLOTS, Math.round(n) || ed.slots));
+    ed.dirty = true; library.saveDraft(toMural(), ed.editingId); renderInfo();
+  };
+  $('slotMinus').addEventListener('click', () => setSlots(ed.slots - 1));
+  $('slotPlus').addEventListener('click', () => setSlots(ed.slots + 1));
+  $('slots').addEventListener('change', (e) => setSlots(Number(e.target.value)));
+
   $('undo').addEventListener('click', () => { if (undo()) changed(); });
   confirmable($('clear'), () => !isEmpty(), () => { snapshot(); clear(); changed(); });
 
@@ -321,7 +332,7 @@ buildPalette();
 initView({ changed, picked: (v) => selectColor(v) });
 bindControls();
 
-// editor/#edit=BB1-… (from the game) > current draft > empty mural
+// editor/#edit=BB2-… (from the game) > current draft > empty mural
 const editCode = location.hash.match(/^#edit=(.+)$/)?.[1];
 const fromLink = editCode && decodeMural(decodeURIComponent(editCode));
 const draft = library.loadDraft();
