@@ -92,9 +92,11 @@ export const slugify = (name) => cleanName(name).replace(/œ/gi, 'oe').replace(/
   .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'mural';
 
 // Entry to paste into data/maps.js, plus its translation line.
-export function toMapsSnippet({ name, map }) {
+export function toMapsSnippet({ name, map, slots = DEFAULT_SLOTS }) {
   const id = slugify(name);
   const rows = map.map((r) => `    '${r}',`).join('\n');
   const label = cleanName(name) || id;
-  return `  { id: '${id}', map: [\n${rows}\n  ] },\n\n// locales/fr.json and locales/en.json:\n// "map.${id}": "${label}",`;
+  return `  { id: '${id}', slots: ${slots}, map: [\n${rows}\n  ] },\n\n` +
+    `// slots: remove it to follow the adventure's progression (4 slots for the first 3 murals, then 3).\n` +
+    `// locales/fr.json and locales/en.json:\n// "map.${id}": "${label}",`;
 }

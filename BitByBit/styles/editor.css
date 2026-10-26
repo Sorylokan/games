@@ -19,6 +19,8 @@ a.brand { text-decoration: none; }
 .field-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0 12px; }
 .field-row > .field:last-child { align-items: flex-end; }
 .field-help { margin: -4px 0 10px; }
+/* Undo, move arrows and clear, under the grid */
+.board-tools { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .stepper .icon-btn { width: 32px; height: 32px; padding: 0; font: 400 18px var(--display); line-height: 1; }
 .stepper input { width: 4.5em; text-align: center; font: 500 18px var(--display); }
 .row-btns { display: flex; gap: 8px; flex-wrap: wrap; }

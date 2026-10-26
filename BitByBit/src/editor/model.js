@@ -93,3 +93,10 @@ export function resize(N) {
 }
 
 export const clear = () => { ed.cells = blank(ed.N); ed.dirty = true; };
+
+// Moves the whole drawing by (dr, dc) cells. What leaves one side comes back on the other: nothing is lost.
+export function shift(dr, dc) {
+  const N = ed.N, old = ed.cells;
+  ed.cells = Array.from({ length: N }, (_, r) => Array.from({ length: N }, (_, c) => old[(r - dr + N) % N][(c - dc + N) % N]));
+  ed.dirty = true;
+}

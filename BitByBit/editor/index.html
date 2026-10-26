@@ -32,7 +32,18 @@
   <main class="table editor">
     <section class="board" id="board">
       <canvas id="ed"></canvas>
-      <p class="hint" data-i18n="ed.hint">Click to paint, right-click to erase. Shortcuts: B brush, F fill, I picker, E eraser, Ctrl+Z undo.</p>
+      <!-- Drawing tools, right under the grid -->
+      <div class="board-tools">
+        <button type="button" class="ghost" id="undo" data-i18n="ed.undo">Undo</button>
+        <div class="stepper" role="group" data-i18n-aria="ed.move">
+          <button type="button" class="icon-btn" data-move="0,-1" data-i18n-title="ed.moveLeft">←</button>
+          <button type="button" class="icon-btn" data-move="-1,0" data-i18n-title="ed.moveUp">↑</button>
+          <button type="button" class="icon-btn" data-move="1,0" data-i18n-title="ed.moveDown">↓</button>
+          <button type="button" class="icon-btn" data-move="0,1" data-i18n-title="ed.moveRight">→</button>
+        </div>
+        <button type="button" class="ghost" id="clear" data-i18n="ed.clear">Clear the drawing</button>
+      </div>
+      <p class="hint" data-i18n="ed.hint">Click to paint, right-click to erase. Shortcuts: B brush, F fill, I picker, E eraser, arrows move the drawing, Ctrl+Z undo.</p>
     </section>
 
     <aside class="side">
@@ -61,10 +72,6 @@
           </div>
         </div>
         <p class="muted field-help" data-i18n="ed.slotsHelp">Fewer slots, more tension. 4 is the usual.</p>
-        <div class="row-btns">
-          <button type="button" class="ghost" id="undo" data-i18n="ed.undo">Undo</button>
-          <button type="button" class="ghost" id="clear" data-i18n="ed.clear">Clear all</button>
-        </div>
       </section>
 
       <section class="side-card">
@@ -116,7 +123,7 @@
         <div class="actions">
           <button type="button" id="play" data-i18n="ed.play">Play this mural</button>
           <button type="button" class="ghost" id="save" data-i18n="ed.save">Save</button>
-          <button type="button" class="ghost" id="new" data-i18n="ed.new">New</button>
+          <button type="button" class="ghost" id="new" data-i18n="ed.new">New mural</button>
         </div>
         <p class="status" id="status" role="status" aria-live="polite"></p>
       </section>

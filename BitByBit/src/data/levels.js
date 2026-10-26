@@ -8,6 +8,7 @@ export const isBoss = (i) => (i + 1) % BOSS_EVERY === 0;
 
 export function levelAt(i) {
   const m = MAPS[i % MAPS.length];
+  const N = m.map.length;
   const round = Math.floor(i / MAPS.length);
   const boss = isBoss(i);
   return {
@@ -15,10 +16,12 @@ export function levelAt(i) {
     map: m.map,
     round,
     boss,
-    cap: i < 3 ? 4 : 3,                          // slots on the line
+    cap: m.slots ?? (i < 3 ? 4 : 3),             // slots on the line (the mural may set its own)
     margin: boss ? 0 : 1,                        // slots to spare in the generated solution
     mix: Math.min(16, 3 + i * 1.5),              // queue shuffling
-    tries: Math.min(24, 4 + i * 3 + round * 4),  // candidates generated, the hardest is kept
+    tries: Math.min(maxTries(N), 4 + i * 3 + round * 4), // candidates generated, the hardest is kept
+    runs: runsFor(N),
+    packet: packetFor(N),
   };
 }
 
@@ -29,15 +32,18 @@ export function packetFor(N) {
   return [Math.round(4 * k), Math.round(12 * k)];
 }
 
+// Generation runs on launch and must stay fast on phones: bigger grids get fewer tries/runs.
+const maxTries = (N) => (N > 32 ? 2 : N > 16 ? 4 : N > 12 ? 12 : 24);
+const runsFor = (N) => (N > 32 ? 6 : 12);
+
 // Level for a custom or community mural (`author` set for community ones). Medium difficulty,
-// with the slot count chosen in the editor. Bigger grids get fewer tries/runs: generation runs
-// on launch and must stay fast on phones.
+// with the slot count chosen in the editor.
 export function customLevel({ name, map, slots = DEFAULT_SLOTS, author = null }) {
   const N = map.length;
   return {
     id: null, name, map, slots, author, community: !!author, round: 0, custom: true, cap: slots, mix: 8,
-    tries: N > 32 ? 2 : N > 16 ? 4 : N > 12 ? 6 : 8,
-    runs: N > 32 ? 6 : 12,
+    tries: Math.min(maxTries(N), 8),
+    runs: runsFor(N),
     packet: packetFor(N),
   };
 }

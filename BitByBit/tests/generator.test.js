@@ -21,13 +21,13 @@ test('chaque niveau généré est faisable et compte exactement les pixels de la
   }
 });
 
-test('départ jamais bloqué : une boîte utile en tête de file, et un emplacement de marge', () => {
+test('départ jamais bloqué : une boîte utile en tête de file, et la marge prévue (aucune pour un boss)', () => {
   for (let i = 0; i < 12; i++) {
     const lvl = { ...levelAt(i), tries: 2 };
     const { N, target, queues } = generate(lvl, nextId);
     const colors = new Set(reachable(target, N).map(([r, c]) => target[r][c]));
     assert.ok(queues.some((q) => colors.has(q[0].color)), `fresque ${i + 1} : aucune boîte utile au départ`);
-    assert.ok(solvable(target, N, queues, lvl.cap - 1), `fresque ${i + 1} : pas de marge`);
+    assert.ok(solvable(target, N, queues, lvl.cap - lvl.margin), `fresque ${i + 1} : pas de marge`);
   }
 });
 
@@ -52,6 +52,14 @@ test('la difficulté monte : moins de places après les premières fresques', ()
   assert.equal(levelAt(0).cap, 4);
   assert.equal(levelAt(5).cap, 3);
   assert.ok(levelAt(MAPS.length).round === 1);
+});
+
+test('une fresque officielle peut imposer son nombre d\'emplacements (2 à 5)', () => {
+  MAPS.forEach((m, i) => {
+    if (m.slots === undefined) return;
+    assert.ok(Number.isInteger(m.slots) && m.slots >= 2 && m.slots <= 5, `${m.id} : slots ${m.slots}`);
+    assert.equal(levelAt(i).cap, m.slots);
+  });
 });
 
 test('boss toutes les 10 fresques, sans marge', () => {

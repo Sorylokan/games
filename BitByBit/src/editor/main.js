@@ -7,7 +7,7 @@ import { $ } from '../dom.js';
 import { encodeMural, decodeMural, toMapsSnippet, pixelCount, cleanName, MIN_SIZE, MAX_SIZE, MIN_SLOTS, MAX_SLOTS } from '../core/mural-code.js';
 import { initLangSelect, initialLang, setLang, t } from '../ui/lang.js';
 import { initSkinSelect, fillSkinSelect, setSkin } from '../ui/skin.js';
-import { ed, ERASER, newMural, loadMural, toMural, toMap, isEmpty, snapshot, undo, resize, clear } from './model.js';
+import { ed, ERASER, newMural, loadMural, toMural, toMap, isEmpty, snapshot, undo, resize, clear, shift } from './model.js';
 import * as library from './library.js';
 import { initView, resizeView, draw, setBackground, setBackgroundOpacity, setBackgroundVisible, imagePixels } from './view.js';
 import { pixelsToMap } from '../core/image-to-map.js';
@@ -86,7 +86,8 @@ function renderTools() {
 }
 
 function renderInfo() {
-  $('name').value = ed.name;
+  // Not while typing: the cleaned name drops a trailing space, which would eat the space just typed.
+  if (document.activeElement !== $('name')) $('name').value = ed.name;
   $('size').value = ed.N;
   $('sizeMinus').disabled = ed.N <= MIN_SIZE;
   $('sizePlus').disabled = ed.N >= MAX_SIZE;
@@ -226,6 +227,7 @@ const showBgTools = (on) => {
 // ---------- wiring ----------
 function bindControls() {
   $('name').addEventListener('input', (e) => { ed.name = cleanName(e.target.value); ed.dirty = true; library.saveDraft(toMural(), ed.editingId); renderInfo(); });
+  $('name').addEventListener('blur', () => { $('name').value = ed.name; });
 
   const setSize = (n) => { snapshot(); if (resize(n)) changed(); else { ed.history.pop(); renderInfo(); } };
   $('sizeMinus').addEventListener('click', () => setSize(ed.N - 1));
@@ -245,6 +247,10 @@ function bindControls() {
 
   document.querySelectorAll('#toolBar button').forEach((b) =>
     b.addEventListener('click', () => { ed.tool = b.dataset.tool; renderTools(); }));
+
+  const move = (dr, dc) => { snapshot(); shift(dr, dc); changed(); };
+  document.querySelectorAll('[data-move]').forEach((b) =>
+    b.addEventListener('click', () => move(...b.dataset.move.split(',').map(Number))));
 
   // Background image (kept in memory only)
   $('bgFile').addEventListener('change', (e) => {
@@ -309,7 +315,8 @@ function bindControls() {
   $('import').addEventListener('click', doImport);
   $('importCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') doImport(); });
 
-  // Shortcuts: Ctrl/Cmd+Z undo; B brush, F fill, I picker, E eraser
+  // Shortcuts: Ctrl/Cmd+Z undo; B brush, F fill, I picker, E eraser; arrows move the drawing
+  const ARROWS = { ArrowLeft: [0, -1], ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowRight: [0, 1] };
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (undo()) changed(); return; }
     if (e.target.closest('input, textarea, select') || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -318,6 +325,7 @@ function bindControls() {
     else if (k === 'f') { ed.tool = 'fill'; renderTools(); }
     else if (k === 'i') { ed.tool = 'pick'; renderTools(); }
     else if (k === 'e') selectColor(ERASER);
+    else if (ARROWS[e.key]) { e.preventDefault(); move(...ARROWS[e.key]); }
   });
 }
 

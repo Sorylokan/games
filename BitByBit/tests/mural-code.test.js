@@ -47,8 +47,8 @@ test('un code invalide renvoie null', () => {
 
 test('export pour maps.js', () => {
   assert.equal(slugify('Mon Chat Câlin !'), 'mon-chat-calin');
-  const s = toMapsSnippet({ name: 'Mon Cœur', map: ['B.', 'KR'] });
-  assert.match(s, /id: 'mon-coeur'/);
+  const s = toMapsSnippet({ name: 'Mon Cœur', map: ['B.', 'KR'], slots: 3 });
+  assert.match(s, /id: 'mon-coeur', slots: 3,/);
   assert.match(s, /'B\.',/);
   assert.equal(pixelCount(['B.', 'KR']), 3);
 });
