@@ -25,6 +25,10 @@ initSfx($('sfx'));
 initSkinSelect(setSkin);
 initLangSelect(changeLang);
 
+// <details> only closes from its own button; a tap anywhere else should close the ⚙ menu too.
+const settings = document.querySelector('.settings');
+document.addEventListener('click', (e) => { if (!settings.contains(e.target)) settings.open = false; });
+
 // Retranslates everything without restarting the game.
 async function changeLang(lang) {
   await setLang(lang);
