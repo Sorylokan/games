@@ -91,13 +91,21 @@ function fillEmptyQueues(qs) {
   }
 }
 
+// A queue's chance to get the next box grows with how far it trails the longest one: gaps stay small but still vary (an even pick gave splits like 2/5/9).
+function trailing(qs, rnd) {
+  const top = Math.max(...qs.map((q) => q.length));
+  const weights = qs.map((q) => top - q.length + 1);
+  let r = rnd() * weights.reduce((a, b) => a + b, 0);
+  return qs[weights.findIndex((w) => (r -= w) < 0)] ?? qs.at(-1);
+}
+
 // At least one queue starts with a box that can collect right away.
 function fairStart(target, N, qs) {
   const colors = new Set(reachable(target, N).map(([r, c]) => target[r][c]));
   return qs.some((q) => q.length && colors.has(q[0].color));
 }
 
-// Candidate queues: a valid order, slightly shuffled, dealt at random. Must stay solvable with `margin` slots to spare (default 1).
+// Candidate queues: a valid order, slightly shuffled, dealt mostly evenly. Must stay solvable with `margin` slots to spare (default 1).
 function candidate(target, N, lvl, nextId, rnd) {
   const attempts = N > 32 ? 4 : N > 16 ? 12 : 40; // each one costs more on a big grid
   for (let attempt = 0; attempt < attempts; attempt++) {
@@ -107,7 +115,7 @@ function candidate(target, N, lvl, nextId, rnd) {
       .sort((x, y) => x.k - y.k)
       .map((x) => x.a);
     const qs = Array.from({ length: QUEUES }, () => []);
-    mixed.forEach((a) => qs[rand(0, QUEUES - 1, rnd)].push({ id: nextId(), ...a }));
+    mixed.forEach((a) => trailing(qs, rnd).push({ id: nextId(), ...a }));
     fillEmptyQueues(qs);
     if (fairStart(target, N, qs) && solvable(target, N, qs, lvl.cap, Math.max(1, lvl.cap - (lvl.margin ?? 1)))) return qs;
   }
