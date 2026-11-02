@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect id="bg" width="512" height="512" rx="96" fill="#0c0b10"/>
+  <!-- one tile per game, in each card's accent color -->
+  <rect x="124" y="124" width="122" height="122" rx="22" fill="#7fa8d9"/>
+  <rect x="266" y="124" width="122" height="122" rx="22" fill="#e60012"/>
+  <rect x="124" y="266" width="122" height="122" rx="22" fill="#b8923a"/>
+  <rect x="266" y="266" width="122" height="122" rx="22" fill="#F29F58"/>
+  <rect x="236" y="236" width="40" height="40" rx="8" fill="#f5e000" transform="rotate(45 256 256)"/>
+</svg>

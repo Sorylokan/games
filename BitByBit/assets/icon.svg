@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect id="bg" width="512" height="512" rx="96" fill="#101827"/>
+  <!-- heart drawn on a 42 px grid, then enlarged around its center to fill the icon -->
+  <g transform="translate(256 256) scale(1.32) translate(-254 -252.5)">
+    <g fill="#e86a7a">
+      <rect x="151" y="130" width="38" height="38" rx="6"/><rect x="193" y="130" width="38" height="38" rx="6"/>
+      <rect x="277" y="130" width="38" height="38" rx="6"/><rect x="319" y="130" width="38" height="38" rx="6"/>
+      <rect x="109" y="172" width="38" height="38" rx="6"/><rect x="193" y="172" width="38" height="38" rx="6"/><rect x="235" y="172" width="38" height="38" rx="6"/><rect x="277" y="172" width="38" height="38" rx="6"/><rect x="319" y="172" width="38" height="38" rx="6"/><rect x="361" y="172" width="38" height="38" rx="6"/>
+      <rect x="109" y="214" width="38" height="38" rx="6"/><rect x="151" y="214" width="38" height="38" rx="6"/><rect x="193" y="214" width="38" height="38" rx="6"/><rect x="235" y="214" width="38" height="38" rx="6"/><rect x="277" y="214" width="38" height="38" rx="6"/><rect x="319" y="214" width="38" height="38" rx="6"/><rect x="361" y="214" width="38" height="38" rx="6"/>
+      <rect x="151" y="256" width="38" height="38" rx="6"/><rect x="193" y="256" width="38" height="38" rx="6"/><rect x="235" y="256" width="38" height="38" rx="6"/><rect x="277" y="256" width="38" height="38" rx="6"/>
+      <rect x="193" y="298" width="38" height="38" rx="6"/><rect x="235" y="298" width="38" height="38" rx="6"/>
+    </g>
+    <rect x="151" y="172" width="38" height="38" rx="6" fill="#f6b3bc"/>
+    <!-- pixels already carried away, from the bottom up like in the game -->
+    <g fill="none" stroke="#f6b3bc" stroke-width="6" stroke-dasharray="10 7">
+      <rect x="322" y="259" width="32" height="32" rx="5"/><rect x="280" y="301" width="32" height="32" rx="5"/><rect x="238" y="343" width="32" height="32" rx="5"/>
+    </g>
+  </g>
+</svg>

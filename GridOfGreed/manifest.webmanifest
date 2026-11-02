@@ -1,0 +1,13 @@
+{
+  "name": "Grid of Greed",
+  "short_name": "Grid of Greed",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#15131c",
+  "theme_color": "#15131c",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

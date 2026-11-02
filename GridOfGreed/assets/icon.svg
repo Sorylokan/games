@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect id="bg" width="512" height="512" rx="96" fill="#15131c"/>
+  <!-- square cards like in the game (src/ui/styles.css): backs with a faint inner frame and a diamond, faces with a colored border -->
+  <g fill="none" stroke="#b8923a">
+    <rect x="96" y="96" width="150" height="150" rx="15" fill="#0c0b10" stroke-width="9"/>
+    <rect x="114" y="114" width="114" height="114" rx="9" stroke-width="4" opacity=".4"/>
+    <rect x="151.5" y="151.5" width="39" height="39" stroke-width="7" transform="rotate(45 171 171)"/>
+    <rect x="266" y="266" width="150" height="150" rx="15" fill="#0c0b10" stroke-width="9"/>
+    <rect x="284" y="284" width="114" height="114" rx="9" stroke-width="4" opacity=".4"/>
+    <rect x="321.5" y="321.5" width="39" height="39" stroke-width="7" transform="rotate(45 341 341)"/>
+  </g>
+  <rect x="266" y="96" width="150" height="150" rx="15" fill="#0c0b10" stroke="#5fb3a1" stroke-width="9"/>
+  <circle cx="341" cy="171" r="30" fill="#5fb3a1"/>
+  <rect x="96" y="266" width="150" height="150" rx="15" fill="#0c0b10" stroke="#d65a5a" stroke-width="9"/>
+  <circle cx="171" cy="341" r="30" fill="#d65a5a"/>
+</svg>
