@@ -49,9 +49,17 @@ function setup() {
   master.gain.value = 0;
   const limiter = ctx.createDynamicsCompressor();
   limiter.connect(ctx.destination);
-  master.connect(limiter);
+  // Phone speakers can't play the bass and kick (under ~150 Hz): fed them anyway, they rattle. Touch screens get them cut, before the limiter so it doesn't react to sound nobody hears.
+  let input = limiter;
+  if (window.matchMedia?.('(pointer: coarse)').matches) {
+    input = ctx.createBiquadFilter();
+    input.type = 'highpass';
+    input.frequency.value = 150;
+    input.connect(limiter);
+  }
+  master.connect(input);
   sfxBus = ctx.createGain();
-  sfxBus.connect(limiter);
+  sfxBus.connect(input);
 
   // "Tape": everything goes through a soft low-pass.
   const tape = ctx.createBiquadFilter();
