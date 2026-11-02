@@ -13,8 +13,8 @@ export function buildSequence(target, N, rnd = Math.random, [lo, hi] = PACKET, e
   const g = clone(target), seq = [];
   let guard = remaining(g) + 1; // each pass removes at least one pixel
   while (remaining(g) && guard-- > 0) {
-    const colors = [...new Set(reachable(g, N).map(([r, c]) => g[r][c]))];
-    const color = pick(colors, rnd);
+    // Weighted by reachable pixels, so details get exposed whole before they're boxed (picking colors evenly made tiny boxes that clog big murals).
+    const color = pick(reachable(g, N).map(([r, c]) => g[r][c]), rnd);
     const n = collect(g, N, color, rand(lo, hi, rnd), entry);
     if (n) seq.push({ color, count: n });
   }
