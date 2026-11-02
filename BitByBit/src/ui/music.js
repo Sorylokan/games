@@ -52,10 +52,13 @@ function setup() {
   // Phone speakers can't play the bass and kick (under ~150 Hz): fed them anyway, they rattle. Touch screens get them cut, before the limiter so it doesn't react to sound nobody hears.
   let input = limiter;
   if (window.matchMedia?.('(pointer: coarse)').matches) {
-    input = ctx.createBiquadFilter();
-    input.type = 'highpass';
-    input.frequency.value = 150;
-    input.connect(limiter);
+    for (let k = 0; k < 2; k++) { // two filters in a row: one alone still let half of the 100 Hz through
+      const hp = ctx.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.value = 160;
+      hp.connect(input);
+      input = hp;
+    }
   }
   master.connect(input);
   sfxBus = ctx.createGain();
