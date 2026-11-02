@@ -1,19 +1,17 @@
-// Game tuning, in one place.
-
 export const BASE_SPEED = 6.5;   // carrier speed in cells/s (before the species multiplier)
 export const SPAWN_MS = 130;     // delay between two carriers leaving the same box
 export const MAX_OUT = 5;        // carriers out at once per box
 export const BOX_OPEN_MS = 280;  // delay before a placed box sends its first carrier
-export const BOX_CLOSE_MS = 500; // fade-out time of an emptied box
-export const QUEUE_COUNT = 3;    // number of box queues
+export const BOX_CLOSE_MS = 300; // fade-out time of an emptied box
+export const QUEUE_COUNT = 3;
 
-// localStorage keys. The "pc-" prefix comes from the old name ("Petite Colonie"), kept so players don't lose their progress.
+// localStorage keys (old "pc-" keys are renamed in storage.js).
 export const STORAGE = {
-  level: 'pc-level',
-  best: 'pc-best',
-  skin: 'pc-skin',             // the language key ('pc-lang') lives in src/i18n.js
-  music: 'pc-music',
-  sfx: 'pc-sfx',
-  murals: 'pc-murals', // saved custom murals (editor)
-  draft: 'pc-draft',   // mural being edited
+  level: 'bbb-level',
+  best: 'bbb-best',
+  skin: 'bbb-skin',     // the language key ('bbb-lang') lives in src/i18n.js
+  music: 'bbb-music',
+  sfx: 'bbb-sfx',
+  murals: 'bbb-murals', // editor: saved murals and the current draft
+  draft: 'bbb-draft',
 };

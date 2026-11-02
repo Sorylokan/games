@@ -4,7 +4,7 @@
 
 export const LANGS = { fr: "Français", en: "English" }; // each language named in itself
 export const DEFAULT_LOCALE = "en"; // reference language: its file is complete
-const STORAGE_KEY = "pc-lang";
+const STORAGE_KEY = "bbb-lang";
 const LEGACY_KEYS = []; // older storage keys, still read
 
 // locales/ is resolved from this file (src/i18n.js), not from the page.
