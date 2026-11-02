@@ -67,9 +67,7 @@
   background-attachment: fixed, fixed, fixed;
 }
 
-/* Falling leaves: two groups (::before, ::after), each with two tiles of different sizes so the
-   pattern doesn't show. The fall (background) and the sway (transform) are separate animations
-   with unrelated durations, so nothing moves in sync. */
+/* Falling leaves: two groups, each with two tiles of different sizes so the pattern doesn't show; fall and sway have unrelated durations so nothing moves in sync. */
 :root[data-skin="autumn"] body::before,
 :root[data-skin="autumn"] body::after {
   content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;

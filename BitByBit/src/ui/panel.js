@@ -1,5 +1,4 @@
-// Side column: mural info and box queues.
-// Rebuilt only when something changes (not every frame), otherwise clicks get lost.
+// Side column: mural info and box queues, rebuilt only when something changes (every frame, clicks would get lost).
 import { COLORS, inkFor } from '../data/colors.js';
 import { QUEUE_COUNT } from '../config.js';
 import { $ } from '../dom.js';
@@ -11,7 +10,7 @@ const boxHTML = (a, small) =>
 
 let queueBtns = [];
 
-// Creates the queue buttons once. onPlace(qi, button) is called on click.
+// onPlace(qi, button) is called on click.
 export function initPanel(onPlace) {
   queueBtns = Array.from({ length: QUEUE_COUNT }, (_, qi) => {
     const b = document.createElement('button');
@@ -62,7 +61,7 @@ export function renderProgress() {
   $('bar').style.width = (st.picked / st.total * 100) + '%';
 }
 
-// Small shake when a queue is clicked while the line is full.
+// When a queue is clicked while the line is full.
 export function shake(el) {
   el.classList.remove('shake');
   void el.offsetWidth; // restart the animation

@@ -1,6 +1,4 @@
 // Beach: crabs, and now and then a hermit crab.
-// Each function draws the species standing, centered on (0, 0), 30 units = 1 cell.
-// ph: animation phase, flip: 1 or -1 (direction), carry: carried pixel color or null.
 import { ctx, tile, dot } from '../canvas.js';
 
 export function drawCrab(ph, flip, carry) {

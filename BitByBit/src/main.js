@@ -60,8 +60,7 @@ window.bitByBit = {
   level: (i) => start(Math.max(0, Math.floor(Number(i) || 0))),
 };
 
-// Resize only when the board WIDTH changes: its height depends on the canvas,
-// so watching it would loop ("ResizeObserver loop").
+// Resize only when the board WIDTH changes: its height depends on the canvas, so watching it would loop ("ResizeObserver loop").
 let lastW = 0;
 new ResizeObserver(() => {
   const w = $('board').clientWidth;
@@ -75,7 +74,7 @@ await setLang(initialLang());
 fillSkinSelect();
 setSkin(store.get(STORAGE.skin, DEFAULT_SKIN));
 renderCommunityBtn();
-// #play=BB1-…: play a custom mural (link from the editor or a friend).
+// #play=BB2-…: play a custom mural (link from the editor or a friend).
 const playCode = location.hash.match(/^#play=(.+)$/)?.[1];
 const mural = playCode && decodeMural(decodeURIComponent(playCode));
 if (mural) {

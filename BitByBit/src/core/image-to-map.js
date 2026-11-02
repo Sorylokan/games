@@ -1,5 +1,4 @@
-// Image → mural conversion. No browser APIs: takes RGBA pixels already read.
-// Colors are compared in OKLab, which matches human perception.
+// Image → mural conversion, without browser APIs (takes RGBA pixels already read). Colors are compared in OKLab, which matches human perception.
 import { DIRS } from './grid.js';
 
 const EMPTY = '.';
@@ -23,7 +22,7 @@ export function toOklab(r, g, b) {
   ];
 }
 
-// Palette ({ letter: '#rrggbb' }) in OKLab, computed once per palette.
+// Computed once per palette.
 const cache = new WeakMap();
 function paletteLab(palette) {
   let p = cache.get(palette);
@@ -38,7 +37,6 @@ function paletteLab(palette) {
   return p;
 }
 
-// Index of the closest color among `allowed` (palette indices).
 function nearestIndex(L, A, B, lab, allowed) {
   let best = allowed[0], bestD = Infinity;
   for (const i of allowed) {
@@ -49,7 +47,6 @@ function nearestIndex(L, A, B, lab, allowed) {
   return best;
 }
 
-// Letter of the palette color closest to an sRGB color.
 export function nearestColor(r, g, b, palette) {
   const p = paletteLab(palette);
   return p.letters[nearestIndex(...toOklab(r, g, b), p.lab, [...p.lab.keys()])];
@@ -69,8 +66,7 @@ export function cleanIsolated(grid) {
   return grid;
 }
 
-// Clears the most common corner color, flood-filling from the edges only:
-// the same color inside the drawing is kept.
+// Clears the most common corner color, flood-filling from the edges only: the same color inside the drawing is kept.
 export function clearBackground(grid) {
   const N = grid.length;
   const corners = [grid[0][0], grid[0][N - 1], grid[N - 1][0], grid[N - 1][N - 1]].filter((v) => v !== EMPTY);
@@ -88,16 +84,12 @@ export function clearBackground(grid) {
   return grid;
 }
 
-// RGBA pixels of a square (N×S)² image → mural (N strings, same format as data/maps.js).
-// Each cell is voted by its S×S pixels: each votes for its closest palette color ('.' if alpha < 128),
-// the majority wins.
-// Options: saturation and contrast (1 = unchanged), maxColors (keep the K most used colors),
-// cleanup (cleanIsolated), transparentBg (clearBackground).
+// RGBA pixels of a square (N×S)² image → mural: each cell takes the majority vote of its S×S pixels (closest palette color, '.' if alpha < 128).
 export function pixelsToMap(data, N, palette, { saturation = 1, contrast = 1, maxColors = Infinity, cleanup = false, transparentBg = false } = {}) {
   const W = Math.round(Math.sqrt(data.length / 4)), S = W / N;
   const { letters, lab } = paletteLab(palette), n = letters.length;
 
-  // 1) every pixel to OKLab, with settings applied once (there may be two votes)
+  // Settings applied once: there may be two votes.
   const px = new Float32Array(W * W * 3), clear = new Uint8Array(W * W);
   for (let p = 0; p < W * W; p++) {
     if (data[p * 4 + 3] < 128) { clear[p] = 1; continue; }
@@ -107,7 +99,6 @@ export function pixelsToMap(data, N, palette, { saturation = 1, contrast = 1, ma
     px[p * 3 + 2] = B * saturation;
   }
 
-  // 2) vote cell by cell; usage = votes per color over the whole image
   const vote = (allowed) => {
     const usage = new Float64Array(n), grid = [];
     const tally = new Uint16Array(n + 1); // last slot = empty cell
@@ -131,7 +122,7 @@ export function pixelsToMap(data, N, palette, { saturation = 1, contrast = 1, ma
 
   let { grid, usage } = vote([...lab.keys()]);
 
-  // 3) too many colors: keep the K most used and vote again
+  // Too many colors: keep the most used ones and vote again.
   const used = [...usage.keys()].filter((i) => usage[i] > 0).sort((a, b) => usage[b] - usage[a]);
   if (used.length > maxColors) grid = vote(used.slice(0, Math.max(1, maxColors))).grid;
 

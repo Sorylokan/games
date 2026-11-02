@@ -22,8 +22,7 @@ export function start(li) {
   store.set(STORAGE.level, li);
 }
 
-// Custom mural (editor or shared link), or community mural if mural.author is set.
-// Doesn't touch adventure progress.
+// Editor, shared link, or community mural (mural.author set); doesn't touch adventure progress.
 export function startCustom(mural) {
   launch(customLevel(mural), null);
 }
@@ -80,7 +79,6 @@ export function place(qi, el) {
   renderUI();
 }
 
-// Advances the game by dt seconds.
 export function update(now, dt) {
   const st = app.st;
   if (st.status !== 'play') return;

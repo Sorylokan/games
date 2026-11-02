@@ -1,6 +1,4 @@
 // Garden: gnomes, and now and then a snail.
-// Each function draws the species standing, centered on (0, 0), 30 units = 1 cell.
-// ph: animation phase, flip: 1 or -1 (direction), carry: carried pixel color or null.
 import { ctx, tile, dot, rr } from '../canvas.js';
 
 export function drawGnome(ph, flip, carry) {

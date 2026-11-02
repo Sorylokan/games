@@ -1,7 +1,5 @@
-// Pixel palette: one uppercase letter per color, used in murals (data/maps.js) and share codes
-// (core/mural-code.js only accepts A-Z, so 26 colors max). Grouped by family = editor palette order.
-// Never change a letter (murals and shared codes depend on it); the hex value can be tweaked.
-// Free letters: E, U.
+// Pixel palette: one letter A-Z per color (share codes only accept A-Z, so 26 max), grouped by family in editor palette order.
+// Never change a letter (murals and shared codes depend on it); hex values can be tweaked. Free letters: E, U.
 
 export const COLORS = {
   // neutrals

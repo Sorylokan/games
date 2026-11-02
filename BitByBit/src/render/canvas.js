@@ -48,7 +48,6 @@ export function tile(px, py, size, color, alpha = 1) {
   ctx.globalAlpha = 1;
 }
 
-// Filled circle.
 export function dot(x, y, r, c) {
   ctx.fillStyle = c;
   ctx.beginPath();

@@ -1,5 +1,4 @@
-// Pixel grid rules (no browser APIs, testable with node).
-// A grid g is an N×N array of color letters, null for an empty cell.
+// Pixel grid rules, without browser APIs (testable with node). A grid g is an N×N array of color letters, null for an empty cell.
 import { MAX_OUT } from '../config.js';
 
 export const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -9,11 +8,9 @@ export const pick = (arr, rnd = Math.random) => arr[Math.floor(rnd() * arr.lengt
 export const clone = (g) => g.map((r) => r.slice());
 export const remaining = (g) => g.reduce((s, r) => s + r.filter(Boolean).length, 0);
 
-// Mural (rows of letters) → grid.
 export const parseMap = (map) => map.map((row) => [...row].map((ch) => (ch === '.' ? null : ch)));
 
-// Free cells connected to the outside. The grid has a 1-cell border (coordinates -1 and N),
-// hence an (N+2)×(N+2) array.
+// Free cells connected to the outside, in an (N+2)×(N+2) array: the grid has a 1-cell border (coordinates -1 and N).
 export function outsideMap(g, N) {
   const W = N + 2, seen = new Uint8Array(W * W), stack = [[-1, -1]];
   const free = (r, c) => r < 0 || c < 0 || r >= N || c >= N || !g[r][c];
@@ -32,7 +29,7 @@ export function outsideMap(g, N) {
   return seen;
 }
 
-// Pixels a carrier can reach: filled, with a neighbor in the outside area. Optional color filter.
+// Pixels a carrier can reach: filled, with a neighbor in the outside area.
 export function reachable(g, N, color) {
   const W = N + 2, out = outsideMap(g, N), res = [];
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
@@ -43,12 +40,10 @@ export function reachable(g, N, color) {
   return res;
 }
 
-// Column of the path cell (row N, under the mural) where carriers from slot i of `slots` enter.
-// Shared with the game (game/geometry.js) so the generator picks pixels like the real carriers.
+// Column (row N, under the mural) where carriers from slot i enter; shared with game/geometry.js so the generator picks pixels like the real carriers.
 export const entryCol = (i, slots, N) => Math.max(-1, Math.min(N, Math.floor(-1 + (i + 0.5) * (N + 2) / slots)));
 
-// Walking distance from an entry cell to every free cell (the 1-cell border counts as free).
-// Returns d(r, c) for a pixel: steps to stand next to it, or -1 if out of reach.
+// Returns d(r, c): walking steps from `entry` to stand next to pixel (r, c), or -1 if out of reach.
 export function distancesFrom(g, N, entry) {
   const W = N + 2, d = new Int32Array(W * W).fill(-1), q = [entry];
   const free = (r, c) => r < 0 || c < 0 || r >= N || c >= N || !g[r][c];
@@ -74,8 +69,7 @@ export function distancesFrom(g, N, entry) {
   };
 }
 
-// A box picks up pixels of its color, up to k, like the carriers: the nearest to its entry cell,
-// MAX_OUT at a time. Mutates g, returns the count.
+// A box picks up to k pixels of its color like the carriers: the nearest to its entry, MAX_OUT at a time. Mutates g, returns the count.
 export function collect(g, N, color, k, entry = [N, Math.floor(N / 2)]) {
   let n = 0;
   while (n < k) {
@@ -92,8 +86,7 @@ export function collect(g, N, color, k, entry = [N, Math.floor(N / 2)]) {
   return n;
 }
 
-// Lets every box on the line collect until nothing moves. line: one entry per slot, null or { color, rem }.
-// Returns the line with full boxes removed (their slot becomes null).
+// Lets every box on the line (null or { color, rem } per slot) collect until nothing moves; full boxes leave their slot.
 export function settle(g, N, line) {
   let changed = true;
   while (changed) {

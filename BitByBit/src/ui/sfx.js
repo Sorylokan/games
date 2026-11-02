@@ -78,7 +78,6 @@ export function win() {
   [...a.chord, a.chord[0] + 12, a.chord[2] + 12].forEach((m, i) => pluck(a, m + 12, t + i * 0.09, 0.07));
 }
 
-// Button + saved choice.
 export function initSfx(button) {
   const render = () => button.setAttribute('aria-pressed', String(enabled));
   render();

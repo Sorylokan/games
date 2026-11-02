@@ -1,5 +1,4 @@
-/* Base: default (Night) theme colors, font, buttons, selects.
-   Other themes only redefine --bg, --card, --accent, --line, --txt, --mut. */
+/* Base: default (Night) theme colors, font, buttons, selects. Other themes only redefine --bg, --card, --accent, --line, --txt, --mut. */
 
 :root {
   --bg: #0a0e18;

@@ -11,7 +11,7 @@ import { drawFox, drawHedgehog } from './autumn.js';
 import { drawGhost, drawBat } from './halloween.js';
 import { drawElf, drawSnowman } from './xmas.js';
 
-// Species drawn standing (they flip with the direction instead of rotating).
+// Species drawn standing, flipped with the direction instead of rotated: draw(ph, flip, carry, a), centered on (0, 0), 30 units = 1 cell.
 const UPRIGHT = {
   crab: drawCrab, hermit: drawHermit,
   fairy: drawFairy, wisp: drawWisp,

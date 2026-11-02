@@ -7,8 +7,7 @@ export const BOX_OPEN_MS = 280;  // delay before a placed box sends its first ca
 export const BOX_CLOSE_MS = 500; // fade-out time of an emptied box
 export const QUEUE_COUNT = 3;    // number of box queues
 
-// localStorage keys. The "pc-" prefix comes from the old name ("Petite Colonie"):
-// kept so players don't lose their progress.
+// localStorage keys. The "pc-" prefix comes from the old name ("Petite Colonie"), kept so players don't lose their progress.
 export const STORAGE = {
   level: 'pc-level',
   best: 'pc-best',

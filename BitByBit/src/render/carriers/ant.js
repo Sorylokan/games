@@ -1,5 +1,4 @@
-// Ant (Classic, Spring, Summer, Winter themes). Top view, rotated to face its heading,
-// drawn in the theme's text color.
+// Ant (Classic, Spring, Summer, Winter themes): top view, rotated to face its heading, drawn in the theme's text color.
 import { app } from '../../game/state.js';
 import { toScreen } from '../../game/geometry.js';
 import { ctx, tile } from '../canvas.js';

@@ -4,11 +4,10 @@ import { clone, remaining, reachable, collect, settle, entryCol, rand, pick, par
 const QUEUES = 3;
 const PACKET = [4, 12]; // default pixels per box (see packetFor in data/levels.js)
 
-// Total boxes: bounds the loops below (at most one box placed per step).
+// Total boxes: caps the play loop (at most one box placed per step).
 const boxCount = (queues) => queues.reduce((s, q) => s + q.length, 0);
 
-// One valid order to take the mural apart, in single-color packets of lo..hi pixels, collected from
-// `entry` (the first slot's entry: placed one at a time, the boxes replay this exactly).
+// One valid take-apart order, in single-color packets collected from `entry` (the first slot's: placed one at a time, the boxes replay it exactly).
 export function buildSequence(target, N, rnd = Math.random, [lo, hi] = PACKET, entry = undefined) {
   const g = clone(target), seq = [];
   let guard = remaining(g) + 1; // each pass removes at least one pixel
@@ -21,15 +20,21 @@ export function buildSequence(target, N, rnd = Math.random, [lo, hi] = PACKET, e
   return seq;
 }
 
-// Two simulated careful players; if either wins, the level is solvable. The line has `slots` slots
-// (carriers leave from their slot, as in the game) but at most `limit` boxes may sit on it at once.
+// Solvable if either careful player wins. Carriers leave from their own slot, but at most `limit` boxes may sit on the line at once.
 export function solvable(target, N, queues, slots, limit = slots) {
   return play(target, N, queues, slots, limit, mostUseful) || play(target, N, queues, slots, limit, inOrder);
 }
 
+// Win rate of a player placing boxes at random, over `runs` games. Lower = harder level.
+export function randomWins(target, N, queues, slots, runs, rnd = Math.random) {
+  let wins = 0;
+  for (let k = 0; k < runs; k++) if (play(target, N, queues, slots, slots, atRandom(rnd))) wins++;
+  return wins / runs;
+}
+
 const used = (line) => line.filter(Boolean).length;
 
-// Player 1: always places the box that unlocks the most.
+// Careful player 1: places the box that unlocks the most.
 function mostUseful(g, N, qs, line, free) {
   let best = null;
   qs.forEach((q, qi) => {
@@ -44,8 +49,7 @@ function mostUseful(g, N, qs, line, free) {
   return best ? best.qi : -1;
 }
 
-// Player 2: places boxes in the order the mural was taken apart (box.order, see buildSequence).
-// Wins where player 1 gets lost, e.g. a big one-color background with details inside.
+// Careful player 2: follows the take-apart order (box.order). Wins where player 1 gets lost, e.g. a big one-color background with details inside.
 function inOrder(g, N, qs) {
   let best = -1;
   qs.forEach((q, qi) => {
@@ -54,8 +58,15 @@ function inOrder(g, N, qs) {
   return best;
 }
 
-// A box goes on the first free slot, as in the game.
-function play(target, N, queues, slots, limit, pick) {
+function atRandom(rnd) {
+  return (_g, _N, qs) => {
+    const open = [...qs.keys()].filter((qi) => qs[qi].length);
+    return open.length ? pick(open, rnd) : -1;
+  };
+}
+
+// Boxes go on the first free slot, like session.place does.
+function play(target, N, queues, slots, limit, choose) {
   const g = clone(target), qs = queues.map((q) => q.slice());
   let line = Array(slots).fill(null);
   for (let step = 0, max = boxCount(qs) + 1; step < max; step++) {
@@ -63,7 +74,7 @@ function play(target, N, queues, slots, limit, pick) {
     if (!remaining(g)) return true;
     const free = line.indexOf(null);
     if (free < 0 || used(line) >= limit) return false;
-    const qi = pick(g, N, qs, line, free);
+    const qi = choose(g, N, qs, line, free);
     if (qi < 0) return false;
     const a = qs[qi].shift();
     line[free] = { color: a.color, rem: a.count };
@@ -71,25 +82,7 @@ function play(target, N, queues, slots, limit, pick) {
   return false;
 }
 
-// Win rate of a player placing boxes at random over `runs` games. Lower = harder level.
-export function randomWins(target, N, queues, slots, runs, rnd = Math.random) {
-  let wins = 0;
-  for (let k = 0; k < runs; k++) {
-    const g = clone(target), qs = queues.map((q) => q.slice());
-    let line = Array(slots).fill(null);
-    for (let step = 0, max = boxCount(qs) + 1; step < max; step++) {
-      line = settle(g, N, line);
-      if (!remaining(g)) { wins++; break; }
-      const open = qs.filter((q) => q.length), free = line.indexOf(null);
-      if (free < 0 || !open.length) break;
-      const a = pick(open, rnd).shift();
-      line[free] = { color: a.color, rem: a.count };
-    }
-  }
-  return wins / runs;
-}
-
-// No queue may start empty: move the last box of the longest queue into it.
+// No queue starts empty: it takes the last box of the longest one.
 function fillEmptyQueues(qs) {
   for (const q of qs) {
     if (q.length) continue;
@@ -104,8 +97,7 @@ function fairStart(target, N, qs) {
   return qs.some((q) => q.length && colors.has(q[0].color));
 }
 
-// Candidate queues: a valid order, slightly shuffled, dealt at random between queues.
-// Must be solvable with `margin` slots fewer than the player has (default 1: a spare slot).
+// Candidate queues: a valid order, slightly shuffled, dealt at random. Must stay solvable with `margin` slots to spare (default 1).
 function candidate(target, N, lvl, nextId, rnd) {
   const attempts = N > 32 ? 4 : N > 16 ? 12 : 40; // each one costs more on a big grid
   for (let attempt = 0; attempt < attempts; attempt++) {
@@ -124,8 +116,7 @@ function candidate(target, N, lvl, nextId, rnd) {
 
 const firstEntry = (lvl, N) => [N, entryCol(0, lvl.cap, N)];
 
-// Full level: the grid and the box queues, keeping the hardest of `lvl.tries` candidates.
-// lvl comes from data/levels.js; nextId gives each box a unique id.
+// Full level: among `lvl.tries` candidates, the one whose random win rate is closest to `lvl.aim` (default 0 = hardest).
 export function generate(lvl, nextId, rnd = Math.random) {
   const N = lvl.map.length;
   const target = parseMap(lvl.map);

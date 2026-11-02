@@ -20,16 +20,14 @@ export function setBackgroundOpacity(v) { bg.opacity = v; draw(); }
 export function setBackgroundVisible(v) { bg.visible = v; draw(); }
 export const hasBackground = () => !!bg.img;
 
-// "Contain" fit of the image in an s×s square. Shared by the preview and the conversion
-// so both use exactly the same framing.
+// "Contain" fit in an s×s square, shared by the preview and the conversion so both use exactly the same framing.
 function fitImage(img, s) {
   const k = Math.min(s / img.width, s / img.height);
   const w = img.width * k, h = img.height * k;
   return { k, x: (s - w) / 2, y: (s - h) / 2, w, h };
 }
 
-// RGBA pixels of the background image scaled to (N×S)², S samples per cell side, or null if no image.
-// Margins around a non-square image stay transparent.
+// Background image scaled to (N×S)² RGBA pixels (S samples per cell side); margins around a non-square image stay transparent.
 export function imagePixels(N, S = 1) {
   if (!bg.img) return null;
   const side = N * S;

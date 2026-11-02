@@ -1,5 +1,4 @@
-// Lofi background music, generated live (Web Audio, no audio files).
-// Every bar is drawn a little ahead of time: chords, bass, drums, a sparse melody, vinyl crackle.
+// Lofi background music generated live with Web Audio, each bar scheduled a little ahead: chords, bass, drums, a sparse melody, vinyl crackle.
 import { STORAGE } from '../config.js';
 import { store } from '../storage.js';
 
@@ -307,8 +306,7 @@ export function setTension(on) {
   tensionTarget = on ? 1 : 0;
 }
 
-// For the sound effects (sfx.js): the audio context, their output, and the chord being heard
-// (Cmaj9 without music). Null until the browser allows sound.
+// For sfx.js: the audio context, their output, and the chord being heard (Cmaj9 without music). Null until the browser allows sound.
 export function audio() {
   if (!ctx && !setup()) return null;
   if (ctx.state === 'suspended' && !document.hidden) ctx.resume();
@@ -316,7 +314,7 @@ export function audio() {
   return { ctx, out: sfxBus, chord: now ? now.keys : CHORDS[2].keys };
 }
 
-// Button + saved choice. Browsers only allow sound after a click or a key press.
+// Browsers only allow sound after a click or a key press.
 export function initMusic(button) {
   const render = () => button.setAttribute('aria-pressed', String(enabled));
   render();
@@ -329,7 +327,6 @@ export function initMusic(button) {
   const unlock = () => play();
   window.addEventListener('pointerdown', unlock, { once: true });
   window.addEventListener('keydown', unlock, { once: true });
-  // Paused while the tab is hidden.
   document.addEventListener('visibilitychange', () => {
     if (!ctx) return;
     if (document.hidden) ctx.suspend(); else ctx.resume();

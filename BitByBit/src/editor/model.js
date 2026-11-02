@@ -1,5 +1,4 @@
-// Editor model: the mural being edited, tools and undo history. No DOM.
-// The grid is N×N color letters, '.' for empty.
+// Editor model, without DOM: the mural being edited (N×N color letters, '.' for empty), tools and undo history.
 import { MIN_SIZE, MAX_SIZE, DEFAULT_SLOTS, cleanName } from '../core/mural-code.js';
 import { DIRS } from '../core/grid.js';
 

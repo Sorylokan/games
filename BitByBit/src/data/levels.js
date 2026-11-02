@@ -2,8 +2,7 @@
 import { MAPS } from './maps.js';
 import { DEFAULT_SLOTS } from '../core/mural-code.js';
 
-// Every 10th level (10, 20…) is a boss: no rescue slot, tense music. It keeps the spare slot:
-// carriers' timing varies a little in the real game, and without it a boss could become unwinnable.
+// Every 10th level is a boss: no rescue slot, tense music. It keeps the spare slot: carriers' timing varies in the real game, and without it a boss could become unwinnable.
 export const BOSS_EVERY = 10;
 export const isBoss = (i) => (i + 1) % BOSS_EVERY === 0;
 
@@ -26,8 +25,7 @@ export function levelAt(i) {
   };
 }
 
-// Pixels per box: 4–12 up to 24×24. Beyond, boxes grow with the area so a big mural needs about
-// as many boxes as a 24×24 one (and generates fast).
+// Pixels per box: 4–12 up to 24×24; beyond, boxes grow with the area so a big mural needs about as many boxes as a 24×24 one (and generates fast).
 export function packetFor(N) {
   const k = Math.max(1, (N / 24) ** 2);
   return [Math.round(4 * k), Math.round(12 * k)];
@@ -37,8 +35,7 @@ export function packetFor(N) {
 const maxTries = (N) => (N > 32 ? 2 : N > 16 ? 4 : N > 12 ? 12 : 24);
 const runsFor = (N) => (N > 32 ? 6 : 12);
 
-// Level for a custom or community mural (`author` set for community ones). Medium difficulty,
-// with the slot count chosen in the editor.
+// Custom or community mural (`author` set): medium difficulty, with the slot count chosen in the editor.
 export function customLevel({ name, map, slots = DEFAULT_SLOTS, author = null }) {
   const N = map.length;
   return {

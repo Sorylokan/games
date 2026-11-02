@@ -1,5 +1,4 @@
-// Custom murals: short share codes, and export for data/maps.js.
-// Only needs btoa/atob/TextEncoder (also in Node 18+).
+// Custom murals: short share codes, and export for data/maps.js. Only needs btoa/atob/TextEncoder (also in Node 18+).
 import { COLORS } from '../data/colors.js';
 
 export const MIN_SIZE = 4;
@@ -32,7 +31,7 @@ export function unrle(s, maxLen = MAX_SIZE * MAX_SIZE) {
   while (pos < s.length) {
     re.lastIndex = pos;
     const m = re.exec(s);
-    if (!m) return null; // unreadable chunk
+    if (!m) return null;
     const n = Number(m[1]);
     if (!n || out.length + n > maxLen) return null;
     out += m[2].repeat(n);
@@ -91,7 +90,6 @@ export function decodeMural(code) {
 export const slugify = (name) => cleanName(name).replace(/œ/gi, 'oe').replace(/æ/gi, 'ae').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'mural';
 
-// Entry to paste into data/maps.js, plus its translation line.
 export function toMapsSnippet({ name, map, slots = DEFAULT_SLOTS }) {
   const id = slugify(name);
   const rows = map.map((r) => `    '${r}',`).join('\n');

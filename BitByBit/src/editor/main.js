@@ -22,8 +22,7 @@ function status(key, vars, isError = false) {
   if (key) statusTimer = setTimeout(() => { el.textContent = ''; }, 3500);
 }
 
-// Click-twice confirmation (no "are you sure?" dialog): the 1st click changes the label,
-// a 2nd click within 3 s runs the action.
+// Click-twice confirmation instead of an "are you sure?" dialog: the 1st click changes the label, a 2nd within 3 s runs the action.
 function confirmable(btn, needConfirm, action) {
   let armed = null;
   btn.addEventListener('click', () => {
@@ -168,7 +167,6 @@ function renderAll() {
   draw();
 }
 
-// After every drawing change: save the draft, refresh info and canvas.
 function changed() {
   library.saveDraft(toMural(), ed.editingId);
   renderInfo();
@@ -192,8 +190,7 @@ const convOptions = () => ({
   transparentBg: $('convTransparent').checked,
 });
 
-// A conversion "series" lasts until the grid is edited by hand: a single snapshot() at the start,
-// so one Ctrl+Z goes back to before the conversion, whatever settings were tried.
+// A conversion "series" lasts until the grid is edited by hand, with one snapshot() at the start: one Ctrl+Z undoes it, whatever settings were tried.
 const inSeries = () => lastConverted !== null && toMap().join('|') === lastConverted;
 
 function convert() {

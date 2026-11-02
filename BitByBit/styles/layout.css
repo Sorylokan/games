@@ -20,8 +20,7 @@
 /* Board + column */
 .table { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, 1fr); gap: 18px; align-items: start; }
 
-/* Mobile: one column, box queues right under the mural (where the thumb is), info and rules after.
-   Tighter spacing so everything fits without scrolling. */
+/* Mobile: one column, box queues right under the mural (where the thumb is), info and rules after, tighter so everything fits without scrolling. */
 @media (max-width: 780px) {
   .table { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .topbar { padding-block: 10px; margin-bottom: 10px; }
