@@ -12,6 +12,7 @@ export const STORAGE = {
   skin: 'bbb-skin',     // the language key ('bbb-lang') lives in src/i18n.js
   music: 'bbb-music',
   sfx: 'bbb-sfx',
+  awake: 'bbb-awake',
   murals: 'bbb-murals', // editor: saved murals and the current draft
   draft: 'bbb-draft',
 };

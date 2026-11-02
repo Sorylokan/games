@@ -17,6 +17,7 @@ import { initLangSelect, initialLang, setLang } from './ui/lang.js';
 import { initMusic } from './ui/music.js';
 import { initSfx } from './ui/sfx.js';
 import { initSpeed, setSpeed } from './ui/speed.js';
+import { initAwake } from './ui/awake.js';
 
 // --- interface ---
 initPanel(place);
@@ -24,6 +25,7 @@ initMusic($('music'));
 initSfx($('sfx'));
 initSkinSelect(setSkin);
 initLangSelect(changeLang);
+initAwake($('awake'));
 
 // <details> only closes from its own button; a tap anywhere else should close the ⚙ menu too.
 const settings = document.querySelector('.settings');
