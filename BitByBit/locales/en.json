@@ -1,8 +1,8 @@
 {
   "bar.back": "All games",
   "boss.title": "Boss mural!",
-  "boss.text": "{name}, in its toughest version: no rescue slot this time. Take your time.",
-  "boss.go": "Let's go",
+  "boss.text": "{name} stands ready for you. No joker here: if the colony gets stuck, it's back to square one.",
+  "boss.go": "Take the challenge",
   "boss.badge": "boss",
   "bar.settings": "Settings",
   "bar.lang": "Language",

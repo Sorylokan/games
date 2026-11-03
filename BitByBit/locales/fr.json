@@ -1,8 +1,8 @@
 {
   "bar.back": "Tous les jeux",
   "boss.title": "Fresque boss !",
-  "boss.text": "{name}, dans sa version la plus coriace : pas d'emplacement de secours cette fois. Prends ton temps.",
-  "boss.go": "C'est parti",
+  "boss.text": "{name} t'attend de pied ferme. Ici, pas de joker : si la colonie se coince, retour à la case départ.",
+  "boss.go": "Relever le défi",
   "boss.badge": "boss",
   "bar.settings": "Réglages",
   "bar.lang": "Langue",
