@@ -11,14 +11,8 @@
     "en": "Carriers (ants, crabs, fairies, foxes…) take apart a pixel-art mural. Place their boxes in the right order: if no one can reach their colour anymore, the colony is stuck."
   },
   "tags": {
-    "fr": ["Solo", "9 fresques", "12 thèmes"],
-    "en": ["Solo", "9 murals", "12 themes"]
-  },
-  "fonts": ["Fredoka:wght@600", "Nunito:wght@400;700"],
-  "badge": "⚠ BETA ⚠",
-  "warning": {
-    "fr": "À vos risques et périls : ça peut bugger !",
-    "en": "At your own risk: it may be buggy!"
+    "fr": ["Solo", "50 fresques", "12 thèmes"],
+    "en": ["Solo", "50 murals", "12 themes"]
   },
   "button": { "fr": "Jouer →", "en": "Play →" },
 
