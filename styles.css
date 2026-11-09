@@ -137,6 +137,22 @@ h1 i { font-style: normal; color: var(--pop); text-shadow: 4px 4px 0 rgba(245, 2
 .tg.on { background: var(--tg-on); }
 .tg-label { text-align: center; }
 
+/* "regions" preview: districts with thick edges between them, lanterns lighting up on hover (colors in the JSON, --regions-*) */
+.preview-regions { width: 100%; max-width: 15rem; align-self: center; margin: .5rem 0; display: flex; flex-direction: column; gap: .7rem; }
+.regions-grid { display: grid; border: 2px solid var(--regions-edge, #000); border-radius: 8px; overflow: hidden; }
+.regions-grid i { aspect-ratio: 1; display: grid; place-items: center; background: var(--c); }
+.regions-grid .t { border-top: 2px solid var(--regions-edge, #000); }
+.regions-grid .b { border-bottom: 2px solid var(--regions-edge, #000); }
+.regions-grid .l { border-left: 2px solid var(--regions-edge, #000); }
+.regions-grid .r { border-right: 2px solid var(--regions-edge, #000); }
+/* lantern: ribbed paper body, a cap on each end */
+.regions-grid b { position: relative; width: 44%; height: 56%; border-radius: 50%; background: repeating-linear-gradient(to bottom, transparent 0 20%, rgba(90, 20, 10, .35) 20% 25%), var(--regions-lantern, #e2402b); transform: scale(0); transition: transform .3s ease, box-shadow .3s ease; }
+.regions-grid b::before, .regions-grid b::after { content: ""; position: absolute; left: 20%; right: 20%; height: 14%; border-radius: 2px; background: var(--regions-cap, #2a1a14); }
+.regions-grid b::before { top: -7%; }
+.regions-grid b::after { bottom: -7%; }
+.tile:hover .regions-grid b, .tile:focus-visible .regions-grid b { transform: scale(1); box-shadow: 0 0 10px var(--regions-glow, #ffcf7a); transition-delay: var(--d); }
+.regions-label { text-align: center; }
+
 /* Footer */
 footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem 2rem; margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--line); color: var(--mut); font-size: .95rem; }
 footer p { margin: 0; max-width: 38rem; }
@@ -147,6 +163,6 @@ footer a:hover { color: var(--ink); border-color: var(--txt); }
   /* cancel transforms/animations added by card_*.json */
   .tile, .tile:hover { transform: none !important; }
   .badge, .grid > li, .spotlight { animation: none !important; }
-  .tile, .cell-in, .tg, .px { transition: none !important; }
+  .tile, .cell-in, .tg, .px, .regions-grid b { transition: none !important; }
   .tile:hover .px, .tile:focus-visible .px { transform: none; opacity: 1; }
 }

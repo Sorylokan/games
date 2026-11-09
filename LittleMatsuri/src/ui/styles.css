@@ -68,18 +68,22 @@ select { font: inherit; font-size: 13px; color: var(--txt); background: var(--bg
 .cell.edge-l { border-left: 2px solid #05060d; }
 .cell.edge-r { border-right: 2px solid #05060d; }
 
-.cell svg { width: 70%; height: 70%; overflow: visible; }
-.cell .body { fill: var(--accent); }
-.cell .cap { fill: #2a1a14; }
-.cell .ribs { stroke: rgba(80, 30, 10, .45); stroke-width: 1; fill: none; }
-.cell .string { stroke: #2a1a14; stroke-width: 1.2; }
+/* Lantern of the icon; caps and string in gold here, dark ones vanished on the night districts. */
+.cell svg { position: absolute; inset: 10%; width: 80%; height: 80%; overflow: visible; } /* absolute: the tall lantern must not stretch the square cell */
+.cell .body { fill: #e2402b; }
+.cell .ribs { stroke: #a92a18; stroke-width: 6; }
+.cell .flower { fill: #fbf3e4; }
+.cell .heart { fill: #e2402b; }
+.cell .cap { fill: #e8b54a; }
+.cell .string { stroke: #e8b54a; stroke-width: 8; stroke-linecap: round; }
 .cell[data-mark="1"] svg { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--glow) 70%, transparent)); }
 .cell .x { font-size: clamp(10px, 3.2vmin, 22px); color: rgba(255, 255, 255, .55); }
 .cell.auto .x { color: rgba(255, 255, 255, .25); } /* automatic cross, lighter than one the player placed */
 
-/* Two lanterns breaking a rule glow red; a lantern a hint proved wrong gets a solid red ring. */
-.cell.bad .body { fill: #ff8a7a; }
-.cell.bad svg { filter: drop-shadow(0 0 5px var(--warn)); }
+/* Two lanterns breaking a rule go out (grey) inside a red glow, a red lantern alone wouldn't stand out; a lantern a hint proved wrong gets a solid red ring. */
+.cell.bad .body, .cell.bad .heart { fill: #8a8590; }
+.cell.bad .ribs { stroke: #6a6570; }
+.cell.bad svg { filter: drop-shadow(0 0 6px var(--warn)); }
 .cell.wrong { box-shadow: inset 0 0 0 3px var(--warn); }
 
 .cell.hinted { animation: hinted 1.2s ease-out; }

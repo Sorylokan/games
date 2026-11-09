@@ -149,6 +149,26 @@ const PREVIEWS = {
     );
   },
 
+  // Grid of colored districts (one letter per district, colors: letter → color); on hover the lanterns ([row, col]) light up one by one.
+  regions: (p) => {
+    const at = (r, c) => p.map[r]?.[c];
+    const cells = p.map
+      .flatMap((row, r) =>
+        [...row].map((ch, c) => {
+          const edges = [["t", r - 1, c], ["b", r + 1, c], ["l", r, c - 1], ["r", r, c + 1]].filter(([, rr, cc]) => at(rr, cc) !== undefined && at(rr, cc) !== ch).map(([e]) => e);
+          const k = p.lanterns.findIndex(([lr, lc]) => lr === r && lc === c);
+          return `<i class="${edges.join(" ")}" style="--c:${p.colors[ch]}">${k < 0 ? "" : `<b style="--d:${k * 180}ms"></b>`}</i>`;
+        })
+      )
+      .join("");
+    return (
+      `<div class="preview preview-regions" aria-hidden="true">` +
+      `<div class="regions-grid" style="grid-template-columns: repeat(${p.map[0].length}, 1fr)">${cells}</div>` +
+      (p.label ? `<span class="regions-label">${tr(p.label)}</span>` : "") +
+      `</div>`
+    );
+  },
+
   // Switch-grid demo (initToggle). Full config passed via data-config; the HTML only has empty cells.
   toggle: (p) =>
     `<div class="preview preview-toggle" aria-hidden="true" data-config="${encodeURIComponent(JSON.stringify(p))}">` +

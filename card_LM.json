@@ -1,0 +1,73 @@
+{
+  "title": "Little Matsuri",
+  "path": "LittleMatsuri/",
+  "mode": "solo",
+  "tagline": {
+    "fr": "Un petit puzzle de logique sous les lampions.",
+    "en": "A little logic puzzle under the lanterns."
+  },
+  "description": {
+    "fr": "Suspends un lampion dans chaque quartier : un seul par ligne et par colonne, et jamais deux qui se touchent. Quand tout est juste, le quartier s'illumine.",
+    "en": "Hang one lantern in each district: only one per row and per column, and never two touching. Get it right and the whole district lights up."
+  },
+  "tags": {
+    "fr": ["Solo", "Logique", "6×6 à 10×10"],
+    "en": ["Solo", "Logic", "6×6 to 10×10"]
+  },
+  "fonts": ["Fraunces:opsz,wght@9..144,500;9..144,700"],
+  "badge": "⚠ BETA ⚠",
+  "warning": {
+    "fr": "À vos risques et périls : ça peut bugger !",
+    "en": "At your own risk: it may be buggy!"
+  },
+  "button": { "fr": "Tester →", "en": "Try it →" },
+
+  "style": {
+    "--accent": "#e2402b",
+    "--moon": "#f2e6c4",
+    "--line": "#2b3050",
+    "--regions-edge": "#05060d",
+    "--regions-lantern": "#e2402b",
+    "--regions-cap": "#e8b54a",
+    "--regions-glow": "#ffcf7a",
+    "background": "radial-gradient(18rem 18rem at 100% 0%, rgba(242,230,196,.12), transparent 70%), #0f1020",
+    "color": "#d6d9ea",
+    "border": "1px solid var(--line)",
+    "borderRadius": "12px",
+    "padding": "1.5rem",
+    "fontFamily": "Georgia, serif",
+    "transition": "border-color .2s"
+  },
+
+  "css": [
+    "&:hover { border-color: var(--accent); }",
+    "h2 { margin: 0; font: 700 clamp(2rem, 5vw, 2.6rem)/1.05 Fraunces, Georgia, serif; color: var(--moon); }",
+    ".tagline { font-style: italic; color: #8a8fae; }",
+    ".regions-label { color: #8a8fae; font-size: .85rem; font-style: italic; }",
+    ".tags span { padding: .1rem .6rem; border: 1px solid var(--line); border-radius: 6px; font-size: .85rem; }",
+    ".go { padding: .5rem 1.3rem; color: var(--moon); background: var(--accent); border-radius: 8px; }",
+    "&:hover .go { background: #f05a40; }"
+  ],
+
+  "preview": {
+    "type": "regions",
+    "label": { "fr": "Survole pour allumer les lampions", "en": "Hover to light the lanterns" },
+    "map": [
+      "AAAAAA",
+      "CAABBB",
+      "CCCBBB",
+      "DCCBBE",
+      "DDFBEE",
+      "FFFEEE"
+    ],
+    "lanterns": [[0, 3], [1, 5], [2, 2], [3, 0], [4, 4], [5, 1]],
+    "colors": {
+      "A": "#3d4f7a",
+      "B": "#6b4a73",
+      "C": "#3f6a5e",
+      "D": "#7a5a3d",
+      "E": "#4c6b8a",
+      "F": "#7a4a4f"
+    }
+  }
+}

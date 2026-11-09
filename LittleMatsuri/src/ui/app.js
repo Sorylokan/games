@@ -13,7 +13,17 @@ let locale = initialLocale();
 // game = { n, regions, marks, possible, wrong: Set of red lanterns, hintsLeft, hintReadyAt, won }
 let game = null;
 
-const LANTERN_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path class="string" d="M12 1v3"/><rect class="cap" x="8" y="4" width="8" height="2" rx="1"/><path class="body" d="M7 9c0-2 2-3 5-3s5 1 5 3v6c0 2-2 3-5 3s-5-1-5-3z"/><path class="ribs" d="M7 12h10M7 15h10"/><rect class="cap" x="8" y="18" width="8" height="2" rx="1"/><path class="string" d="M12 20v3"/></svg>';
+// Same lantern as assets/icon.svg (same coordinates), cropped to the lantern.
+const PETAL = "M0 -0.1C-0.42 -0.35 -0.4 -0.9 -0.12 -0.98L0 -0.82L0.12 -0.98C0.4 -0.9 0.42 -0.35 0 -0.1z";
+const LANTERN_SVG =
+  '<svg viewBox="128 48 256 424" aria-hidden="true">' +
+  '<path class="string" d="M256 52v52M256 430v18"/>' +
+  '<ellipse class="body" cx="256" cy="265" rx="118" ry="148"/>' +
+  '<path class="ribs" d="M165 170h182M144 218h224M145 314h222M167 362h178"/>' +
+  `<g class="flower" transform="translate(256 265) scale(62)">${[0, 72, 144, 216, 288].map((a) => `<path d="${PETAL}" transform="rotate(${a})"/>`).join("")}<circle class="heart" r="0.14"/></g>` +
+  '<rect class="cap" x="188" y="100" width="136" height="30" rx="10"/><rect class="cap" x="188" y="400" width="136" height="30" rx="10"/>' +
+  '<path class="cap" d="M244 448h24l-4 20h-16z"/>' +
+  "</svg>";
 
 // ---- Games ----
 
