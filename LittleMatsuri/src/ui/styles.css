@@ -1,0 +1,101 @@
+/* Provisional look (the art direction comes later): a night district, districts in muted colors, warm lanterns. */
+
+:root {
+  --bg: #0f1020;
+  --card: #171a2e;
+  --line: #2b3050;
+  --txt: #d6d9ea;
+  --mut: #8a8fae;
+  --accent: #f29f58;
+  --glow: #ffcf7a;
+  --warn: #ef5b5b;
+  --display: "Fraunces", Georgia, serif;
+  /* one color per district, dim enough for lanterns to stand out */
+  --r0: #3d4f7a; --r1: #6b4a73; --r2: #3f6a5e; --r3: #7a5a3d; --r4: #4c6b8a;
+  --r5: #7a4a4f; --r6: #5a6b3f; --r7: #4a4a7a; --r8: #7a6a4a; --r9: #3f5f6a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0; min-height: 100dvh; color: var(--txt); font: 15px/1.45 Georgia, serif;
+  background: radial-gradient(circle at 80% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 40%), var(--bg);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+
+button { font: inherit; color: var(--accent); background: none; border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+button:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+button:disabled { opacity: .5; cursor: default; }
+button.ghost { border-color: var(--line); color: var(--txt); }
+button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+select { font: inherit; font-size: 13px; color: var(--txt); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+
+.app { max-width: 1000px; margin: 0 auto; padding-block: 0 28px; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
+
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 14px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.brand-group { display: flex; align-items: center; gap: 10px; }
+.brand { font: 700 21px var(--display); color: var(--accent); }
+.icon-btn { display: inline-flex; padding: 7px; border: 1px solid var(--line); border-radius: 8px; color: var(--txt); }
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+.icon-btn svg { width: 18px; height: 18px; }
+
+.table { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(240px, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 760px) { .table { grid-template-columns: minmax(0, 1fr); gap: 12px; } .topbar { padding-block: 10px; margin-bottom: 12px; } }
+
+.card, .board-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.card h2 { margin: 0 0 10px; font: 700 15px var(--display); color: var(--accent); }
+.side { display: flex; flex-direction: column; gap: 12px; }
+.sizes, .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions { margin-top: 12px; }
+.rules p, .rules ul { margin: 0; color: var(--mut); font-size: 14px; }
+.rules ul { padding-left: 18px; margin-top: 6px; }
+
+/* Board */
+#board { display: grid; grid-template-columns: repeat(var(--n), 1fr); aspect-ratio: 1; width: 100%; max-width: min(100%, 72dvh); margin: 0 auto; border: 2px solid #05060d; border-radius: 6px; overflow: hidden; user-select: none; }
+
+.cell {
+  position: relative; display: grid; place-items: center; padding: 0; border: 0; border-radius: 0; aspect-ratio: 1;
+  background: var(--region); color: var(--txt);
+  box-shadow: inset 0 0 0 .5px rgba(0, 0, 0, .25);
+  transition: background .3s, filter .3s;
+}
+.cell:hover:not(:disabled) { background: color-mix(in srgb, var(--region) 80%, white); }
+.cell.edge-t { border-top: 2px solid #05060d; }
+.cell.edge-b { border-bottom: 2px solid #05060d; }
+.cell.edge-l { border-left: 2px solid #05060d; }
+.cell.edge-r { border-right: 2px solid #05060d; }
+
+.cell svg { width: 70%; height: 70%; overflow: visible; }
+.cell .body { fill: var(--accent); }
+.cell .cap { fill: #2a1a14; }
+.cell .ribs { stroke: rgba(80, 30, 10, .45); stroke-width: 1; fill: none; }
+.cell .string { stroke: #2a1a14; stroke-width: 1.2; }
+.cell[data-mark="1"] svg { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--glow) 70%, transparent)); }
+.cell .x { font-size: clamp(10px, 3.2vmin, 22px); color: rgba(255, 255, 255, .55); }
+.cell.auto .x { color: rgba(255, 255, 255, .25); } /* automatic cross, lighter than one the player placed */
+
+/* Two lanterns breaking a rule glow red; a lantern a hint proved wrong gets a solid red ring. */
+.cell.bad .body { fill: #ff8a7a; }
+.cell.bad svg { filter: drop-shadow(0 0 5px var(--warn)); }
+.cell.wrong { box-shadow: inset 0 0 0 3px var(--warn); }
+
+.cell.hinted { animation: hinted 1.2s ease-out; }
+@keyframes hinted { from { filter: brightness(1.8); } to { filter: none; } }
+
+/* Solved: the districts warm up and every lantern glows. */
+#board.won .cell { background: color-mix(in srgb, var(--region) 70%, var(--glow)); }
+#board.won .cell[data-mark="1"] svg { animation: glow 1.6s ease-in-out infinite alternate; }
+#board.won .cell .x { opacity: 0; }
+@keyframes glow { from { filter: drop-shadow(0 0 4px var(--glow)); } to { filter: drop-shadow(0 0 14px var(--glow)); } }
+
+/* Win window */
+.overlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 16px; background: rgba(5, 6, 13, .55); }
+.modal { width: min(380px, 100%); padding: 22px 24px; background: var(--card); border: 1px solid var(--accent); border-radius: 12px; text-align: center; }
+.modal h2 { margin: 0 0 6px; font: 700 26px var(--display); color: var(--accent); }
+.modal p { margin: 0; color: var(--mut); }
+.modal .actions { justify-content: center; margin-top: 16px; }
+
+@media (prefers-reduced-motion: reduce) { .cell.hinted, #board.won .cell[data-mark="1"] svg { animation: none; } }

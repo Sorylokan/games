@@ -1,0 +1,6 @@
+{
+  "name": "little-matsuri",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test" }
+}
