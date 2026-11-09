@@ -27,8 +27,22 @@ const LANTERN_SVG =
 
 // ---- Games ----
 
+// A big grid takes up to ~1 s to generate on a phone, so the next one is made while the player is busy with the current one.
+const spare = new Map();
+
+function prepare(n) {
+  if (!n || spare.has(n)) return;
+  setTimeout(() => { if (!spare.has(n)) spare.set(n, generate(n)); }, 300); // after the new grid is painted
+}
+
+function take(n) {
+  const g = spare.get(n) || generate(n);
+  spare.delete(n);
+  return g;
+}
+
 function start(n) {
-  const g = generate(n);
+  const g = take(n);
   game = {
     n, regions: g.regions, marks: new Array(n * n).fill(EMPTY), possible: possibleCells(n, g.regions),
     wrong: new Set(), hintsLeft: HINTS_PER_GRID, hintReadyAt: 0, won: false,
@@ -36,6 +50,7 @@ function start(n) {
   $("win").hidden = true;
   buildBoard();
   render();
+  prepare(n);
 }
 
 function play(i, next) {
@@ -73,6 +88,7 @@ function showWin() {
   if (next) $("win-next").textContent = t("win.next", { size: `${next}×${next}` });
   $("win-again").textContent = t("win.again", { size: `${n}×${n}` });
   $("win").hidden = false;
+  prepare(next);
 }
 
 // ---- Drawing ----

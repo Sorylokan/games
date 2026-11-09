@@ -1,12 +1,12 @@
 // Game flow: start a level, place boxes, move carriers, win or get stuck.
 import { BASE_SPEED, SPAWN_MS, MAX_OUT, BOX_OPEN_MS, BOX_CLOSE_MS, STORAGE } from '../config.js';
 import { clone, remaining } from '../core/grid.js';
-import { generate } from '../core/generator.js';
+import { levelData, prepare } from './levelgen.js';
 import { levelAt, customLevel, isEndOfSeries } from '../data/levels.js';
 import { encodeMural } from '../core/mural-code.js';
 import { pickCarrier } from '../data/skins.js';
 import { store } from '../storage.js';
-import { app, nextId } from './state.js';
+import { app } from './state.js';
 import { findTarget, pathLen } from './pathfinding.js';
 import { resize } from '../render/canvas.js';
 import { renderUI, shake } from '../ui/panel.js';
@@ -27,8 +27,13 @@ export function startCustom(mural) {
   launch(customLevel(mural), null);
 }
 
-function launch(lvl, li) {
-  const { N, target, queues } = generate(lvl, nextId);
+let launching = 0;
+
+async function launch(lvl, li) {
+  const ticket = ++launching;
+  if (app.st) app.st.status = 'wait';
+  const { N, target, queues } = await levelData(lvl, li);
+  if (ticket !== launching) return; // the player asked for another level meanwhile
   app.st = {
     li, lvl, N, target, queues,
     grid: clone(target),
@@ -53,9 +58,14 @@ function launch(lvl, li) {
       { label: t('boss.go'), fn: () => { app.st.status = 'play'; hideOverlay(); renderUI(); } },
     ]);
   }
+  if (li !== null) prepare(li + 1, levelAt(li + 1));
 }
 
-export const restart = () => (app.st.lvl.custom ? launch(app.st.lvl, null) : start(app.st.li));
+export const restart = () => {
+  if (!app.st) return; // first level still being built
+  if (app.st.lvl.custom) launch(app.st.lvl, null);
+  else start(app.st.li);
+};
 
 // End-of-game actions for custom murals.
 const editLink = () => { location.href = './editor/#edit=' + encodeMural(app.st.lvl); };
