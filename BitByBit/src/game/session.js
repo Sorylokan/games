@@ -58,6 +58,7 @@ async function launch(lvl, li) {
       { label: t('boss.go'), fn: () => { app.st.status = 'play'; hideOverlay(); renderUI(); } },
     ]);
   }
+  if (li !== null && lvl.boss) prepare(li, lvl); // no joker on a boss, so "Restart" comes often and its new mural is the slowest to build
   if (li !== null) prepare(li + 1, levelAt(li + 1));
 }
 

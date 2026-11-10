@@ -1,0 +1,30 @@
+/* Jardin fleuri: pink dusk; ten plots of clearly different hues and no green, so the sprouts stand out and every pansy (same hue, brighter) differs. */
+:root[data-theme="flowers"] {
+  --bg: #2a1c2a; --card: #362536; --line: #4e3550; --txt: #f0e2e6; --mut: #b59cab;
+  --accent: #f28ab8; --glow: #ffd6e8; --edge: #140a12;
+  --r0: hsl(0 34% 38%); --r1: hsl(22 34% 38%); --r2: hsl(42 34% 38%); --r3: hsl(190 34% 38%); --r4: hsl(212 34% 38%);
+  --r5: hsl(235 34% 38%); --r6: hsl(262 34% 38%); --r7: hsl(288 34% 38%); --r8: hsl(315 34% 38%); --r9: hsl(340 34% 38%);
+  --f0: hsl(0 90% 70%); --f1: hsl(22 90% 70%); --f2: hsl(42 90% 70%); --f3: hsl(190 90% 70%); --f4: hsl(212 90% 70%);
+  --f5: hsl(235 90% 70%); --f6: hsl(262 90% 70%); --f7: hsl(288 90% 70%); --f8: hsl(315 90% 70%); --f9: hsl(340 90% 70%);
+}
+
+.cell .stem { stroke: #5fae4a; stroke-width: 7; stroke-linecap: round; fill: none; }
+.cell .leaves { fill: #7ccc5c; }
+.cell .bloom { transform: scale(0); transform-box: fill-box; transform-origin: center; }
+.cell .back { fill: color-mix(in srgb, var(--flower) 75%, black); }
+.cell .petals { fill: var(--flower); }
+.cell .eye { fill: #2a1e28; opacity: .55; }
+.cell .bloom .heart { fill: #f5c518; }
+.cell.bad .stem { stroke: #6a6570; }
+.cell.bad .leaves { fill: #8a8590; }
+
+/* The win wave: each sprout gives way to its pansy, from the top left corner to the bottom right one. */
+#board.won .cell .sprout { animation: wilt .3s var(--wave) ease-in both; }
+#board.won .cell .bloom { animation: bloom .5s var(--wave) ease-out both; }
+@keyframes bloom { from { transform: scale(0); } 70% { transform: scale(1.15); } to { transform: scale(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  #board.won .cell .sprout, #board.won .cell .bloom { animation: none; }
+  #board.won .cell .sprout { opacity: 0; }
+  #board.won .cell .bloom { transform: none; }
+}

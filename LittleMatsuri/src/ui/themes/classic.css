@@ -1,0 +1,27 @@
+/* Classique: a night district, districts in muted colors, warm lanterns. Also the default look before a theme is set. */
+:root {
+  --bg: #0f1020; --card: #171a2e; --line: #2b3050; --txt: #d6d9ea; --mut: #8a8fae;
+  --accent: #f29f58; --glow: #ffcf7a; --edge: #05060d;
+  /* dim enough for lanterns to stand out */
+  --r0: #3d4f7a; --r1: #6b4a73; --r2: #3f6a5e; --r3: #7a5a3d; --r4: #4c6b8a;
+  --r5: #7a4a4f; --r6: #5a6b3f; --r7: #4a4a7a; --r8: #7a6a4a; --r9: #3f5f6a;
+}
+
+/* Caps and string in gold: dark ones, as on the icon, vanished on the night districts. */
+.cell .body { fill: #e2402b; }
+.cell .ribs { stroke: #a92a18; stroke-width: 6; }
+.cell .flower { fill: #fbf3e4; }
+.cell .heart { fill: #e2402b; }
+.cell .cap { fill: #e8b54a; }
+.cell .string { stroke: #e8b54a; stroke-width: 8; stroke-linecap: round; }
+/* A red lantern alone wouldn't stand out inside the red glow, so a lantern breaking a rule goes out. */
+.cell.bad .body, .cell.bad .heart { fill: #8a8590; }
+.cell.bad .ribs { stroke: #6a6570; }
+
+/* Only lanterns shine; solved, the districts warm up and every lantern glows. */
+:root[data-theme="classic"] .cell:not(.bad)[data-mark="1"] svg { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--glow) 70%, transparent)); }
+:root[data-theme="classic"] #board.won .cell { background: color-mix(in srgb, var(--region) 70%, var(--glow)); }
+:root[data-theme="classic"] #board.won .cell[data-mark="1"] svg { animation: glow 1.6s ease-in-out infinite alternate; }
+@keyframes glow { from { filter: drop-shadow(0 0 4px var(--glow)); } to { filter: drop-shadow(0 0 14px var(--glow)); } }
+
+@media (prefers-reduced-motion: reduce) { :root[data-theme="classic"] #board.won .cell[data-mark="1"] svg { animation: none; } }

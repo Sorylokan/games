@@ -1,18 +1,8 @@
-/* Provisional look (the art direction comes later): a night district, districts in muted colors, warm lanterns. */
+/* Shared by every theme; each theme's colors, piece styles and win animation live in themes/<key>.css. */
 
 :root {
-  --bg: #0f1020;
-  --card: #171a2e;
-  --line: #2b3050;
-  --txt: #d6d9ea;
-  --mut: #8a8fae;
-  --accent: #f29f58;
-  --glow: #ffcf7a;
   --warn: #ef5b5b;
   --display: "Fraunces", Georgia, serif;
-  /* one color per district, dim enough for lanterns to stand out */
-  --r0: #3d4f7a; --r1: #6b4a73; --r2: #3f6a5e; --r3: #7a5a3d; --r4: #4c6b8a;
-  --r5: #7a4a4f; --r6: #5a6b3f; --r7: #4a4a7a; --r8: #7a6a4a; --r9: #3f5f6a;
   color-scheme: dark;
 }
 
@@ -42,6 +32,16 @@ select { font: inherit; font-size: 13px; color: var(--txt); background: var(--bg
 .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
 .icon-btn svg { width: 18px; height: 18px; }
 
+.settings { position: relative; }
+.settings > summary { list-style: none; cursor: pointer; }
+.settings > summary::-webkit-details-marker { display: none; }
+.settings[open] > summary { border-color: var(--accent); color: var(--accent); }
+.settings > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.settings-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 10; display: grid; gap: 10px; min-width: 180px; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0, 0, 0, .35); }
+.settings-menu label { display: grid; gap: 4px; font-size: 13px; color: var(--mut); }
+.settings-menu .check { display: flex; align-items: center; gap: 8px; color: var(--txt); cursor: pointer; }
+.settings-menu .check input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+
 .table { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(240px, 1fr); gap: 18px; align-items: start; }
 @media (max-width: 760px) { .table { grid-template-columns: minmax(0, 1fr); gap: 12px; } .topbar { padding-block: 10px; margin-bottom: 12px; } }
 
@@ -54,7 +54,7 @@ select { font: inherit; font-size: 13px; color: var(--txt); background: var(--bg
 .rules ul { padding-left: 18px; margin-top: 6px; }
 
 /* Board */
-#board { display: grid; grid-template-columns: repeat(var(--n), 1fr); aspect-ratio: 1; width: 100%; max-width: min(100%, 72dvh); margin: 0 auto; border: 2px solid #05060d; border-radius: 6px; overflow: hidden; user-select: none; }
+#board { display: grid; grid-template-columns: repeat(var(--n), 1fr); aspect-ratio: 1; width: 100%; max-width: min(100%, 72dvh); margin: 0 auto; border: 2px solid var(--edge); border-radius: 6px; overflow: hidden; user-select: none; }
 
 .cell {
   position: relative; display: grid; place-items: center; padding: 0; border: 0; border-radius: 0; aspect-ratio: 1;
@@ -63,37 +63,26 @@ select { font: inherit; font-size: 13px; color: var(--txt); background: var(--bg
   transition: background .3s, filter .3s;
 }
 .cell:hover:not(:disabled) { background: color-mix(in srgb, var(--region) 80%, white); }
-.cell.edge-t { border-top: 2px solid #05060d; }
-.cell.edge-b { border-bottom: 2px solid #05060d; }
-.cell.edge-l { border-left: 2px solid #05060d; }
-.cell.edge-r { border-right: 2px solid #05060d; }
+.cell.edge-t { border-top: 2px solid var(--edge); }
+.cell.edge-b { border-bottom: 2px solid var(--edge); }
+.cell.edge-l { border-left: 2px solid var(--edge); }
+.cell.edge-r { border-right: 2px solid var(--edge); }
 
-/* Lantern of the icon; caps and string in gold here, dark ones vanished on the night districts. */
 .cell svg { position: absolute; inset: 10%; width: 80%; height: 80%; overflow: visible; } /* absolute: the tall lantern must not stretch the square cell */
-.cell .body { fill: #e2402b; }
-.cell .ribs { stroke: #a92a18; stroke-width: 6; }
-.cell .flower { fill: #fbf3e4; }
-.cell .heart { fill: #e2402b; }
-.cell .cap { fill: #e8b54a; }
-.cell .string { stroke: #e8b54a; stroke-width: 8; stroke-linecap: round; }
-.cell[data-mark="1"] svg { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--glow) 70%, transparent)); }
 .cell .x { font-size: clamp(10px, 3.2vmin, 22px); color: rgba(255, 255, 255, .55); }
 .cell.auto .x { color: rgba(255, 255, 255, .25); } /* automatic cross, lighter than one the player placed */
 
-/* Two lanterns breaking a rule go out (grey) inside a red glow, a red lantern alone wouldn't stand out; a lantern a hint proved wrong gets a solid red ring. */
-.cell.bad .body, .cell.bad .heart { fill: #8a8590; }
-.cell.bad .ribs { stroke: #6a6570; }
+/* Pieces breaking a rule go grey (in each theme's file) inside a red glow; a piece a hint proved wrong gets a solid red ring. */
 .cell.bad svg { filter: drop-shadow(0 0 6px var(--warn)); }
 .cell.wrong { box-shadow: inset 0 0 0 3px var(--warn); }
 
 .cell.hinted { animation: hinted 1.2s ease-out; }
 @keyframes hinted { from { filter: brightness(1.8); } to { filter: none; } }
 
-/* Solved: the districts warm up and every lantern glows. */
-#board.won .cell { background: color-mix(in srgb, var(--region) 70%, var(--glow)); }
-#board.won .cell[data-mark="1"] svg { animation: glow 1.6s ease-in-out infinite alternate; }
 #board.won .cell .x { opacity: 0; }
-@keyframes glow { from { filter: drop-shadow(0 0 4px var(--glow)); } to { filter: drop-shadow(0 0 14px var(--glow)); } }
+/* Building blocks for the themes' win waves, delayed per cell by --wave. */
+@keyframes wilt { to { opacity: 0; } }
+@keyframes appear { to { opacity: 1; } }
 
 /* Win window */
 .overlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 16px; background: rgba(5, 6, 13, .55); }
@@ -102,4 +91,4 @@ select { font: inherit; font-size: 13px; color: var(--txt); background: var(--bg
 .modal p { margin: 0; color: var(--mut); }
 .modal .actions { justify-content: center; margin-top: 16px; }
 
-@media (prefers-reduced-motion: reduce) { .cell.hinted, #board.won .cell[data-mark="1"] svg { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .cell.hinted { animation: none; } }

@@ -1,0 +1,28 @@
+/* Terrier de renard: autumn undergrowth (moss, bark, pine, ochre, heather, stone…), no orange plot so the foxes stand out. */
+:root[data-theme="fox"] {
+  --bg: #16180f; --card: #20221a; --line: #353829; --txt: #ece4cf; --mut: #a9a38c;
+  --accent: #f18f26; --glow: #ffd983; --edge: #0a0b06;
+  --r0: #4a5a32; --r1: #5e4636; --r2: #2f5446; --r3: #75643a; --r4: #4f3f4e;
+  --r5: #5f6a34; --r6: #3e4a52; --r7: #6e4a40; --r8: #53604f; --r9: #6a5a52;
+}
+
+.cell .fur { fill: #f18f26; }
+.cell .ear-in { fill: #7a2a12; }
+.cell .cream { fill: #fff3dc; }
+.cell .blush { fill: #ff8fa3; opacity: .75; }
+.cell .ink { fill: #272b2b; }
+.cell .shine { fill: #fff; }
+.cell .mouth, .cell .eyes-happy { stroke: #272b2b; stroke-width: 2.2; fill: none; stroke-linecap: round; }
+.cell .eyes-happy { stroke-width: 4; opacity: 0; }
+.cell.bad .fur { fill: #8a8590; }
+.cell.bad .ear-in { fill: #6a6570; }
+
+/* The win wave: each fox closes its eyes happily, from the top left corner to the bottom right one. */
+#board.won .cell .eyes-open { animation: wilt .15s var(--wave) both; }
+#board.won .cell .eyes-happy { animation: appear .15s var(--wave) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  #board.won .cell .eyes-open, #board.won .cell .eyes-happy { animation: none; }
+  #board.won .cell .eyes-open { opacity: 0; }
+  #board.won .cell .eyes-happy { opacity: 1; }
+}

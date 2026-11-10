@@ -37,13 +37,11 @@ function withIds(g) {
 const ahead = new Map();
 
 export function prepare(li, lvl) {
-  if (ahead.has(li)) return;
-  ahead.clear();
-  ahead.set(li, build(lvl));
+  if (!ahead.has(li)) ahead.set(li, build(lvl));
 }
 
 export function levelData(lvl, li = null) {
   const p = (li !== null && ahead.get(li)) || build(lvl);
-  ahead.delete(li);
+  if (li !== null) for (const k of ahead.keys()) if (k <= li) ahead.delete(k);
   return p.then(withIds);
 }

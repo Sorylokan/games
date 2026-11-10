@@ -1,0 +1,13 @@
+/* Potager: dusk over the plots, earth and green soils, carrot orange. */
+:root[data-theme="garden"] {
+  --bg: #1e1520; --card: #2a1e28; --line: #46323e; --txt: #eadfd0; --mut: #a8968c;
+  --accent: #f08a24; --glow: #ffd28a; --edge: #1a120a;
+  --r0: #5b4a32; --r1: #4f5d34; --r2: #6e5236; --r3: #5d6b3c; --r4: #7a6440;
+  --r5: #465a3e; --r6: #6a5a2e; --r7: #4a5530; --r8: #75583a; --r9: #586240;
+}
+
+.cell .root { fill: #f08a24; }
+.cell .leaf { stroke: #5fae4a; stroke-width: 7; stroke-linecap: round; fill: none; }
+.cell .lines { stroke: #c8611b; stroke-width: 3; stroke-linecap: round; }
+.cell.bad .root { fill: #8a8590; }
+.cell.bad .lines, .cell.bad .leaf { stroke: #6a6570; }
